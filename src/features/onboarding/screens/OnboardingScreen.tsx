@@ -1,25 +1,61 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView } from 'react-native';
+import { View, Text, Image, SafeAreaView } from 'react-native';
+import { Button } from '@components/atoms/Button';
 import { styles } from './OnboardingScreen.styles';
-import { Button } from '@/components/atoms/Button';
+
+const STEPS = [
+  { title: "Your Title Goes", highlight: "Here", desc: "You can schedule your work with us more easily" },
+  { title: "Smart Local", highlight: "Player", desc: "Organize your music library automatically" },
+  { title: "High Quality", highlight: "Audio", desc: "Experience your FLAC and MP3 files like never before" },
+  { title: "Ready to", highlight: "Start?", desc: "Give us permissions to scan your music" },
+];
 
 const OnboardingScreen = ({ navigation }: any) => {
-  const [step, setStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNext = () => {
+    if (currentStep < STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      navigation.replace('Main');
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Step {step}</Text>
-        <Text style={styles.description}>Simulating professional structure...</Text>
-      </View>
-
-      <View style={styles.footer}>
-        <Button 
-          title={step === 4 ? "GET STARTED" : "NEXT"} 
-          onPress={() => step === 4 ? navigation.replace('Main') : setStep(step + 1)} 
+    <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image 
+          source={require('@/assets/img/handset.jpg')} 
+          style={styles.image} 
         />
       </View>
-    </SafeAreaView>
+      <View style={styles.content}>
+        <Text style={styles.title}>
+          {STEPS[currentStep].title}{'\n'}
+          <Text style={styles.titleAccent}>{STEPS[currentStep].highlight}</Text>
+        </Text>
+        
+        <Text style={styles.description}>
+          {STEPS[currentStep].desc}
+        </Text>
+        <View style={styles.pagination}>
+          {STEPS.map((_, i) => (
+            <View 
+              key={i} 
+              style={[styles.dot, currentStep === i && styles.activeDot]} 
+            />
+          ))}
+        </View>
+      </View>
+      <SafeAreaView style={styles.footer}>
+        <Button 
+          title={currentStep === STEPS.length - 1 ? "GET STARTED" : "Next"} 
+          onPress={handleNext}
+          style={styles.buttonOverride}
+          textColor='white'
+        />
+      </SafeAreaView>
+    </View>
   );
 };
 

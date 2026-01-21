@@ -1,5 +1,5 @@
 export const Colors = {
-  primary: '#00E5FF',
+  primary: '#372add',
   background: '#0F0F0F', 
   surface: '#1A1A1A', 
   text: '#FFFFFF',
@@ -8,4 +8,7 @@ export const Colors = {
   success: '#4CAF50',
   white: '#FFFFFF',
   black: '#000000',
+  accent: '#A5A6F6',
+  muted: '#F5F5F5',
+  darkGrey: '#333333',
 };
