@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, Image, SafeAreaView } from 'react-native';
 import { Button } from '@components/atoms/Button';
 import { styles } from './OnboardingScreen.styles';
@@ -25,7 +25,7 @@ const OnboardingScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <Image 
-          source={require('@/assets/img/handset.jpg')} 
+          source={require('@assets/img/handset.jpg')} 
           style={styles.image} 
         />
       </View>
