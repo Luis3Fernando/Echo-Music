@@ -9,7 +9,11 @@
       "@assets/*": ["src/presentation/assets/*"],
       "@features/*": ["src/presentation/features/*"],
       "@navigation/*": ["src/presentation/navigation/*"],
-      "@theme/*": ["src/core/theme/*"]
+      "@theme/*": ["src/core/theme/*"],
+      "@models/*": ["src/domain/models/*"],
+      "@mocks/*": ["src/domain/mocks/*"],
+      "@repository/*": ["src/domain/repository/*"],
+      "@hooks/*": ["src/logic/hooks/*"]
     }
   }
 }

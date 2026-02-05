@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Image, SafeAreaView } from 'react-native';
 import { Button } from '@components/atoms/Button';
-import { styles } from './OnboardingScreen.styles';
+import { styles } from '../styles/OnboardingScreen.styles';
 
 const STEPS = [
   { title: "Your Title Goes", highlight: "Here", desc: "You can schedule your work with us more easily" },
