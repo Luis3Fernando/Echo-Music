@@ -12,8 +12,10 @@
       "@theme/*": ["src/core/theme/*"],
       "@models/*": ["src/domain/models/*"],
       "@mocks/*": ["src/domain/mocks/*"],
+      "@database/*": ["src/domain/database/*"],
       "@repository/*": ["src/domain/repository/*"],
-      "@hooks/*": ["src/logic/hooks/*"]
+      "@hooks/*": ["src/logic/hooks/*"],
+      "@services/*": ["src/logic/services/*"],
     }
   }
 }
