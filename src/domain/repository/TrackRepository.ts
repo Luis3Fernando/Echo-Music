@@ -20,13 +20,20 @@ export const TrackRepository = {
     }
   },
 
-  async updateMetadata(id: string, meta: Partial<RawTrack>) {
+  async updateMetadata(id: string, meta: any) {
     const query = `
       UPDATE tracks 
-      SET artist = ?, album = ?, genre = ?, year = ?, artwork_uri = ?, is_processed = 1 
+      SET title = COALESCE(?, title), 
+          artist = ?, 
+          album = ?, 
+          genre = ?, 
+          year = ?, 
+          artwork_uri = ?, 
+          is_processed = 1 
       WHERE id = ?
     `;
     await db.runAsync(query, [
+      meta.title ?? null,
       meta.artist ?? null,
       meta.album ?? null,
       meta.genre ?? null,
@@ -44,7 +51,21 @@ export const TrackRepository = {
 
   async getAllProcessed(): Promise<RawTrack[]> {
     return await db.getAllAsync<RawTrack>(
-      "SELECT id, file_uri as url, title, artist, album, artwork_uri as artworkUri, duration FROM tracks WHERE is_processed = 1 ORDER BY date_added DESC"
+      `SELECT 
+        id, 
+        file_uri AS url, 
+        title, 
+        artist, 
+        album, 
+        duration,
+        artwork_uri AS artworkUri 
+      FROM tracks 
+      WHERE is_processed = 1 
+      ORDER BY title ASC`,
     );
-  }
+  },
+
+  async deleteAll() {
+    await db.execAsync("DELETE FROM tracks");
+  },
 };

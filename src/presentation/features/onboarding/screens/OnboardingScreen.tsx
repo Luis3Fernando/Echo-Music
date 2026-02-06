@@ -10,6 +10,7 @@ import {
 import { Button } from "@/presentation/components/atoms/Button";
 import { usePermissions } from "@hooks/usePermissions";
 import { styles } from "../styles/OnboardingScreen.styles";
+import { ScannerService } from "@services/ScannerService";
 
 const STEPS = [
   {
@@ -42,16 +43,21 @@ const OnboardingScreen = ({ navigation }: any) => {
   const isLastStep = currentStep === STEPS.length - 1;
 
   const handleNext = async () => {
-    if (isPermissionStep && !isGranted) {
-      const success = await askForPermissions();
-      if (success) {
-        setCurrentStep(currentStep + 1);
+    if (isPermissionStep) {
+      if (!isGranted) {
+        const success = await askForPermissions();
+        if (success) {
+          ScannerService.startFullScan();
+          setCurrentStep(currentStep + 1);
+        } else {
+          Alert.alert(
+            "Permisos Necesarios",
+            "Para continuar, Echo Music requiere acceso a tus archivos de audio.",
+            [{ text: "Entendido" }]
+          );
+        }
       } else {
-        Alert.alert(
-          "Permisos Necesarios",
-          "Para continuar, Echo Music requiere acceso a tus archivos de audio desde los ajustes del sistema.",
-          [{ text: "Entendido" }]
-        );
+        setCurrentStep(currentStep + 1);
       }
       return;
     }

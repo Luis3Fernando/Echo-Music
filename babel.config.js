@@ -20,6 +20,7 @@ module.exports = function(api) {
             '@repository': './src/domain/repository',
             '@hooks': './src/logic/hooks',
             '@services': './src/logic/services',
+            '@state': './src/logic/state',
           },
         },
       ],
