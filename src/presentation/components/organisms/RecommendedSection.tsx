@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Dimensions, StyleSheet, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { Colors } from '@theme/colors';
-import Banner from '../atoms/Banner';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+  StyleSheet,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from "react-native";
+import { Colors } from "@theme/colors";
+import Banner from "../atoms/Banner";
 
-const { width } = Dimensions.get('window');
-const ITEM_WIDTH = width - 20; // Ajuste para ver un poco del siguiente item
+const { width } = Dimensions.get("window");
+const ITEM_WIDTH = width - 20;
 
 const RecommendedSection = ({ data }: { data: any[] }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -17,37 +25,35 @@ const RecommendedSection = ({ data }: { data: any[] }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Canciones Recomendadas</Text>
-      
+      <Text style={styles.label}>Canciones recomendadas</Text>
+
       <FlatList
         data={data}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={ITEM_WIDTH + 10} // Snap al ancho del item + gap
+        snapToInterval={ITEM_WIDTH + 10}
         decelerationRate="fast"
         onScroll={onScroll}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <View style={{ width: ITEM_WIDTH, marginRight: 10 }}>
-            <Banner 
-              type={item.type} 
-              data={item.data} 
-              onPress={() => console.log("Play", item.data.title)} 
+            <Banner
+              type={item.type}
+              data={item.data}
+              onPress={() => console.log("Play", item.data.title)}
             />
           </View>
         )}
       />
-
-      {/* Indicador de posición (Puntos) */}
       <View style={styles.pagination}>
         {data.map((_, index) => (
-          <View 
-            key={index} 
+          <View
+            key={index}
             style={[
-              styles.dot, 
-              activeIndex === index ? styles.activeDot : styles.inactiveDot
-            ]} 
+              styles.dot,
+              activeIndex === index ? styles.activeDot : styles.inactiveDot,
+            ]}
           />
         ))}
       </View>
@@ -60,19 +66,18 @@ const styles = StyleSheet.create({
   label: {
     color: Colors.textSecondary,
     fontSize: 11,
-    fontWeight: '800',
-    textTransform: 'uppercase',
+    fontWeight: "800",
     letterSpacing: 1.5,
     marginBottom: 5,
-    paddingHorizontal: 15, // Alineado con el header
+    paddingHorizontal: 15,
   },
   listContent: {
-    paddingHorizontal: 10, // Ese padding de 1 casi pegado al borde
+    paddingHorizontal: 10,
   },
   pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 5,
   },
   dot: {
@@ -81,7 +86,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   activeDot: {
-    width: 15, // Alargado para toque moderno/punk
+    width: 15,
     backgroundColor: Colors.primary,
   },
   inactiveDot: {
