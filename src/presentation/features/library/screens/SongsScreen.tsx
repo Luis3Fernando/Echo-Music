@@ -74,9 +74,8 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   listContent: {
-    paddingBottom: 100, // Espacio para un futuro mini-reproductor
+    paddingBottom: 100,
   },
-  // Banner de Escaneo
   scanBanner: {
     backgroundColor: "#1e1e1e",
     padding: 16,
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   scanPercent: {
-    color: "#1DB954", // Verde acento
+    color: "#1DB954",
     fontWeight: "bold",
   },
   progressBarBackground: {
@@ -114,7 +113,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "right",
   },
-  // Items de la Lista
   songItem: {
     flexDirection: "row",
     paddingVertical: 8,
@@ -154,7 +152,6 @@ const styles = StyleSheet.create({
     color: "#b3b3b3",
     fontSize: 13,
   },
-  // Empty State
   emptyState: {
     flex: 1,
     marginTop: 100,

@@ -62,13 +62,13 @@ class ScannerServiceClass {
       let processed = 0;
 
       for (const track of pending) {
-        await new Promise((resolve) => setTimeout(resolve, 1));
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
         try {
-          await new Promise((resolve) => setTimeout(resolve, 1));
+          await new Promise((resolve) => setTimeout(resolve, 50)); // Respiro para la UI
 
           const isFlac = track.url.toLowerCase().endsWith(".flac");
-          const readSize = isFlac ? 1024 * 1024 * 4 : 1024 * 512;
+          const readSize = isFlac ? 1024 * 1024 * 3 : 1024 * 512;
 
           const base64 = await FileSystem.readAsStringAsync(track.url, {
             encoding: "base64",
@@ -76,26 +76,27 @@ class ScannerServiceClass {
             length: readSize,
           });
 
-          const buffer = Buffer.from(base64, "base64");
+          await new Promise((resolve) => setTimeout(resolve, 10));
 
+          const buffer = Buffer.from(base64, "base64");
           const metadata = await mmb.parseBuffer(buffer, {
             mimeType: isFlac ? "audio/flac" : "audio/mpeg",
           });
           const { common } = metadata;
 
-          let finalArtworkUri = null;
+          const genre = common.genre && common.genre.length > 0 ? common.genre[0] : null;
+          const trackNumber = common.track?.no || null;
+          const diskNumber = common.disk?.no || null;
 
+          let finalArtworkUri = null;
           if (common.picture && common.picture.length > 0) {
             const pic = common.picture[0];
-            const filename = `thumb_${track.id}.jpg`;
-            const fileUri = `${ARTWORK_CACHE_DIR}${filename}`;
-
+            const fileUri = `${ARTWORK_CACHE_DIR}thumb_${track.id}.jpg`;
             await FileSystem.writeAsStringAsync(
               fileUri,
               Buffer.from(pic.data).toString("base64"),
               { encoding: "base64" },
             );
-
             finalArtworkUri = fileUri;
           }
 
@@ -103,12 +104,15 @@ class ScannerServiceClass {
             title: common.title || track.title,
             artist: common.artist || "Artista Desconocido",
             album: common.album || "Álbum Desconocido",
+            genre: genre,
+            trackNumber: trackNumber, 
+            diskNumber: diskNumber,
             year: common.year || null,
             artworkUri: finalArtworkUri,
             is_processed: 1,
           });
         } catch (error) {
-          console.error(`Error procesando ${track.title}:`, error);
+          console.error(`Error en ${track.title}:`, error);
           await TrackRepository.updateMetadata(track.id, {
             is_processed: 1,
           } as any);
