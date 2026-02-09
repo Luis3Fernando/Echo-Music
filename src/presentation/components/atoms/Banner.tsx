@@ -42,7 +42,6 @@ const Banner = ({ type, data, onPress }: BannerProps) => {
               <Text style={styles.subtitle}>{data.subtitle}</Text>
             )}
           </View>
-
           {isSong && (
             <View style={styles.playButton}>
               <Ionicons name="play" size={18} color={Colors.white} />

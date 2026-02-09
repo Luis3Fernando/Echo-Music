@@ -16,7 +16,6 @@ const ScreenHeader = ({ title, onActionPress, showAction = true }: ScreenHeaderP
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerIndicator} />
       </View>
-      
       {showAction && (
         <TouchableOpacity 
           style={styles.actionButton} 

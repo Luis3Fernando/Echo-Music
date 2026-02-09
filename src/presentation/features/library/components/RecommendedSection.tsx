@@ -9,7 +9,8 @@ import {
   NativeSyntheticEvent,
 } from "react-native";
 import { Colors } from "@theme/colors";
-import Banner from "../atoms/Banner";
+import Banner from "../../../components/atoms/Banner";
+import SectionTitle from "@/presentation/components/atoms/SectionTitle";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width - 20;
@@ -25,8 +26,7 @@ const RecommendedSection = ({ data }: { data: any[] }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Canciones recomendadas</Text>
-
+      <SectionTitle title="Canciones recomendadas" />
       <FlatList
         data={data}
         horizontal
@@ -63,14 +63,6 @@ const RecommendedSection = ({ data }: { data: any[] }) => {
 
 const styles = StyleSheet.create({
   container: { marginTop: 10 },
-  label: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.5,
-    marginBottom: 5,
-    paddingHorizontal: 15,
-  },
   listContent: {
     paddingHorizontal: 10,
   },
