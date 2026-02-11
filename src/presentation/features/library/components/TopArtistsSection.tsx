@@ -38,7 +38,7 @@ const TopArtistsSection = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 25,
+    marginTop: 20,
   },
   listContent: {
     paddingHorizontal: 15,

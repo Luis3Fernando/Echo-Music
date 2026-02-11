@@ -8,6 +8,7 @@ import ScreenHeader from "@components/organisms/ScreenHeader";
 import RecentAlbumsSection from "../components/RecentAlbumsSection";
 import MostPlayedSection from "../components/MostPlayedSection";
 import TopArtistsSection from "../components/TopArtistsSection";
+import LibraryStatsSection from "../components/LibraryStatsSection";
 
 const ExploreScreen = () => {
   const { recommendedTracks, loading } = useRecommendations();
@@ -47,6 +48,7 @@ const ExploreScreen = () => {
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
       <MostPlayedSection />
       <TopArtistsSection />
+      <LibraryStatsSection />
       <View style={{ height: 40 }} />
     </ScrollView>
   );
