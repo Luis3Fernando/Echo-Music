@@ -6,6 +6,7 @@ import { Colors } from "@theme/colors";
 import { useRecommendations } from "@/logic/hooks/useRecommendations";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import RecentAlbumsSection from "@/presentation/features/library/components/RecentAlbumsSection";
+import MostPlayedSection from "../components/MostPlayedSection";
 
 const ExploreScreen = () => {
   const { recommendedTracks, loading } = useRecommendations();
@@ -43,6 +44,7 @@ const ExploreScreen = () => {
         <RecommendedSection data={recommendedTracks} />
       )}
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
+      <MostPlayedSection />
       <View style={{ height: 40 }} />
     </ScrollView>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import AlbumCard from '../../../components/atoms/AlbumCard';
-import SectionTitle from '@/presentation/components/atoms/SectionTitle';
+import { View, FlatList, StyleSheet } from 'react-native';
+import AlbumCard from '@components/atoms/AlbumCard';
+import SectionTitle from '@components/atoms/SectionTitle';
 
 const MOCK_ALBUMS = [
   { 
@@ -67,7 +67,7 @@ const RecentAlbumsSection = ({ isScanning, scanProgress }: { isScanning?: boolea
 };
 
 const styles = StyleSheet.create({
-  section: { marginTop: 25 },
+  section: { marginTop: 20 },
   listContent: { paddingHorizontal: 10, marginTop: 5 }
 });
 
