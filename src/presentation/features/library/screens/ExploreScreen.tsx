@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { ScrollView, ActivityIndicator, View } from "react-native";
 import { styles } from "../styles/ExploreStyles";
-import RecommendedSection from "@/presentation/features/library/components/RecommendedSection";
 import { Colors } from "@theme/colors";
-import { useRecommendations } from "@/logic/hooks/useRecommendations";
+import { useRecommendations } from "@hooks/useRecommendations";
+import RecommendedSection from "../components/RecommendedSection";
 import ScreenHeader from "@components/organisms/ScreenHeader";
-import RecentAlbumsSection from "@/presentation/features/library/components/RecentAlbumsSection";
+import RecentAlbumsSection from "../components/RecentAlbumsSection";
 import MostPlayedSection from "../components/MostPlayedSection";
+import TopArtistsSection from "../components/TopArtistsSection";
 
 const ExploreScreen = () => {
   const { recommendedTracks, loading } = useRecommendations();
@@ -45,6 +46,7 @@ const ExploreScreen = () => {
       )}
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
       <MostPlayedSection />
+      <TopArtistsSection />
       <View style={{ height: 40 }} />
     </ScrollView>
   );
