@@ -1,5 +1,5 @@
 import db from "@/infrastructure/persistence/sqlite/SQLiteClient";
-import { RawTrack } from "@models/Track";
+import { RawTrack } from "@entities/Track";
 
 export const TrackRepository = {
   async saveRawPaths(tracks: Partial<RawTrack>[]) {

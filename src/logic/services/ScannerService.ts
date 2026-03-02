@@ -2,7 +2,7 @@ import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system/legacy";
 import * as mmb from "music-metadata-browser";
 import { Buffer } from "buffer";
-import { TrackRepository } from "@/domain/repository/TrackRepository";
+import { TrackRepository } from "@/infrastructure/repositories/TrackRepository";
 import { useLibraryStore } from "@/logic/state/useLibraryStore";
 
 const ARTWORK_CACHE_DIR = `${FileSystem.cacheDirectory}artworks/`;

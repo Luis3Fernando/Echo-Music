@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PermissionProvider } from '@/domain/storage/PermissionProvider';
+import { PermissionProvider } from '@/infrastructure/persistence/storage/PermissionProvider';
 
 export const usePermissions = () => {
   const [isGranted, setIsGranted] = useState(false);

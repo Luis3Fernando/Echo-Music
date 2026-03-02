@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLibraryStore } from '../../logic/state/useLibraryStore';
-import { TrackRepository } from '@/domain/repository/TrackRepository';
+import { TrackRepository } from '@/infrastructure/repositories/TrackRepository';
 
 export const useLibrary = () => {
   const { 

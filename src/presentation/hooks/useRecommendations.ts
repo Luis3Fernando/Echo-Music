@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrackRepository } from '@/domain/repository/TrackRepository';
+import { TrackRepository } from '@/infrastructure/repositories/TrackRepository';
 
 export const useRecommendations = () => {
   const [recommendedTracks, setRecommendedTracks] = useState<any[]>([]);
