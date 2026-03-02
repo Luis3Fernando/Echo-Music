@@ -12,6 +12,15 @@ export const nativeMediaService = {
       first: 20,
     });
 
-    return media.assets;
+    const filteredAssets = media.assets.filter((asset) => {
+      const durationSeconds = asset.duration || 0;
+      return durationSeconds >= 30;
+    });
+
+    console.log(
+      `[NativeMedia] Encontrados: ${media.assets.length} | Filtrados (música): ${filteredAssets.length}`,
+    );
+
+    return filteredAssets;
   },
 };
