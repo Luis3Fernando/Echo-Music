@@ -1,8 +1,8 @@
+import { Track } from "@/domain/entities/track.entity";
 import db from "@/infrastructure/persistence/sqlite/SQLiteClient";
-import { RawTrack } from "@entities/Track";
 
 export const TrackRepository = {
-  async saveRawPaths(tracks: Partial<RawTrack>[]) {
+  async saveRawPaths(tracks: Partial<Track>[]) {
     const query = `
       INSERT OR IGNORE INTO tracks 
       (id, file_uri, title, duration, is_processed, date_added) 
@@ -43,13 +43,13 @@ export const TrackRepository = {
     ]);
   },
 
-  async getPendingTracks(): Promise<RawTrack[]> {
+  async getPendingTracks(): Promise<Track[]> {
     return await db.getAllAsync<RawTrack>(
       "SELECT id, file_uri as url, title, duration FROM tracks WHERE is_processed = 0",
     );
   },
 
-  async getAllProcessed(): Promise<RawTrack[]> {
+  async getAllProcessed(): Promise<Track[]> {
     return await db.getAllAsync<RawTrack>(
       `SELECT 
         id, 

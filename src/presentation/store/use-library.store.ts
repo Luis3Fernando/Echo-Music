@@ -1,26 +1,29 @@
-import { RawTrack } from '@entities/Track';
 import { create } from 'zustand';
+import { Track } from '@entities/track.entity';
 
 interface LibraryState {
-  tracks: RawTrack[];
   isScanning: boolean;
   scanProgress: number;
   totalTracks: number;
-
-  setScanning: (scanning: boolean) => void;
-  setProgress: (progress: number) => void;
+  tracks: Track[];
+  
+  setScanning: (isScanning: boolean) => void;
+  setScanProgress: (progress: number) => void;
   setTotalTracks: (total: number) => void;
-  setTracks: (tracks: RawTrack[]) => void;
+  setTracks: (tracks: Track[]) => void;
+  resetScan: () => void;
 }
 
 export const useLibraryStore = create<LibraryState>((set) => ({
-  tracks: [],
   isScanning: false,
   scanProgress: 0,
   totalTracks: 0,
+  tracks: [],
 
   setScanning: (isScanning) => set({ isScanning }),
-  setProgress: (scanProgress) => set({ scanProgress }),
+  setScanProgress: (scanProgress) => set({ scanProgress }),
   setTotalTracks: (totalTracks) => set({ totalTracks }),
   setTracks: (tracks) => set({ tracks }),
+  
+  resetScan: () => set({ isScanning: false, scanProgress: 0 }),
 }));

@@ -1,7 +1,5 @@
 import React from "react";
-
 import { View, FlatList, Text, StyleSheet, StatusBar, Image } from "react-native";
-
 import { useLibrary } from "@/presentation/shared/hooks/useLibrary";
 
 export const SongsScreen = () => {
@@ -44,14 +42,14 @@ export const SongsScreen = () => {
               </View>
             )}
 
-            <View style={styles.songInfo}>
-              <Text style={styles.title} numberOfLines={1}>
-                {item.title}
-              </Text>
-              <Text style={styles.artist} numberOfLines={1}>
-                {item.artist || "Artista desconocido"} {item.album ? `• ${item.album}` : ""}
-              </Text>
-            </View>
+           <View style={styles.songInfo}>
+            <Text style={styles.title} numberOfLines={1}>
+              {item.title}
+            </Text>
+            <Text style={styles.artist} numberOfLines={1}>
+              {item.artistName} {item.albumName ? `• ${item.albumName}` : ""}
+            </Text>
+          </View>
           </View>
         )}
         ListEmptyComponent={
@@ -68,97 +66,34 @@ export const SongsScreen = () => {
 export default SongsScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212", 
-    paddingTop: 30,
+  container: { flex: 1, backgroundColor: "#121212" },
+  scanBanner: { 
+    padding: 16, 
+    backgroundColor: "#1db954",
+    borderBottomWidth: 1,
+    borderBottomColor: "#282828" 
   },
-  listContent: {
-    paddingBottom: 100,
+  scanHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
+  scanTitle: { color: "#fff", fontWeight: "bold" },
+  scanPercent: { color: "#fff", fontWeight: "bold" },
+  progressBarBackground: { height: 4, backgroundColor: "rgba(255,255,255,0.3)", borderRadius: 2 },
+  progressBarFill: { height: 4, backgroundColor: "#fff", borderRadius: 2 },
+  scanCount: { color: "#fff", fontSize: 10, marginTop: 4, opacity: 0.8 },
+  listContent: { paddingVertical: 8 },
+  songItem: { flexDirection: "row", padding: 12, alignItems: "center" },
+  artwork: { width: 50, height: 50, borderRadius: 4 },
+  artworkPlaceholder: { 
+    width: 50, 
+    height: 50, 
+    borderRadius: 4, 
+    backgroundColor: "#282828", 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
-  scanBanner: {
-    backgroundColor: "#1e1e1e",
-    padding: 16,
-    margin: 12,
-    borderRadius: 12,
-    elevation: 4,
-  },
-  scanHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  scanTitle: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  scanPercent: {
-    color: "#1DB954",
-    fontWeight: "bold",
-  },
-  progressBarBackground: {
-    height: 4,
-    backgroundColor: "#333",
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: "#1DB954",
-  },
-  scanCount: {
-    color: "#b3b3b3",
-    fontSize: 11,
-    marginTop: 8,
-    textAlign: "right",
-  },
-  songItem: {
-    flexDirection: "row",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignItems: "center",
-  },
-  artwork: {
-    width: 50,
-    height: 50,
-    borderRadius: 4,
-    backgroundColor: "#333",
-  },
-  artworkPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 4,
-    backgroundColor: "#282828",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    color: "#535353",
-    fontSize: 24,
-  },
-  songInfo: {
-    flex: 1,
-    marginLeft: 14,
-    justifyContent: "center",
-  },
-  title: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 2,
-  },
-  artist: {
-    color: "#b3b3b3",
-    fontSize: 13,
-  },
-  emptyState: {
-    flex: 1,
-    marginTop: 100,
-    alignItems: "center",
-  },
-  emptyText: {
-    color: "#535353",
-    fontSize: 16,
-  },
+  placeholderText: { color: "#b3b3b3", fontSize: 24 },
+  songInfo: { marginLeft: 12, flex: 1 },
+  title: { color: "#fff", fontSize: 16, fontWeight: "500" },
+  artist: { color: "#b3b3b3", fontSize: 14, marginTop: 2 },
+  emptyState: { flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 },
+  emptyText: { color: "#b3b3b3" }
 });

@@ -1,28 +1,35 @@
-module.exports = function(api) {
+module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: ["babel-preset-expo"],
     plugins: [
       [
-        'module-resolver',
+        "module-resolver",
         {
-          root: ['./'],
+          root: ["./"],
           alias: {
-            '@': './src',
-            '@components': './src/presentation/components',
-            '@assets': './src/presentation/assets',
-            '@features': './src/presentation/features',
-            '@navigation': './src/presentation/navigation',
-            '@theme': './src/core/theme',
-            '@constants': './src/core/constants',
-            '@entities':'./src/domain/entities',
-            '@value-objects':'./src/domain/value-objects',
-            '@mocks': './src/domain/mocks',
-            '@database': './src/domain/database',
-            '@repository': './src/domain/repository',
-            '@hooks': './src/logic/hooks',
-            '@services': './src/logic/services',
-            '@state': './src/logic/state',
+            "@": "./src",
+            "@theme": "./src/core/theme",
+            "@constants": "./src/core/constants",
+
+            "@entities": "./src/domain/entities",
+            "@value-objects": "./src/domain/value-objects",
+            "@interfaces": "./src/domain/repositories",
+
+            "@services": "./src/infrastructure/services",
+            "@mocks": "./src/infrastructure/mocks",
+            "@repositories": "./src/infrastructure/repositories",
+            "@mappers": "./src/infrastructure/mappers",
+
+            "@use-cases": "./src/application/use-cases",
+            "@dtos": "./src/application/dtos",
+
+            "@components": "./src/presentation/shared/components",
+            "@hooks": "./src/presentation/shared/hooks",
+            "@assets": "./src/presentation/shared/assets",
+            "@features": "./src/presentation/features",
+            "@navigation": "./src/presentation/navigation",
+            "@store": "./src/presentation/store",
           },
         },
       ],

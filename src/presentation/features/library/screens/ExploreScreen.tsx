@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, ActivityIndicator, View } from "react-native";
+import { ScrollView, ActivityIndicator, View, Text } from "react-native";
 import { styles } from "../styles/ExploreStyles";
 import { Colors } from "@theme/colors";
 import { useRecommendations } from "@/presentation/shared/hooks/useRecommendations";
@@ -31,26 +31,29 @@ const ExploreScreen = () => {
   }, []);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <ScreenHeader
-        title="Explorar"
-        onActionPress={() => console.log("Abrir Ajustes")}
-      />
-      {loading ? (
-        <ActivityIndicator
-          size="large"
-          color={Colors.primary}
-          style={{ marginTop: 50 }}
-        />
-      ) : (
-        <RecommendedSection data={recommendedTracks} />
-      )}
-      <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
-      <MostPlayedSection />
-      <TopArtistsSection />
-      <LibraryStatsSection />
-      <View style={{ height: 40 }} />
-    </ScrollView>
+    // <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    //   <ScreenHeader
+    //     title="Explorar"
+    //     onActionPress={() => console.log("Abrir Ajustes")}
+    //   />
+    //   {loading ? (
+    //     <ActivityIndicator
+    //       size="large"
+    //       color={Colors.primary}
+    //       style={{ marginTop: 50 }}
+    //     />
+    //   ) : (
+    //     <RecommendedSection data={recommendedTracks} />
+    //   )}
+    //   <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
+    //   <MostPlayedSection />
+    //   <TopArtistsSection />
+    //   <LibraryStatsSection />
+    //   <View style={{ height: 40 }} />
+    // </ScrollView>
+    <View>
+      <Text>dasdas</Text>
+    </View>
   );
 };
 

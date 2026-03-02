@@ -5,20 +5,27 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@components/*": ["src/presentation/shared/components/*"],
-      "@assets/*": ["src/presentation/assets/*"],
-      "@features/*": ["src/presentation/features/*"],
-      "@navigation/*": ["src/presentation/navigation/*"],
       "@theme/*": ["src/core/theme/*"],
       "@constants/*": ["src/core/constants/*"],
+
       "@entities/*": ["src/domain/entities/*"],
       "@value-objects/*": ["src/domain/value-objects/*"],
-      "@mocks/*": ["src/infrastructure/mocks/*"],
-      "@database/*": ["src/domain/database/*"],
-      "@repository/*": ["src/domain/repository/*"],
-      "@hooks/*": ["src/presentation/shared/hooks/*"],
+      "@interfaces/*": ["src/domain/repositories/*"],
+
       "@services/*": ["src/infrastructure/services/*"],
-      "@state/*": ["src/logic/state/*"],
+      "@mocks/*": ["src/infrastructure/mocks/*"],
+      "@repositories/*": ["src/infrastructure/repositories/*"],
+      "@mappers/*": ["src/infrastructure/mappers/*"],
+
+      "@use-cases/*": ["src/application/use-cases/*"],
+      "@dtos/*": ["src/application/dtos/*"],
+
+      "@components/*": ["src/presentation/shared/components/*"],
+      "@hooks/*": ["src/presentation/shared/hooks/*"],
+      "@assets/*": ["src/presentation/shared/assets/*"],
+      "@features/*": ["src/presentation/features/*"],
+      "@navigation/*": ["src/presentation/navigation/*"],
+      "@store/*": ["src/presentation/store/*"],
     }
   }
 }
