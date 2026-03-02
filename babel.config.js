@@ -20,6 +20,7 @@ module.exports = function (api) {
             "@mocks": "./src/infrastructure/mocks",
             "@repositories": "./src/infrastructure/repositories",
             "@mappers": "./src/infrastructure/mappers",
+            "@persistence": "./src/infrastructure/persistence",
 
             "@use-cases": "./src/application/use-cases",
             "@dtos": "./src/application/dtos",

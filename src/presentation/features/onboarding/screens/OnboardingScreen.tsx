@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Button } from "@/presentation/shared/components/atoms/Button";
-import { usePermissions } from "@/presentation/shared/hooks/usePermissions";
+import { usePermissions } from "@hooks/usePermissions";
 import { styles } from "../styles/OnboardingScreen.styles";
-import { ScannerService } from "@/infrastructure/services/ScannerService";
+import { useLibrary } from "@hooks/use-library.hook";
 
 const STEPS = [
   {
@@ -38,6 +38,7 @@ const STEPS = [
 const OnboardingScreen = ({ navigation }: any) => {
   const [currentStep, setCurrentStep] = useState(0);
   const { askForPermissions, loading, isGranted } = usePermissions();
+  const { startScan } = useLibrary();
 
   const isPermissionStep = currentStep === 2;
   const isLastStep = currentStep === STEPS.length - 1;
@@ -47,7 +48,7 @@ const OnboardingScreen = ({ navigation }: any) => {
       if (!isGranted) {
         const success = await askForPermissions();
         if (success) {
-          ScannerService.startFullScan();
+          startScan();
           setCurrentStep(currentStep + 1);
         } else {
           Alert.alert(

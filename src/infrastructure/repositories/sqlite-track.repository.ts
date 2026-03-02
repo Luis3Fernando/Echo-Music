@@ -10,8 +10,13 @@ export class SqliteTrackRepository implements TrackRepository {
       for (const track of tracks) {
         await this.db.runAsync(
           `INSERT OR REPLACE INTO tracks 
-          (id, url, title, artistName, albumName, duration, format, artworkUri, isProcessed, dateAdded) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (
+          id, url, title, artistName, albumName, 
+          duration, format, bitrate, size, genre, 
+          year, trackNumber, diskNumber, artworkUri, 
+          isProcessed, dateAdded
+        ) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             track.id,
             track.url,
@@ -20,7 +25,13 @@ export class SqliteTrackRepository implements TrackRepository {
             track.albumName ?? "Álbum Desconocido",
             track.duration,
             track.format,
-            track.artworkUri ?? null, 
+            track.bitrate ?? null, 
+            track.size,
+            track.genre ?? null,
+            track.year ?? null,
+            track.trackNumber ?? null,
+            track.diskNumber ?? null,
+            track.artworkUri ?? null,
             track.isProcessed ? 1 : 0,
             track.dateAdded,
           ],

@@ -11,24 +11,24 @@ import TopArtistsSection from "../components/TopArtistsSection";
 import LibraryStatsSection from "../components/LibraryStatsSection";
 
 const ExploreScreen = () => {
-  const { recommendedTracks, loading } = useRecommendations();
-  const [isScanning, setIsScanning] = useState(true);
-  const [progress, setProgress] = useState(0);
+  // const { recommendedTracks, loading } = useRecommendations();
+  // const [isScanning, setIsScanning] = useState(true);
+  // const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsScanning(false), 500);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 300);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setProgress((prev) => {
+  //       if (prev >= 100) {
+  //         clearInterval(interval);
+  //         setTimeout(() => setIsScanning(false), 500);
+  //         return 100;
+  //       }
+  //       return prev + 5;
+  //     });
+  //   }, 300);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     // <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
