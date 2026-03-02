@@ -9,8 +9,8 @@ import {
   NativeSyntheticEvent,
 } from "react-native";
 import { Colors } from "@theme/colors";
-import Banner from "../../../components/atoms/Banner";
-import SectionTitle from "@/presentation/components/atoms/SectionTitle";
+import Banner from "../../../shared/components/atoms/Banner";
+import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width - 20;

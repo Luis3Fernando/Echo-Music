@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native';
-import TrackItem from '@components/atoms/TrackItem';
-import SectionTitle from '@components/atoms/SectionTitle';
+import TrackItem from '@/presentation/shared/components/atoms/TrackItem';
+import SectionTitle from '@/presentation/shared/components/atoms/SectionTitle';
 
 const MOCK_TRACKS = [
   { id: '1', title: 'Adaptation', artist: 'The Weeknd', cover: { uri: 'https://i1.sndcdn.com/artworks-RmwwoND84IopaYip-sKSvqg-t500x500.jpg' } },

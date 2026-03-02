@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import AlbumCard from '@components/atoms/AlbumCard';
-import SectionTitle from '@components/atoms/SectionTitle';
+import AlbumCard from '@/presentation/shared/components/atoms/AlbumCard';
+import SectionTitle from '@/presentation/shared/components/atoms/SectionTitle';
 
 const MOCK_ALBUMS = [
   { 

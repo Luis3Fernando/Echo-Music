@@ -1,6 +1,6 @@
 import { View, FlatList, StyleSheet } from "react-native";
-import ArtistCircle from "@components/atoms/ArtistCircle";
-import SectionTitle from "@components/atoms/SectionTitle";
+import ArtistCircle from "@/presentation/shared/components/atoms/ArtistCircle";
+import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 const MOCK_ARTISTS = [
   { id: "1", name: "The Weeknd" },

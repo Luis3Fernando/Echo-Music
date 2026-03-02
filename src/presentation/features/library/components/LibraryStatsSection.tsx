@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
-import SectionTitle from "@components/atoms/SectionTitle";
+import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 const LibraryStatsSection = () => {
   const stats = [

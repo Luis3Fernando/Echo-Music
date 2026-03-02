@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@components/*": ["src/presentation/components/*"],
+      "@components/*": ["src/presentation/shared/components/*"],
       "@assets/*": ["src/presentation/assets/*"],
       "@features/*": ["src/presentation/features/*"],
       "@navigation/*": ["src/presentation/navigation/*"],
@@ -16,7 +16,7 @@
       "@mocks/*": ["src/infrastructure/mocks/*"],
       "@database/*": ["src/domain/database/*"],
       "@repository/*": ["src/domain/repository/*"],
-      "@hooks/*": ["src/presentation/hooks/*"],
+      "@hooks/*": ["src/presentation/shared/hooks/*"],
       "@services/*": ["src/infrastructure/services/*"],
       "@state/*": ["src/logic/state/*"],
     }

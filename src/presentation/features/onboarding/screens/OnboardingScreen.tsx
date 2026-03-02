@@ -7,8 +7,8 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { Button } from "@/presentation/components/atoms/Button";
-import { usePermissions } from "@/presentation/hooks/usePermissions";
+import { Button } from "@/presentation/shared/components/atoms/Button";
+import { usePermissions } from "@/presentation/shared/hooks/usePermissions";
 import { styles } from "../styles/OnboardingScreen.styles";
 import { ScannerService } from "@/infrastructure/services/ScannerService";
 
