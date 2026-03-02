@@ -10,11 +10,12 @@
       "@features/*": ["src/presentation/features/*"],
       "@navigation/*": ["src/presentation/navigation/*"],
       "@theme/*": ["src/core/theme/*"],
+      "@constants/*": ["src/core/constants/*"],
       "@models/*": ["src/domain/models/*"],
       "@mocks/*": ["src/domain/mocks/*"],
       "@database/*": ["src/domain/database/*"],
       "@repository/*": ["src/domain/repository/*"],
-      "@hooks/*": ["src/logic/hooks/*"],
+      "@hooks/*": ["src/application/hooks/*"],
       "@services/*": ["src/logic/services/*"],
       "@state/*": ["src/logic/state/*"],
     }

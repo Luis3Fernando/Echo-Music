@@ -1,5 +1,6 @@
+import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { MainTabParamList } from "./types";
 import { SettingsNavigator } from "./SettingsNavigator";
@@ -22,16 +23,22 @@ export const MainTabNavigator = () => (
         paddingBottom: 10,
       },
       tabBarLabelStyle: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: "600",
       },
       tabBarIcon: ({ focused, color, size }) => {
+        if (route.name === "Explore") {
+          return <FontAwesome5 name="compact-disc" size={size} color={color} />;
+        }
+
         let iconName: keyof typeof Ionicons.glyphMap = "musical-notes";
 
-        if (route.name === "Explore") {
-          iconName = focused ? "compass" : "compass-outline";
+        if (route.name === "Search") {
+          iconName = focused ? "search" : "search-outline";
         } else if (route.name === "Songs") {
           iconName = focused ? "musical-notes" : "musical-notes-outline";
+        } else if (route.name === "Library") {
+          iconName = focused ? "library" : "library-outline";
         } else if (route.name === "SettingsStack") {
           iconName = focused ? "settings" : "settings-outline";
         }
@@ -46,9 +53,19 @@ export const MainTabNavigator = () => (
       options={{ title: "Explorar" }}
     />
     <Tab.Screen
+      name="Search"
+      component={ExploreScreen} 
+      options={{ title: "Buscar" }}
+    />
+    <Tab.Screen
       name="Songs"
       component={SongsScreen}
       options={{ title: "Canciones" }}
+    />
+    <Tab.Screen
+      name="Library"
+      component={ExploreScreen} 
+      options={{ title: "Biblioteca" }}
     />
     <Tab.Screen
       name="SettingsStack"

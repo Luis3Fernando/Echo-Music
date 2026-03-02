@@ -1,4 +1,3 @@
-// Usamos require para asegurar compatibilidad con Metro
 const jsmediatags = require('jsmediatags');
 
 export const extractMetadataFromFile = (fileUri) => {

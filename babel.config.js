@@ -14,6 +14,7 @@ module.exports = function(api) {
             '@features': './src/presentation/features',
             '@navigation': './src/presentation/navigation',
             '@theme': './src/core/theme',
+            '@constants': './src/core/constants',
             '@models': './src/domain/models',
             '@mocks': './src/domain/mocks',
             '@database': './src/domain/database',

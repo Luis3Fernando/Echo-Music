@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLibraryStore } from '../state/useLibraryStore';
+import { useLibraryStore } from '../../logic/state/useLibraryStore';
 import { TrackRepository } from '@/domain/repository/TrackRepository';
 
 export const useLibrary = () => {

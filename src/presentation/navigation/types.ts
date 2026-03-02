@@ -6,7 +6,9 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Explore: undefined;
   Songs: undefined;
+  Search: undefined;
   Artists: undefined;
+  Library: undefined;
   Albums: undefined;
   SettingsStack: undefined;
 };
