@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, ActivityIndicator, View } from "react-native";
 import { styles } from "../styles/ExploreStyles";
 import { Colors } from "@theme/colors";
-import { useRecommendations } from "@/application/hooks/useRecommendations";
+import { useRecommendations } from "@/presentation/hooks/useRecommendations";
 import RecommendedSection from "../components/RecommendedSection";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import RecentAlbumsSection from "../components/RecentAlbumsSection";

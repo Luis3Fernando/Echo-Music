@@ -1,4 +1,4 @@
-import db from "@database/SQLiteClient";
+import db from "@/infrastructure/persistence/sqlite/SQLiteClient";
 import { RawTrack } from "@models/Track";
 
 export const TrackRepository = {

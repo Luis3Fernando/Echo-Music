@@ -15,7 +15,7 @@
       "@mocks/*": ["src/domain/mocks/*"],
       "@database/*": ["src/domain/database/*"],
       "@repository/*": ["src/domain/repository/*"],
-      "@hooks/*": ["src/application/hooks/*"],
+      "@hooks/*": ["src/presentation/hooks/*"],
       "@services/*": ["src/logic/services/*"],
       "@state/*": ["src/logic/state/*"],
     }

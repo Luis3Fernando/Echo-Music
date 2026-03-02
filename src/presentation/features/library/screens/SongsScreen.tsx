@@ -2,7 +2,7 @@ import React from "react";
 
 import { View, FlatList, Text, StyleSheet, StatusBar, Image } from "react-native";
 
-import { useLibrary } from "@/application/hooks/useLibrary";
+import { useLibrary } from "@/presentation/hooks/useLibrary";
 
 export const SongsScreen = () => {
   const { songs, isScanning, scanProgress, totalTracks } = useLibrary();
