@@ -1,6 +1,6 @@
 import * as MediaLibrary from 'expo-media-library';
 import { initDatabase } from '@/infrastructure/persistence/sqlite/SQLiteClient';
-import { ScannerService } from '@/logic/services/ScannerService';
+import { ScannerService } from '@/infrastructure/services/ScannerService';
 
 export const AppInitService = {
   async init() {

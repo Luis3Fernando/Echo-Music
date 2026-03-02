@@ -13,11 +13,11 @@
       "@constants/*": ["src/core/constants/*"],
       "@entities/*": ["src/domain/entities/*"],
       "@value-objects/*": ["src/domain/value-objects/*"],
-      "@mocks/*": ["src/domain/mocks/*"],
+      "@mocks/*": ["src/infrastructure/mocks/*"],
       "@database/*": ["src/domain/database/*"],
       "@repository/*": ["src/domain/repository/*"],
       "@hooks/*": ["src/presentation/hooks/*"],
-      "@services/*": ["src/logic/services/*"],
+      "@services/*": ["src/infrastructure/services/*"],
       "@state/*": ["src/logic/state/*"],
     }
   }

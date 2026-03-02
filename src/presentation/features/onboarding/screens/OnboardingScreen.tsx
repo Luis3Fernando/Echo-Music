@@ -10,7 +10,7 @@ import {
 import { Button } from "@/presentation/components/atoms/Button";
 import { usePermissions } from "@/presentation/hooks/usePermissions";
 import { styles } from "../styles/OnboardingScreen.styles";
-import { ScannerService } from "@services/ScannerService";
+import { ScannerService } from "@/infrastructure/services/ScannerService";
 
 const STEPS = [
   {

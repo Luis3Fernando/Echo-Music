@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { RootNavigator } from '@navigation/RootNavigator';
-import { AppInitService } from '@services/AppInitService';
+import { AppInitService } from '@/infrastructure/services/AppInitService';
 import { Colors } from '@theme/colors';
 
 export default function App() {

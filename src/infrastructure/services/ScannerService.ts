@@ -3,7 +3,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as mmb from "music-metadata-browser";
 import { Buffer } from "buffer";
 import { TrackRepository } from "@/infrastructure/repositories/TrackRepository";
-import { useLibraryStore } from "@/logic/state/useLibraryStore";
+import { useLibraryStore } from "@/presentation/store/useLibraryStore";
 
 const ARTWORK_CACHE_DIR = `${FileSystem.cacheDirectory}artworks/`;
 

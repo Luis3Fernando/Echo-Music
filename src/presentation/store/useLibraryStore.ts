@@ -1,5 +1,5 @@
+import { RawTrack } from '@entities/Track';
 import { create } from 'zustand';
-import { RawTrack } from '@/domain/models/Track';
 
 interface LibraryState {
   tracks: RawTrack[];
