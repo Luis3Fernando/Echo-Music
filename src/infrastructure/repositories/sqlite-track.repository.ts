@@ -25,7 +25,7 @@ export class SqliteTrackRepository implements TrackRepository {
             track.albumName ?? "Álbum Desconocido",
             track.duration,
             track.format,
-            track.bitrate ?? null, 
+            track.bitrate ?? null,
             track.size,
             track.genre ?? null,
             track.year ?? null,
@@ -70,7 +70,7 @@ export class SqliteTrackRepository implements TrackRepository {
 
   async findAll(): Promise<Track[]> {
     const results = await this.db.getAllAsync<any>(
-      "SELECT * FROM tracks ORDER BY title ASC"
+      "SELECT * FROM tracks ORDER BY title ASC",
     );
 
     return results.map((row) => ({

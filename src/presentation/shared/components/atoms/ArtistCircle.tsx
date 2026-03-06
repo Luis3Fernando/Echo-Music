@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '@theme/colors';
-import { useSpotifyArtist } from '@hooks/useSpotifyArtist'; // Importamos el hook
+import { useArtist } from '@/presentation/shared/hooks/use-artist.hook';
+import { Artist } from '@/domain/entities/artist.entity';
 
 interface ArtistCircleProps {
   data: {
     name: string;
-    // Ya no necesitamos pasar la photo desde afuera, el componente la busca
   };
   onPress?: () => void;
 }
 
 const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
-  // El hook hace la magia usando solo el nombre
-  const { photo, loading } = useSpotifyArtist(data.name);
+  const { fetchArtist, loading } = useArtist();
+  const [artist, setArtist] = useState<Artist | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    fetchArtist(data.name).then((result) => {
+      if (isMounted) setArtist(result);
+    });
+
+    return () => { isMounted = false; };
+  }, [data.name, fetchArtist]);
 
   return (
     <TouchableOpacity 
@@ -22,7 +32,6 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
       activeOpacity={0.8}
     >
       <View style={styles.imageContainer}>
-        {/* Mostramos el loader mientras la API responde */}
         {loading && (
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="small" color={Colors.primary} />
@@ -30,8 +39,12 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
         )}
 
         <Image 
-          source={photo?.uri ? { uri: photo.uri } : require("@assets/img/artist_default.jpg")} 
-          style={[styles.photo, loading && { opacity: 0 }]} // Ocultamos la imagen mientras carga
+          source={
+            artist?.pictureUrl 
+              ? { uri: artist.pictureUrl } 
+              : require("@assets/img/artist_default.jpg")
+          } 
+          style={[styles.photo, loading && { opacity: 0 }]} 
         />
       </View>
       
@@ -45,11 +58,11 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
 const styles = StyleSheet.create({
   container: {
     width: 100,
-    marginRight: 10, // Ajustado para que el gap del FlatList sea más limpio
+    marginRight: 10,
     alignItems: 'center',
   },
   imageContainer: {
-    width: 90, // Un poco más compacto se ve más premium
+    width: 90,
     height: 90,
     borderRadius: 45,
     overflow: 'hidden',
@@ -68,7 +81,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   name: {
-    fontSize: 11, // Un poco más pequeño para que el "numberOfLines={2}" no rompa la UI
+    fontSize: 11,
     color: Colors.black,
     fontWeight: '700',
     textAlign: 'center',

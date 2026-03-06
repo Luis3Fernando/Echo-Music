@@ -1,0 +1,57 @@
+import { ArtistRepository } from "@interfaces/artist.repository";
+import { ExternalMusicService } from "@interfaces-services/external-music.service";
+import { Artist } from "@entities/artist.entity";
+import * as Crypto from "expo-crypto";
+
+export class GetOrCreateArtistUseCase {
+  constructor(
+    private artistRepo: ArtistRepository,
+    private externalService: ExternalMusicService,
+  ) {}
+
+  async execute(artistName: string): Promise<Artist> {
+    const cleanName = artistName.trim();
+
+    try {
+      const localArtists = await this.artistRepo.findAll();
+      const existing = localArtists.find(
+        (a) => a.name.toLowerCase() === cleanName.toLowerCase(),
+      );
+      if (existing) return existing;
+
+      try {
+        const remoteResults =
+          await this.externalService.searchArtist(cleanName);
+
+        if (remoteResults.length > 0) {
+          const bestMatch = remoteResults[0];
+          await this.artistRepo.save(bestMatch);
+          return bestMatch;
+        }
+      } catch (apiError) {
+        console.warn(`[API] Fallo al buscar artista "${cleanName}":`, apiError);
+      }
+
+      const newArtist: Artist = {
+        id: Crypto.randomUUID(),
+        name: cleanName,
+        pictureUrl: "",
+        description: null,
+        socialLinks: null,
+        reels: null,
+        isProcessed: false,
+      };
+
+      await this.artistRepo.save(newArtist);
+      return newArtist;
+    } catch (dbError) {
+      console.error("[DB] Error crítico recuperando/creando artista:", dbError);
+      return {
+        id: "temp-id",
+        name: cleanName,
+        pictureUrl: "",
+        isProcessed: false,
+      };
+    }
+  }
+}

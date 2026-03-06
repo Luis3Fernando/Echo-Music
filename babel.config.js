@@ -15,6 +15,7 @@ module.exports = function (api) {
             "@entities": "./src/domain/entities",
             "@value-objects": "./src/domain/value-objects",
             "@interfaces": "./src/domain/repositories",
+            "@interfaces-services": "./src/domain/services",
 
             "@services": "./src/infrastructure/services",
             "@mocks": "./src/infrastructure/mocks",
