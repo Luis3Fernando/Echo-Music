@@ -6,6 +6,8 @@ import { MainTabParamList } from "./types";
 import { SettingsNavigator } from "./SettingsNavigator";
 import ExploreScreen from "@features/library/screens/ExploreScreen";
 import SongsScreen from "@features/library/screens/SongsScreen";
+import SearchScreen from '@features/library/screens/SearchScreen';
+import LibraryScreen from '@features/library/screens/LibraryScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -39,8 +41,6 @@ export const MainTabNavigator = () => (
           iconName = focused ? "musical-notes" : "musical-notes-outline";
         } else if (route.name === "Library") {
           iconName = focused ? "library" : "library-outline";
-        } else if (route.name === "SettingsStack") {
-          iconName = focused ? "settings" : "settings-outline";
         }
 
         return <Ionicons name={iconName} size={size} color={color} />;
@@ -54,7 +54,7 @@ export const MainTabNavigator = () => (
     />
     <Tab.Screen
       name="Search"
-      component={ExploreScreen} 
+      component={SearchScreen} 
       options={{ title: "Buscar" }}
     />
     <Tab.Screen
@@ -64,13 +64,8 @@ export const MainTabNavigator = () => (
     />
     <Tab.Screen
       name="Library"
-      component={ExploreScreen} 
+      component={LibraryScreen} 
       options={{ title: "Biblioteca" }}
-    />
-    <Tab.Screen
-      name="SettingsStack"
-      component={SettingsNavigator}
-      options={{ title: "Ajustes" }}
     />
   </Tab.Navigator>
 );

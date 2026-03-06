@@ -10,7 +10,6 @@ export type MainTabParamList = {
   Artists: undefined;
   Library: undefined;
   Albums: undefined;
-  SettingsStack: undefined;
 };
 
 export type SettingsStackParamList = {
