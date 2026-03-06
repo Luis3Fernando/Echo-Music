@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   subtitle: { color: "#CCC", fontSize: 13 },
   adsBadge: {
-    color: "#FF3C00",
+    color: "#a0ab9a",
     fontSize: 10,
     fontWeight: "bold",
     marginBottom: 4,
