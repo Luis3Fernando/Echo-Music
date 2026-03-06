@@ -1,5 +1,6 @@
 import { ArtistRepository } from "@interfaces/artist.repository";
 import { ExternalMusicService } from "@interfaces-services/external-music.service";
+import { imageDownloaderService } from "@services/image-downloader.service";
 import { Artist } from "@entities/artist.entity";
 import * as Crypto from "expo-crypto";
 
@@ -22,14 +23,19 @@ export class GetOrCreateArtistUseCase {
       try {
         const remoteResults =
           await this.externalService.searchArtist(cleanName);
-
         if (remoteResults.length > 0) {
           const exactMatch = remoteResults.find(
-            (remote) => remote.name.trim().toLowerCase() === cleanName,
+            (r) => r.name.toLowerCase() === cleanName,
+          );
+          let bestMatch = exactMatch || remoteResults[0];
+          const localPath = await imageDownloaderService.downloadArtistImage(
+            bestMatch.id,
+            bestMatch.pictureUrl,
           );
 
-          const bestMatch = exactMatch || remoteResults[0];
-
+          if (localPath) {
+            bestMatch.pictureUrl = localPath;
+          }
           await this.artistRepo.save(bestMatch);
           return bestMatch;
         }
