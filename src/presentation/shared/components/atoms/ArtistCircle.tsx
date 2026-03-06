@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Colors } from '@theme/colors';
-import { useArtist } from '@/presentation/shared/hooks/use-artist.hook';
-import { Artist } from '@/domain/entities/artist.entity';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
+import { Colors } from "@theme/colors";
+import { useArtist } from "@hooks/use-artist.hook";
+import { Artist } from "@entities/artist.entity";
 
 interface ArtistCircleProps {
   data: {
@@ -12,45 +19,79 @@ interface ArtistCircleProps {
 }
 
 const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
-  const { fetchArtist, loading } = useArtist();
+  const { fetchArtist, loading: apiLoading } = useArtist();
   const [artist, setArtist] = useState<Artist | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const skeletonValue = new Animated.Value(0);
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(skeletonValue, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(skeletonValue, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    animation.start();
+    return () => animation.stop();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
-    
     fetchArtist(data.name).then((result) => {
       if (isMounted) setArtist(result);
     });
-
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [data.name, fetchArtist]);
 
+  const isCurrentlyLoading = apiLoading || !imageLoaded;
+
+  const skeletonOpacity = skeletonValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.7],
+  });
+
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={onPress} 
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
       activeOpacity={0.8}
     >
       <View style={styles.imageContainer}>
-        {loading && (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="small" color={Colors.primary} />
-          </View>
+        {isCurrentlyLoading && (
+          <Animated.View
+            style={[styles.skeleton, { opacity: skeletonOpacity }]}
+          />
         )}
-
-        <Image 
+        <Image
           source={
-            artist?.pictureUrl 
-              ? { uri: artist.pictureUrl } 
+            artist?.pictureUrl
+              ? { uri: artist.pictureUrl }
               : require("@assets/img/artist_default.jpg")
-          } 
-          style={[styles.photo, loading && { opacity: 0 }]} 
+          }
+          style={[styles.photo, !imageLoaded && { width: 0, height: 0 }]}
+          onLoad={() => setImageLoaded(true)}
         />
       </View>
-      
-      <Text style={styles.name} numberOfLines={2}>
-        {data.name}
-      </Text>
+      {apiLoading ? (
+        <Animated.View
+          style={[styles.skeletonText, { opacity: skeletonOpacity }]}
+        />
+      ) : (
+        <Text style={styles.name} numberOfLines={2}>
+          {data.name}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -59,32 +100,42 @@ const styles = StyleSheet.create({
   container: {
     width: 100,
     marginRight: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   imageContainer: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    overflow: 'hidden',
-    backgroundColor: '#F0F0F0',
+    overflow: "hidden",
+    backgroundColor: "#E1E9EE",
     marginBottom: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  loaderContainer: {
-    position: 'absolute',
-    zIndex: 1,
+  skeleton: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#ADB5BD",
+    borderRadius: 45,
+  },
+  skeletonText: {
+    width: 60,
+    height: 10,
+    backgroundColor: "#E1E9EE",
+    borderRadius: 4,
+    marginTop: 4,
   },
   photo: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   name: {
     fontSize: 11,
     color: Colors.black,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
     paddingHorizontal: 2,
     lineHeight: 14,
   },

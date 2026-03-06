@@ -3,7 +3,7 @@ import ArtistCircle from "@/presentation/shared/components/atoms/ArtistCircle";
 import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 const MOCK_ARTISTS = [
-  { id: "1", name: "The Weeknd" },
+  { id: "1", name: "Kygo" },
   { id: "2", name: "Romina Gachoy" },
   { id: "3", name: "Dua Lipa" },
   { id: "4", name: "Arctic Monkeys" },
@@ -13,9 +13,11 @@ const MOCK_ARTISTS = [
   { id: "8", name: "Los Puntos del Amor" },
   { id: "9", name: "Bizarrap" },
   { id: "10", name: "Grupo 5" },
-  { id: "11", name: "Michell Soifer" },
+  { id: "11", name: "Gian Marco" },
   { id: "12", name: "Flavia Laos" },
-  { id: "13", name: "Prince Royce" },
+  { id: "13", name: "Caribeños de Guadalupe" },
+  { id: "14", name: "Avicii" },
+  { id: "15", name: "Juan Gabriel" },
 ];
 
 const TopArtistsSection = () => {
