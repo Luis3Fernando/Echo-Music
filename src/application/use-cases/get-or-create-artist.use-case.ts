@@ -10,12 +10,12 @@ export class GetOrCreateArtistUseCase {
   ) {}
 
   async execute(artistName: string): Promise<Artist> {
-    const cleanName = artistName.trim();
+    const cleanName = artistName.trim().toLowerCase();
 
     try {
       const localArtists = await this.artistRepo.findAll();
       const existing = localArtists.find(
-        (a) => a.name.toLowerCase() === cleanName.toLowerCase(),
+        (a) => a.name.toLowerCase() === cleanName,
       );
       if (existing) return existing;
 
@@ -24,17 +24,25 @@ export class GetOrCreateArtistUseCase {
           await this.externalService.searchArtist(cleanName);
 
         if (remoteResults.length > 0) {
-          const bestMatch = remoteResults[0];
+          const exactMatch = remoteResults.find(
+            (remote) => remote.name.trim().toLowerCase() === cleanName,
+          );
+
+          const bestMatch = exactMatch || remoteResults[0];
+
           await this.artistRepo.save(bestMatch);
           return bestMatch;
         }
       } catch (apiError) {
-        console.warn(`[API] Fallo al buscar artista "${cleanName}":`, apiError);
+        console.warn(
+          `[API] Fallo al buscar artista "${artistName}":`,
+          apiError,
+        );
       }
 
       const newArtist: Artist = {
         id: Crypto.randomUUID(),
-        name: cleanName,
+        name: artistName.trim(),
         pictureUrl: "",
         description: null,
         socialLinks: null,
@@ -48,7 +56,7 @@ export class GetOrCreateArtistUseCase {
       console.error("[DB] Error crítico recuperando/creando artista:", dbError);
       return {
         id: "temp-id",
-        name: cleanName,
+        name: artistName,
         pictureUrl: "",
         isProcessed: false,
       };

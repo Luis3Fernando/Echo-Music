@@ -12,7 +12,10 @@ const MOCK_ARTISTS = [
   { id: "7", name: "Imagine Dragons" },
   { id: "8", name: "Los Puntos del Amor" },
   { id: "9", name: "Bizarrap" },
-  { id: "10", name: "Rosalía" },
+  { id: "10", name: "Grupo 5" },
+  { id: "11", name: "Michell Soifer" },
+  { id: "12", name: "Flavia Laos" },
+  { id: "13", name: "Prince Royce" },
 ];
 
 const TopArtistsSection = () => {
