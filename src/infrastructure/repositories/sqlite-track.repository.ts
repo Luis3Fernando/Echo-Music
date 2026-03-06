@@ -67,4 +67,15 @@ export class SqliteTrackRepository implements TrackRepository {
   async deleteAll(): Promise<void> {
     await this.db.runAsync("DELETE FROM tracks");
   }
+
+  async findAll(): Promise<Track[]> {
+    const results = await this.db.getAllAsync<any>(
+      "SELECT * FROM tracks ORDER BY title ASC"
+    );
+
+    return results.map((row) => ({
+      ...row,
+      isProcessed: row.isProcessed === 1,
+    }));
+  }
 }

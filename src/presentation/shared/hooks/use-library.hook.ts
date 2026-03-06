@@ -19,9 +19,13 @@ export const useLibrary = () => {
 
   const loadSongs = useCallback(async () => {
     const repository = new SqliteTrackRepository(db);
-    const allTracks = await repository.getPendingTracks();
+    const allTracks = await repository.findAll();
     setTracks(allTracks);
   }, [db, setTracks]);
+
+  useEffect(() => {
+    loadSongs();
+  }, [isScanning, loadSongs]);
 
   const startScan = async () => {
     if (isScanning) return;
@@ -54,6 +58,6 @@ export const useLibrary = () => {
     scanProgress,
     totalTracks,
     refreshSongs: loadSongs,
-    startScan, 
+    startScan,
   };
 };
