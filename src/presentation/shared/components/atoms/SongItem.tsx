@@ -1,0 +1,151 @@
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Track } from "@/domain/entities/track.entity";
+import { Colors } from "@theme/colors";
+
+interface SongItemProps {
+  track: Track;
+  index?: number;
+  showIndex?: boolean;
+  showArtist?: boolean;
+  showFavorite?: boolean;
+  showOptions?: boolean;
+  isFavorite?: boolean;
+  onPress?: (track: Track) => void;
+  onFavoritePress?: (track: Track) => void;
+  onOptionsPress?: (track: Track) => void;
+}
+
+const SongItem = ({
+  track,
+  index,
+  showIndex = false,
+  showArtist = true,
+  showFavorite = true,
+  showOptions = true,
+  isFavorite = false,
+  onPress,
+  onFavoritePress,
+  onOptionsPress,
+}: SongItemProps) => {
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => onPress?.(track)}
+      activeOpacity={0.7}
+    >
+      {showIndex && index !== undefined && (
+        <View style={styles.indexContainer}>
+          <Text style={styles.indexText}>{index + 1}</Text>
+        </View>
+      )}
+      <View style={styles.artworkContainer}>
+        {track.artworkUri ? (
+          <Image source={{ uri: track.artworkUri }} style={styles.artwork} />
+        ) : (
+          <View style={styles.placeholder}>
+            <Ionicons name="musical-notes" size={20} color="#555" />
+          </View>
+        )}
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.title} numberOfLines={1}>
+          {track.title}
+        </Text>
+        {showArtist && (
+          <Text style={styles.artist} numberOfLines={1}>
+            {track.artistName}
+          </Text>
+        )}
+      </View>
+      <View style={styles.actionsContainer}>
+        {showFavorite && (
+          <TouchableOpacity
+            onPress={() => onFavoritePress?.(track)}
+            style={styles.actionButton}
+          >
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={22}
+              color={isFavorite ? Colors.primary : "#b3b3b3"}
+            />
+          </TouchableOpacity>
+        )}
+        {showOptions && (
+          <TouchableOpacity
+            onPress={() => onOptionsPress?.(track)}
+            style={styles.actionButton}
+          >
+            <Ionicons name="ellipsis-vertical" size={20} color="#b3b3b3" />
+          </TouchableOpacity>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: "transparent",
+  },
+  indexContainer: {
+    width: 30,
+    marginRight: 4,
+    alignItems: "center",
+  },
+  indexText: {
+    color: "#b3b3b3",
+    fontSize: 14,
+    fontWeight: "400",
+  },
+  artworkContainer: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  artwork: {
+    width: 52,
+    height: 52,
+    borderRadius: 6,
+  },
+  placeholder: {
+    width: 52,
+    height: 52,
+    borderRadius: 6,
+    backgroundColor: "#282828",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 14,
+    justifyContent: "center",
+  },
+  title: {
+    color: "#000",
+    fontSize: 15,
+    fontWeight: "600",
+    letterSpacing: 0.2,
+  },
+  artist: {
+    color: "#b3b3b3",
+    fontSize: 13,
+    marginTop: 2,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  actionButton: {
+    padding: 8,
+    marginLeft: 4,
+  },
+});
+
+export default SongItem;

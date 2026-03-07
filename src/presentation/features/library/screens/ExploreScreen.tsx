@@ -36,7 +36,6 @@ const ExploreScreen = () => {
         title="Explorar"
         onActionPress={() => console.log("Abrir Ajustes")}
       />
-      <RecommendedSection data={recommendedTracks} />
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
       <MostPlayedSection />
       <TopArtistsSection />
