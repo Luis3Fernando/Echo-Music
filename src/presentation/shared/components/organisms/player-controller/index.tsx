@@ -1,23 +1,11 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
-import { StyleSheet, Dimensions, View } from "react-native";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import { View } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolation,
-} from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const MINI_PLAYER_HEIGHT = 70;
 
 export const PlayerController = () => {
@@ -35,31 +23,24 @@ export const PlayerController = () => {
     return unsubscribe;
   }, []);
 
-  const isVisible = currentRoute !== "" && currentRoute !== "Onboarding";
-
   const expandPlayer = useCallback(() => bottomSheetRef.current?.expand(), []);
   const closePlayer = useCallback(() => bottomSheetRef.current?.collapse(), []);
-
-  if (!isVisible) return null;
 
   const miniPlayerStyle = useAnimatedStyle(() => {
     const isHidden = animatedIndex.value > 0.05;
     return {
-      opacity: interpolate(
-        animatedIndex.value,
-        [0, 0.05],
-        [1, 0],
-        Extrapolation.CLAMP,
-      ),
-      height: interpolate(
-        animatedIndex.value,
-        [0, 0.1],
-        [MINI_PLAYER_HEIGHT, 0],
-        Extrapolation.CLAMP,
-      ),
+      opacity: interpolate(animatedIndex.value, [0, 0.05], [1, 0], Extrapolation.CLAMP),
+      height: interpolate(animatedIndex.value, [0, 0.1], [MINI_PLAYER_HEIGHT, 0], Extrapolation.CLAMP),
       display: isHidden ? "none" : "flex",
     };
   });
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    zIndex: animatedIndex.value > 0.01 ? 9999 : 1,
+  }));
+
+  const isVisible = currentRoute !== "" && currentRoute !== "Onboarding";
+  if (!isVisible) return null;
 
   return (
     <BottomSheet
@@ -69,8 +50,10 @@ export const PlayerController = () => {
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
+      enableOverDrag={false}
+      enablePanDownToClose={false}
       enableContentPanningGesture={false}
-      enableHandlePanningGesture={false}
+      style={animatedContainerStyle}
     >
       <BottomSheetView style={{ flex: 1 }}>
         <Animated.View style={miniPlayerStyle}>
@@ -80,7 +63,7 @@ export const PlayerController = () => {
           <FullPlayer
             onClose={closePlayer}
             animatedStyle={{ opacity: 1 }}
-            pointerEvents={animatedIndex.value > 0.1 ? "auto" : "none"}
+            pointerEvents="auto"
           />
         </View>
       </BottomSheetView>

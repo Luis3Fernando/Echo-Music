@@ -23,9 +23,8 @@ export const MainTabNavigator = () => (
         bottom: 70,
         left: 0,
         right: 0,
-        borderTopWidth: 1,
-        borderTopColor: "#F0F0F0",
         elevation: 0,
+        paddingTop: 5
       },
       tabBarItemStyle: {
         justifyContent: "center",
