@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
+    backgroundColor: 'red'
   },
   fullTitle: { color: 'white', fontSize: 24, fontWeight: 'bold', marginBottom: 40 },
   bigArt: { 

@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import Animated from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
-import { MOCK_TRACK } from '@mocks/mock-track';
+import { MOCK_TRACK } from "@mocks/mock-track";
 
 interface MiniPlayerProps {
   animatedStyle: any;
@@ -14,24 +13,24 @@ const MiniPlayer = ({ animatedStyle }: MiniPlayerProps) => {
 
   return (
     <Animated.View style={[styles.cardContainer, animatedStyle]}>
-      <Image source={{ uri: track.artworkUri || '' }} style={styles.artwork} />
-      
+      <Image
+        source={{ uri: track.artworkUri || undefined }}
+        style={styles.artwork}
+      />
       <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={1}>{track.title}</Text>
-        <Text style={styles.artist} numberOfLines={1}>{track.artistName}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {track.title}
+        </Text>
+        <Text style={styles.artist} numberOfLines={1}>
+          {track.artistName}
+        </Text>
       </View>
-
       <View style={styles.controls}>
-        <TouchableOpacity style={styles.controlBtn}>
-          <Ionicons name="play-back" size={22} color={Colors.black} />
+        <TouchableOpacity style={styles.playBtn} activeOpacity={0.7}>
+          <Ionicons name="play" size={26} color={Colors.black} />
         </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.playBtn}>
-          <Ionicons name="play" size={24} color={Colors.black} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.controlBtn}>
-          <Ionicons name="play-forward" size={22} color={Colors.black} />
+        <TouchableOpacity activeOpacity={0.7}>
+          <Ionicons name="play-forward" size={24} color={Colors.black} />
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -40,27 +39,21 @@ const MiniPlayer = ({ animatedStyle }: MiniPlayerProps) => {
 
 const styles = StyleSheet.create({
   cardContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
     height: 75,
-    backgroundColor: '#FFF',
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: Colors.black,
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
-    marginHorizontal: 10,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 8,
-    position: 'absolute',
-    width: '95%',
-    alignSelf: 'center',
   },
   artwork: {
     width: 50,
     height: 50,
     borderRadius: 12,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: "#F0F0F0",
   },
   textContainer: {
     flex: 1,
@@ -69,30 +62,28 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    fontWeight: '700',
-    color: Colors.black,
+    fontWeight: "700",
+    color: Colors.white,
+    letterSpacing: 0.2,
   },
   artist: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  controlBtn: {
-    padding: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   playBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
+    backgroundColor: "#F8F9FA",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default MiniPlayer;
