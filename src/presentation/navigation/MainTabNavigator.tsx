@@ -1,13 +1,12 @@
-import React from 'react';
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { MainTabParamList } from "./types";
-import { SettingsNavigator } from "./SettingsNavigator";
 import ExploreScreen from "@features/library/screens/ExploreScreen";
 import SongsScreen from "@features/library/screens/SongsScreen";
-import SearchScreen from '@features/library/screens/SearchScreen';
-import LibraryScreen from '@features/library/screens/LibraryScreen';
+import SearchScreen from "@features/library/screens/SearchScreen";
+import LibraryScreen from "@features/library/screens/LibraryScreen";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -16,34 +15,40 @@ export const MainTabNavigator = () => (
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarActiveTintColor: Colors.primary,
-      tabBarInactiveTintColor: Colors.textSecondary,
+      tabBarInactiveTintColor: "#999",
       tabBarStyle: {
-        backgroundColor: Colors.white,
+        backgroundColor: "#FFFFFF",
         borderTopWidth: 0,
-        elevation: 10,
-        height: 60,
-        paddingBottom: 10,
+        height: 70,
+        paddingBottom: 12,
+        elevation: 0,
+        borderTopColor: "transparent",
       },
       tabBarLabelStyle: {
-        fontSize: 9,
-        fontWeight: "600",
+        fontSize: 10,
+        fontWeight: "700",
+        marginTop: -5,
       },
-      tabBarIcon: ({ focused, color, size }) => {
-        if (route.name === "Explore") {
-          return <FontAwesome5 name="compact-disc" size={size} color={color} />;
-        }
-
+      tabBarIcon: ({ focused, color }) => {
         let iconName: keyof typeof Ionicons.glyphMap = "musical-notes";
 
-        if (route.name === "Search") {
+        if (route.name === "Explore") {
+          return (
+            <Ionicons
+              name={focused ? "disc" : "disc-outline"}
+              size={24}
+              color={color}
+            />
+          );
+        } else if (route.name === "Search") {
           iconName = focused ? "search" : "search-outline";
         } else if (route.name === "Songs") {
-          iconName = focused ? "musical-notes" : "musical-notes-outline";
+          iconName = focused ? "musical-note" : "musical-note-outline";
         } else if (route.name === "Library") {
           iconName = focused ? "library" : "library-outline";
         }
 
-        return <Ionicons name={iconName} size={size} color={color} />;
+        return <Ionicons name={iconName} size={24} color={color} />;
       },
     })}
   >
@@ -54,7 +59,7 @@ export const MainTabNavigator = () => (
     />
     <Tab.Screen
       name="Search"
-      component={SearchScreen} 
+      component={SearchScreen}
       options={{ title: "Buscar" }}
     />
     <Tab.Screen
@@ -64,7 +69,7 @@ export const MainTabNavigator = () => (
     />
     <Tab.Screen
       name="Library"
-      component={LibraryScreen} 
+      component={LibraryScreen}
       options={{ title: "Biblioteca" }}
     />
   </Tab.Navigator>
