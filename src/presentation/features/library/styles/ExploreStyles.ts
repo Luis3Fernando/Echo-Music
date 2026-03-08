@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.white, 
     paddingHorizontal: 1,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    marginBottom:120
   },
   section: {
     marginTop: 20,
