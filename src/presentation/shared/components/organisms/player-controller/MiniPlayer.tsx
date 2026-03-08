@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Animated from "react-native-reanimated";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { MOCK_TRACK } from "@mocks/mock-track";
 
@@ -11,8 +12,13 @@ interface MiniPlayerProps {
 
 const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
   const track = MOCK_TRACK;
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const handlePrevious = () => console.log("Evento: Canción Anterior");
-  const handlePlayPause = () => console.log("Evento: Play/Pause");
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+    console.log("Evento: Play/Pause");
+  };
   const handleNext = () => console.log("Evento: Siguiente Canción");
 
   return (
@@ -32,17 +38,21 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
         </View>
         <View style={styles.controls}>
           <TouchableOpacity onPress={handlePrevious} activeOpacity={0.6}>
-            <Ionicons name="play-back-sharp" size={22} color="#1A1A1A" />
+            <FontAwesome6 name="backward" size={18} color={Colors.black} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handlePlayPause}
             style={styles.playBtnPrimary}
             activeOpacity={0.8}
           >
-            <Ionicons name="play-sharp" size={20} color={Colors.white} />
+            <Ionicons 
+              name={isPlaying ? "pause-outline" : "play-outline"} 
+              size={22} 
+              color={Colors.white} 
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNext} activeOpacity={0.6}>
-            <Ionicons name="play-forward-sharp" size={22} color="#1A1A1A" />
+            <FontAwesome6 name="forward" size={18} color={Colors.black} />
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -58,8 +68,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
   },
   artwork: {
     width: 48,
@@ -85,16 +93,16 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 18,
+    gap: 22,
   },
   playBtnPrimary: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 3,
+    elevation: 4,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
