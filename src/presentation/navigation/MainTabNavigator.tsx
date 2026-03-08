@@ -14,10 +14,10 @@ export const MainTabNavigator = () => (
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarShowLabel: false,
-      tabBarActiveTintColor: Colors.white,
-      tabBarInactiveTintColor: "#7b7b7b",
+      tabBarActiveTintColor: Colors.primary,
+      tabBarInactiveTintColor: "#4f4f4f",
       tabBarStyle: {
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         borderTopWidth: 0,
         height: 50,
         elevation: 0,
@@ -38,7 +38,7 @@ export const MainTabNavigator = () => (
         } else {
           iconName = focused ? "library" : "library-outline";
         }
-        return <Ionicons name={iconName} size={28} color={color} />;
+        return <Ionicons name={iconName} size={24} color={color} />;
       },
     })}
   >

@@ -27,7 +27,7 @@ const MiniPlayer = ({ animatedStyle }: MiniPlayerProps) => {
       </View>
       <View style={styles.controls}>
         <TouchableOpacity style={styles.playBtn} activeOpacity={0.7}>
-          <Ionicons name="play" size={26} color={Colors.black} />
+          <Ionicons name="play" size={20} color={Colors.black} />
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.7}>
           <Ionicons name="play-forward" size={24} color={Colors.black} />
@@ -43,11 +43,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 75,
-    backgroundColor: Colors.black,
+    height: 70,
+    backgroundColor: Colors.white,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   artwork: {
     width: 50,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: Colors.white,
+    color: Colors.black,
     letterSpacing: 0.2,
   },
   artist: {
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   playBtn: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 20,
     backgroundColor: "#F8F9FA",
     justifyContent: "center",

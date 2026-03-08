@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Dimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -38,30 +38,56 @@ export const PlayerController = () => {
   const isVisible = currentRoute !== "" && currentRoute !== "Onboarding";
 
   const containerStyle = useAnimatedStyle(() => {
-  if (!isVisible) return { display: 'none' };
+    if (!isVisible) return { display: "none" };
 
-  const radiusValue = interpolate(expandProgress.value, [0, 1], [25, 0], Extrapolation.CLAMP);
+    const radiusValue = interpolate(
+      expandProgress.value,
+      [0, 1],
+      [10, 0],
+      Extrapolation.CLAMP,
+    );
 
-  return {
-    display: 'flex',
-    height: interpolate(expandProgress.value, [0, 1], [75, SCREEN_HEIGHT], Extrapolation.CLAMP),
-    bottom: interpolate(expandProgress.value, [0, 1], [TAB_BAR_HEIGHT, 0], Extrapolation.CLAMP),
-    left: 0, 
-    right: 0,
-    borderTopLeftRadius: radiusValue,
-    borderTopRightRadius: radiusValue,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    backgroundColor: "#FFFFFF",
-  };
-});
+    return {
+      display: "flex",
+      height: interpolate(
+        expandProgress.value,
+        [0, 1],
+        [70, SCREEN_HEIGHT],
+        Extrapolation.CLAMP,
+      ),
+      bottom: interpolate(
+        expandProgress.value,
+        [0, 1],
+        [TAB_BAR_HEIGHT, 0],
+        Extrapolation.CLAMP,
+      ),
+      left: 0,
+      right: 0,
+      borderTopLeftRadius: radiusValue,
+      borderTopRightRadius: radiusValue,
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+      backgroundColor: "#FFFFFF",
+      overflow: "visible",
+    };
+  });
 
   const miniOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(expandProgress.value, [0, 0.1], [1, 0], Extrapolation.CLAMP),
+    opacity: interpolate(
+      expandProgress.value,
+      [0, 0.1],
+      [1, 0],
+      Extrapolation.CLAMP,
+    ),
   }));
 
   const fullOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(expandProgress.value, [0.2, 0.5], [0, 1], Extrapolation.CLAMP),
+    opacity: interpolate(
+      expandProgress.value,
+      [0.2, 0.5],
+      [0, 1],
+      Extrapolation.CLAMP,
+    ),
   }));
 
   const gesture = Gesture.Pan()
@@ -79,9 +105,9 @@ export const PlayerController = () => {
     <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.container, containerStyle]}>
         <MiniPlayer animatedStyle={miniOpacity} />
-        <FullPlayer 
-          animatedStyle={fullOpacity} 
-          pointerEvents={expandProgress.value > 0.5 ? "auto" : "none"} 
+        <FullPlayer
+          animatedStyle={fullOpacity}
+          pointerEvents={expandProgress.value > 0.5 ? "auto" : "none"}
         />
       </Animated.View>
     </GestureDetector>
@@ -93,5 +119,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     overflow: "hidden",
     zIndex: 999,
+   
   },
 });
