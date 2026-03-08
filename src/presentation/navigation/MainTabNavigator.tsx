@@ -18,8 +18,13 @@ export const MainTabNavigator = () => (
       tabBarInactiveTintColor: "#4f4f4f",
       tabBarStyle: {
         backgroundColor: Colors.white,
-        borderTopWidth: 0,
         height: 50,
+        position: "absolute",
+        bottom: 70,
+        left: 0,
+        right: 0,
+        borderTopWidth: 1,
+        borderTopColor: "#F0F0F0",
         elevation: 0,
       },
       tabBarItemStyle: {

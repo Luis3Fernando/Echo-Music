@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Dimensions } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
+import { StyleSheet, Dimensions, View } from "react-native";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
@@ -13,112 +18,72 @@ import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-const TAB_BAR_HEIGHT = 50;
+const MINI_PLAYER_HEIGHT = 70;
 
 export const PlayerController = () => {
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentRoute, setCurrentRoute] = useState<string>("");
-  const expandProgress = useSharedValue(0);
+  const animatedIndex = useSharedValue(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const initialRoute = navigationRef.getCurrentRoute()?.name;
-      if (initialRoute) setCurrentRoute(initialRoute);
-    }, 200);
-
+    const initial = navigationRef.getCurrentRoute()?.name;
+    if (initial) setCurrentRoute(initial);
     const unsubscribe = navigationRef.addListener("state", () => {
       const routeName = navigationRef.getCurrentRoute()?.name;
       if (routeName) setCurrentRoute(routeName);
     });
-    return () => {
-      clearTimeout(timer);
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   const isVisible = currentRoute !== "" && currentRoute !== "Onboarding";
 
-  const containerStyle = useAnimatedStyle(() => {
-    if (!isVisible) return { display: "none" };
+  const expandPlayer = useCallback(() => bottomSheetRef.current?.expand(), []);
+  const closePlayer = useCallback(() => bottomSheetRef.current?.collapse(), []);
 
-    const radiusValue = interpolate(
-      expandProgress.value,
-      [0, 1],
-      [10, 0],
-      Extrapolation.CLAMP,
-    );
+  if (!isVisible) return null;
 
+  const miniPlayerStyle = useAnimatedStyle(() => {
+    const isHidden = animatedIndex.value > 0.05;
     return {
-      display: "flex",
+      opacity: interpolate(
+        animatedIndex.value,
+        [0, 0.05],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
       height: interpolate(
-        expandProgress.value,
-        [0, 1],
-        [70, SCREEN_HEIGHT],
+        animatedIndex.value,
+        [0, 0.1],
+        [MINI_PLAYER_HEIGHT, 0],
         Extrapolation.CLAMP,
       ),
-      bottom: interpolate(
-        expandProgress.value,
-        [0, 1],
-        [TAB_BAR_HEIGHT, 0],
-        Extrapolation.CLAMP,
-      ),
-      left: 0,
-      right: 0,
-      borderTopLeftRadius: radiusValue,
-      borderTopRightRadius: radiusValue,
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
-      backgroundColor: "#FFFFFF",
-      overflow: "visible",
+      display: isHidden ? "none" : "flex",
     };
   });
 
-  const miniOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      expandProgress.value,
-      [0, 0.1],
-      [1, 0],
-      Extrapolation.CLAMP,
-    ),
-  }));
-
-  const fullOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      expandProgress.value,
-      [0.2, 0.5],
-      [0, 1],
-      Extrapolation.CLAMP,
-    ),
-  }));
-
-  const gesture = Gesture.Pan()
-    .onUpdate((e) => {
-      const val = -e.translationY / (SCREEN_HEIGHT - 100);
-      expandProgress.value = Math.max(0, Math.min(1, val));
-    })
-    .onEnd((e) => {
-      if (e.velocityY < -500 || expandProgress.value > 0.5)
-        expandProgress.value = withSpring(1, { damping: 15 });
-      else expandProgress.value = withSpring(0, { damping: 15 });
-    });
-
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.container, containerStyle]}>
-        <MiniPlayer animatedStyle={miniOpacity} />
-        <FullPlayer
-          animatedStyle={fullOpacity}
-          pointerEvents={expandProgress.value > 0.5 ? "auto" : "none"}
-        />
-      </Animated.View>
-    </GestureDetector>
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={0}
+      snapPoints={[70, "100%"]}
+      animatedIndex={animatedIndex}
+      handleComponent={null}
+      backgroundStyle={{ backgroundColor: "#FFF" }}
+      enableContentPanningGesture={false}
+      enableHandlePanningGesture={false}
+    >
+      <BottomSheetView style={{ flex: 1 }}>
+        <Animated.View style={miniPlayerStyle}>
+          <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
+        </Animated.View>
+        <View style={{ flex: 1 }}>
+          <FullPlayer
+            onClose={closePlayer}
+            animatedStyle={{ opacity: 1 }}
+            pointerEvents={animatedIndex.value > 0.1 ? "auto" : "none"}
+          />
+        </View>
+      </BottomSheetView>
+    </BottomSheet>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    overflow: "hidden",
-    zIndex: 999,
-   
-  },
-});

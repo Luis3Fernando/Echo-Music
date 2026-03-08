@@ -6,48 +6,42 @@ import { MOCK_TRACK } from "@mocks/mock-track";
 
 interface MiniPlayerProps {
   animatedStyle: any;
+  onExpand?: () => void;
 }
 
-const MiniPlayer = ({ animatedStyle }: MiniPlayerProps) => {
+const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
   const track = MOCK_TRACK;
 
   return (
-    <Animated.View style={[styles.cardContainer, animatedStyle]}>
-      <Image
-        source={{ uri: track.artworkUri || undefined }}
-        style={styles.artwork}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={1}>
-          {track.title}
-        </Text>
-        <Text style={styles.artist} numberOfLines={1}>
-          {track.artistName}
-        </Text>
-      </View>
-      <View style={styles.controls}>
-        <TouchableOpacity style={styles.playBtn} activeOpacity={0.7}>
-          <Ionicons name="play" size={20} color={Colors.black} />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Ionicons name="play-forward" size={24} color={Colors.black} />
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
+    <TouchableOpacity onPress={onExpand} activeOpacity={1}>
+      <Animated.View style={[styles.cardContainer, animatedStyle]}>
+        <Image source={{ uri: track.artworkUri || undefined }} style={styles.artwork} />
+        <View style={styles.textContainer}>
+          <Text style={styles.title} numberOfLines={1}>{track.title}</Text>
+          <Text style={styles.artist} numberOfLines={1}>{track.artistName}</Text>
+        </View>
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.playBtn} activeOpacity={0.7}>
+            <Ionicons name="play" size={20} color={Colors.black} />
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.7}>
+            <Ionicons name="play-forward" size={24} color={Colors.black} />
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   cardContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
+    width: "100%",
     height: 70,
     backgroundColor: Colors.white,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
   },
   artwork: {
     width: 50,
@@ -74,11 +68,11 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 16,
   },
   playBtn: {
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     borderRadius: 20,
     backgroundColor: "#F8F9FA",
     justifyContent: "center",
