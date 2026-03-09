@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 10,
     marginTop: 3,
-    marginBottom: 15,
+    marginBottom: 20,
     columnGap: 30
   },
   imageColumn: {

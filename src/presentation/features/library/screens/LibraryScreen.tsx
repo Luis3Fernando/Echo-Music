@@ -4,6 +4,7 @@ import { Colors } from "@theme/colors";
 import PlaylistPromoSection from "../components/PlaylistPromoSection";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import PlaylistHorizontalList from "../components/PlaylistHorizontalList";
+import FolderListSection from "../components/FolderListSection";
 
 const USER_PLAYLISTS = [
   {
@@ -83,6 +84,7 @@ const LibraryScreen = () => {
           sectionTitle="Para tí"
           data={SYSTEM_PLAYLISTS}
         />
+        <FolderListSection />
       </ScrollView>
     </View>
   );
