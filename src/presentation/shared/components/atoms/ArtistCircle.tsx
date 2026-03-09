@@ -132,9 +132,8 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   name: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.black,
-    fontWeight: "700",
     textAlign: "center",
     paddingHorizontal: 2,
     lineHeight: 14,

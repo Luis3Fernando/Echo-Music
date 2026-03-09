@@ -23,9 +23,16 @@ export const MainTabNavigator = () => (
         bottom: 70,
         left: 0,
         right: 0,
-        elevation: 0,
         paddingTop: 5,
         borderTopWidth: 0,
+        elevation: 10, 
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: -5, 
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
       },
       tabBarItemStyle: {
         justifyContent: "center",
@@ -40,7 +47,6 @@ export const MainTabNavigator = () => (
             <Ionicons name="disc-outline" size={24} color={color} />
           );
         }
-
         if (route.name === "Songs") {
           return (
             <Ionicons
@@ -50,7 +56,6 @@ export const MainTabNavigator = () => (
             />
           );
         }
-
         if (route.name === "Library") {
           return (
             <MaterialCommunityIcons
@@ -60,7 +65,6 @@ export const MainTabNavigator = () => (
             />
           );
         }
-
         if (route.name === "Search") {
           return (
             <Ionicons
