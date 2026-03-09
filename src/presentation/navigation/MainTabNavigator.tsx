@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { MainTabParamList } from "./types";
 import ExploreScreen from "@features/library/screens/ExploreScreen";
@@ -24,7 +24,8 @@ export const MainTabNavigator = () => (
         left: 0,
         right: 0,
         elevation: 0,
-        paddingTop: 5
+        paddingTop: 5,
+        borderTopWidth: 0,
       },
       tabBarItemStyle: {
         justifyContent: "center",
@@ -32,17 +33,43 @@ export const MainTabNavigator = () => (
         height: 50,
       },
       tabBarIcon: ({ focused, color }) => {
-        let iconName: keyof typeof Ionicons.glyphMap;
         if (route.name === "Explore") {
-          iconName = focused ? "disc" : "disc-outline";
-        } else if (route.name === "Search") {
-          iconName = focused ? "search" : "search-outline";
-        } else if (route.name === "Songs") {
-          iconName = focused ? "musical-notes" : "musical-notes-outline";
-        } else {
-          iconName = focused ? "library" : "library-outline";
+          return focused ? (
+            <FontAwesome6 name="compact-disc" size={24} color={color} />
+          ) : (
+            <Ionicons name="disc-outline" size={24} color={color} />
+          );
         }
-        return <Ionicons name={iconName} size={24} color={color} />;
+
+        if (route.name === "Songs") {
+          return (
+            <Ionicons
+              name={focused ? "musical-notes" : "musical-notes-outline"}
+              size={24}
+              color={color}
+            />
+          );
+        }
+
+        if (route.name === "Library") {
+          return (
+            <MaterialCommunityIcons
+              name={focused ? "music-box-multiple" : "music-box-multiple-outline"}
+              size={24}
+              color={color}
+            />
+          );
+        }
+
+        if (route.name === "Search") {
+          return (
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
+              size={24}
+              color={color}
+            />
+          );
+        }
       },
     })}
   >
