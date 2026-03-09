@@ -17,7 +17,6 @@ const FolderListSection = () => {
             name={folder.name}
             path={folder.path}
             onPress={() => {
-              console.log(`Navegando a Carpeta: ${folder.name}`);
               navigation.navigate("Folder", { 
                 folderId: folder.id, 
                 folderName: folder.name 
@@ -32,7 +31,7 @@ const FolderListSection = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 30,
+    marginTop: 20,
   },
   listWrapper: {
     marginTop: 5,

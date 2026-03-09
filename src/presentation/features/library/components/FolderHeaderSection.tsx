@@ -55,7 +55,8 @@ const FolderHeaderSection = ({ name, path }: FolderHeaderProps) => {
 const styles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 5,
+    marginTop: 30,
     backgroundColor: '#FFF',
   },
   topNavigationRow: {
