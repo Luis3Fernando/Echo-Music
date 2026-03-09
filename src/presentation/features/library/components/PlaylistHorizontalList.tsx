@@ -1,6 +1,7 @@
+import { FlatList, StyleSheet, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import PlaylistItem from "@components/atoms/PlaylistItem";
 import SectionTitle from "@components/atoms/SectionTitle";
-import { FlatList, StyleSheet, View } from "react-native";
 
 interface PlaylistData {
   id: string;
@@ -17,6 +18,8 @@ const PlaylistHorizontalList = ({
   sectionTitle,
   data,
 }: PlaylistHorizontalListProps) => {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.container}>
       <SectionTitle title={sectionTitle} />
@@ -30,7 +33,13 @@ const PlaylistHorizontalList = ({
           <PlaylistItem
             title={item.title}
             imageUri={item.imageUri}
-            onPress={() => console.log(`Navegando a playlist: ${item.title}`)}
+            onPress={() => {
+              console.log(`Navegando a Playlist ID: ${item.id}`);
+              navigation.navigate("Playlist", {
+                playlistId: item.id,
+                playlistTitle: item.title,
+              });
+            }}
           />
         )}
       />
