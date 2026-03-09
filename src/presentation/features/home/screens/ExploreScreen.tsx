@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { styles } from "../styles/ExploreStyles";
+import { styles } from "../../library/styles/ExploreStyles";
 import { useRecommendations } from "@hooks/use-recommendations.hook";
 import RecommendedSection from "../components/RecommendedSection";
 import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeader";

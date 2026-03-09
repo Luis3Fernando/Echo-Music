@@ -62,7 +62,7 @@ const RecommendedSection = ({ data }: { data: any[] }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { marginTop: 10 },
+  container: { marginTop: 5 },
   listContent: {
     paddingHorizontal: 10,
   },

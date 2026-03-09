@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
-    marginTop: 3,
+    marginTop: 5,
     marginBottom: 20,
     columnGap: 30
   },

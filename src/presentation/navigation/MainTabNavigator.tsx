@@ -2,10 +2,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { MainTabParamList } from "./types";
-import ExploreScreen from "@features/library/screens/ExploreScreen";
-import SongsScreen from "@features/library/screens/SongsScreen";
-import SearchScreen from "@features/library/screens/SearchScreen";
-import LibraryScreen from "@features/library/screens/LibraryScreen";
+import ExploreScreen from "@features/home/screens/ExploreScreen";
+import SongsScreen from "@features/songs/screens/SongsScreen";
+import SearchScreen from "@features/search/screens/SearchScreen";
+import { LibraryNavigator } from "./LibraryNavigator";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -80,6 +80,6 @@ export const MainTabNavigator = () => (
     <Tab.Screen name="Explore" component={ExploreScreen} />
     <Tab.Screen name="Search" component={SearchScreen} />
     <Tab.Screen name="Songs" component={SongsScreen} />
-    <Tab.Screen name="Library" component={LibraryScreen} />
+    <Tab.Screen name="Library" component={LibraryNavigator} />
   </Tab.Navigator>
 );
