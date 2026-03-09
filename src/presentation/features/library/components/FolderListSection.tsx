@@ -1,16 +1,12 @@
+import { FOLDER_MOCKS } from "@/infrastructure/mocks/mock-folder";
 import FolderItem from "@components/atoms/FolderItem";
 import SectionTitle from "@components/atoms/SectionTitle";
 import { View, StyleSheet } from "react-native";
-
-const FOLDER_MOCKS = [
-  { id: "f1", name: "Descargas", path: "/storage/emulated/0/Download" },
-  { id: "f2", name: "WhatsApp Audio", path: "/storage/emulated/0/WhatsApp/Media" },
-  { id: "f3", name: "Echo Music Local", path: "/storage/emulated/0/Music/Echo" },
-  { id: "f4", name: "Audio", path: "/storage/emulated/0/Music" },
-  { id: "f5", name: "Music", path: "/storage/emulated/0/Music/Music/Music" },
-];
+import { useNavigation } from "@react-navigation/native";
 
 const FolderListSection = () => {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.container}>
       <SectionTitle title="Carpetas locales" />
@@ -20,7 +16,13 @@ const FolderListSection = () => {
             key={folder.id}
             name={folder.name}
             path={folder.path}
-            onPress={() => console.log(`Evento: Abriendo carpeta ${folder.name}`)}
+            onPress={() => {
+              console.log(`Navegando a Carpeta: ${folder.name}`);
+              navigation.navigate("Folder", { 
+                folderId: folder.id, 
+                folderName: folder.name 
+              });
+            }}
           />
         ))}
       </View>
@@ -30,7 +32,7 @@ const FolderListSection = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: 30,
   },
   listWrapper: {
     marginTop: 5,

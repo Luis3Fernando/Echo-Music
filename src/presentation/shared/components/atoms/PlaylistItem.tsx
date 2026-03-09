@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
   coverImage: {
     width: 130,
-    height: 150,
+    height: 140,
     borderRadius: 10,
     backgroundColor: "#F0F0F0",
   },
