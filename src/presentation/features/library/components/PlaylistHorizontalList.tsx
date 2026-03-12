@@ -30,8 +30,8 @@ const PlaylistHorizontalList = ({
             artworkUri={item.artworkUri}
             onPress={() => {
               navigation.navigate("Playlist", {
-                playlistId: item.id,
-                playlistName: item.name,
+                id: item.id,
+                name: item.name,
               });
             }}
           />

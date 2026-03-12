@@ -15,4 +15,6 @@ export const Colors = {
   muted: "#f2f2f2",
   gray_text: "#707070",
   gray_light: "#C2C0C5",
+  gray: '#858585',
+  gray_dark: '#2D2D2D'
 };

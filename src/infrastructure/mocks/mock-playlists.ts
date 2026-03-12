@@ -38,7 +38,7 @@ export const USER_PLAYLISTS: Playlist[] = [
   {
     id: "5",
     name: "Techno",
-    artworkUri: "https://miro.medium.com/0*K2jbty9GAtQeAPc1",
+    artworkUri: "https://i1.sndcdn.com/artworks-000413760396-hymugh-t500x500.jpg",
     isUserCreated: true,
     createdAt: now,
     updatedAt: now,
