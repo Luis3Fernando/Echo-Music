@@ -1,12 +1,15 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
+import { useNavigation } from "@react-navigation/native";
 
 interface PlaylistPromoProps {
   hasPlaylist: boolean;
 }
 
 const PlaylistPromoSection = ({ hasPlaylist }: PlaylistPromoProps) => {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.imageColumn}>
@@ -30,10 +33,15 @@ const PlaylistPromoSection = ({ hasPlaylist }: PlaylistPromoProps) => {
             </Text>
           </View>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8}>
+            <TouchableOpacity 
+              style={styles.primaryBtn} 
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("PlaylistForm")} 
+            >
               <Ionicons name="add-circle" size={20} color={Colors.white} />
               <Text style={styles.btnText}>Crear</Text>
             </TouchableOpacity>
+            
             {hasPlaylist && (
               <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
                 <Ionicons name="play" size={20} color={Colors.black} />
