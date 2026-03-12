@@ -43,7 +43,6 @@ const PlaylistPromoSection = ({ playlist }: PlaylistPromoProps) => {
               48 canciones • 2h 15m
             </Text>
           </View>
-          
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.primaryBtn}
@@ -53,7 +52,6 @@ const PlaylistPromoSection = ({ playlist }: PlaylistPromoProps) => {
               <Ionicons name="add-circle" size={20} color={Colors.white} />
               <Text style={styles.btnText}>Crear</Text>
             </TouchableOpacity>
-
             <TouchableOpacity 
               style={styles.secondaryBtn} 
               activeOpacity={0.8}
@@ -110,7 +108,7 @@ const styles = StyleSheet.create({
   },
   playlistStats: {
     fontSize: 13,
-    color: "#707070",
+    color: Colors.gray_text,
     lineHeight: 18,
   },
   buttonRow: {
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   secondaryBtn: {
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.muted,
     width: 44,
     height: 44,
     borderRadius: 12,

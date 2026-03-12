@@ -44,7 +44,7 @@ const SongItem = ({
           <Image source={{ uri: track.artworkUri }} style={styles.artwork} />
         ) : (
           <View style={styles.placeholder}>
-            <Ionicons name="musical-notes" size={20} color="#555" />
+            <Ionicons name="musical-notes" size={20} color={Colors.gray_light} />
           </View>
         )}
       </View>
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 6,
-    backgroundColor: "#282828",
+    backgroundColor: "#EAE7EE",
     justifyContent: "center",
     alignItems: "center",
   },
