@@ -2,51 +2,70 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { useNavigation } from "@react-navigation/native";
+import { Playlist } from "@/domain/entities/playlist.entity";
 
 interface PlaylistPromoProps {
-  hasPlaylist: boolean;
+  playlist: Playlist;
 }
 
-const PlaylistPromoSection = ({ hasPlaylist }: PlaylistPromoProps) => {
+const PlaylistPromoSection = ({ playlist }: PlaylistPromoProps) => {
   const navigation = useNavigation<any>();
 
   return (
     <View style={styles.sectionContainer}>
-      <View style={styles.imageColumn}>
+      <TouchableOpacity
+        style={styles.imageColumn}
+        activeOpacity={0.9}
+        onPress={() => {
+          navigation.navigate("Playlist", {
+            playlistId: playlist.id,
+            playlistName: playlist.name,
+          });
+        }}
+      >
         <Image
           source={
-            hasPlaylist
-              ? { uri: "https://http2.mlstatic.com/D_Q_NP_950212-MLA92976537143_092025-O.webp" }
+            playlist.artworkUri
+              ? { uri: playlist.artworkUri }
               : require("@assets/img/album_default.png")
           }
           style={styles.coverImage}
         />
-      </View>
+      </TouchableOpacity>
+      
       <View style={styles.infoColumn}>
         <View style={styles.bottomContent}>
           <View style={styles.textWrapper}>
             <Text style={styles.playlistTitle} numberOfLines={2}>
-              {hasPlaylist ? "Dua Lipa Favorites" : "Organiza tu Música"}
+              {playlist.name}
             </Text>
             <Text style={styles.playlistStats}>
-              {hasPlaylist ? "48 canciones • 2h 15m" : "Crea una playlist para organizar tus canciones"}
+              48 canciones • 2h 15m
             </Text>
           </View>
+          
           <View style={styles.buttonRow}>
-            <TouchableOpacity 
-              style={styles.primaryBtn} 
+            <TouchableOpacity
+              style={styles.primaryBtn}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate("PlaylistForm")} 
+              onPress={() => navigation.navigate("PlaylistForm")}
             >
               <Ionicons name="add-circle" size={20} color={Colors.white} />
               <Text style={styles.btnText}>Crear</Text>
             </TouchableOpacity>
-            
-            {hasPlaylist && (
-              <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
-                <Ionicons name="play" size={20} color={Colors.black} />
-              </TouchableOpacity>
-            )}
+
+            <TouchableOpacity 
+              style={styles.secondaryBtn} 
+              activeOpacity={0.8}
+              onPress={() => {
+                navigation.navigate("Playlist", {
+                  playlistId: playlist.id,
+                  playlistName: playlist.name,
+                });
+              }}
+            >
+              <Ionicons name="play" size={20} color={Colors.black} />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -60,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 5,
     marginBottom: 20,
-    columnGap: 30
+    columnGap: 30,
   },
   imageColumn: {
     flex: 0.4,
@@ -80,7 +99,7 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   textWrapper: {
-    marginBottom: 12, 
+    marginBottom: 12,
   },
   playlistTitle: {
     fontSize: 20,

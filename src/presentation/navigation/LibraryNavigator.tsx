@@ -7,7 +7,7 @@ import PlaylistFormScreen from "@features/library/screens/PlaylistFormScreen";
 
 export type LibraryStackParamList = {
   LibraryIndex: undefined;
-  Playlist: { id: string; title: string };
+  Playlist: { id: string; name: string };
   Folder: { name: string; path: string };
   PlaylistForm: { playlist?: Playlist };
 };

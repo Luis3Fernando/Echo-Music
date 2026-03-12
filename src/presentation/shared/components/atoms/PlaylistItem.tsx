@@ -1,19 +1,21 @@
-import { Colors } from "@/core/theme/colors";
-import React from "react";
-import { TouchableOpacity, Image, Text, StyleSheet, View } from "react-native";
+import { Colors } from "@theme/colors";
+import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
 
 interface PlaylistItemProps {
-  title: string;
-  imageUri: string;
+  name: string;
+  artworkUri?: string | null;
   onPress: () => void;
 }
 
-const PlaylistItem = ({ title, imageUri, onPress }: PlaylistItemProps) => {
+const PlaylistItem = ({ name, artworkUri, onPress }: PlaylistItemProps) => {
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={onPress} activeOpacity={0.7}>
-      <Image source={{ uri: imageUri }} style={styles.coverImage} />
+      <Image 
+        source={artworkUri ? { uri: artworkUri } : require("@assets/img/album_default.png")} 
+        style={styles.coverImage} 
+      />
       <Text style={styles.playlistName} numberOfLines={2}>
-        {title}
+        {name}
       </Text>
     </TouchableOpacity>
   );
@@ -21,12 +23,12 @@ const PlaylistItem = ({ title, imageUri, onPress }: PlaylistItemProps) => {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    width: 130, 
+    width: 140, 
     marginRight: 15,
   },
   coverImage: {
-    width: 130,
-    height: 140,
+    width: 140,
+    height: 150,
     borderRadius: 10,
     backgroundColor: "#F0F0F0",
   },
