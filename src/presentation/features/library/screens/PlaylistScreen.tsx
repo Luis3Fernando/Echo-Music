@@ -19,6 +19,7 @@ import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MOCK_SONGS } from "@mocks/mock-songs";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
+import { Track } from "@/domain/entities/track.entity";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -26,17 +27,17 @@ const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
-
-  // Estados para el Menú Popover
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+  const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
+  const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
 
   const playlist = useMemo(() => {
     const allPlaylists = [...USER_PLAYLISTS, ...SYSTEM_PLAYLISTS];
     return allPlaylists.find((p) => p.id === id);
   }, [id]);
 
-  // Opciones del Menú con iconos
   const playlistOptions: MenuItem[] = [
     {
       label: "Editar playlist",
@@ -45,7 +46,7 @@ const PlaylistScreen = () => {
     },
     {
       label: "Eliminar",
-      icon: "trash",
+      icon: "trash-outline",
       variant: "danger",
       onPress: () => console.log("Lógica para eliminar"),
     },
@@ -53,9 +54,33 @@ const PlaylistScreen = () => {
 
   const { main, dark } = useImageAccentColor(
     playlist?.artworkUri,
-    Colors.gray_dark
+    Colors.gray_dark,
   );
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const trackOptions: MenuItem[] = [
+    {
+      label: "Reproducir",
+      icon: "play-outline",
+      onPress: () => console.log("Play", selectedTrack?.title),
+    },
+    {
+      label: "Añadir a la cola",
+      icon: "list-outline",
+      onPress: () => console.log("A cola"),
+    },
+    {
+      label: "Quitar de esta playlist",
+      icon: "remove-circle-outline",
+      onPress: () => console.log("Quitar"),
+    },
+    {
+      label: "Eliminar del dispositivo",
+      icon: "trash-outline",
+      variant: "danger",
+      onPress: () => console.log("Borrar"),
+    },
+  ];
 
   useEffect(() => {
     if (main !== Colors.gray_dark) {
@@ -128,22 +153,29 @@ const PlaylistScreen = () => {
                 track={item as any}
                 showIndex={false}
                 showFavorite={true}
-                isFavorite={item.id === "1"}
-                onPress={(t) => console.log("Reproduciendo:", t.title)}
-                onFavoritePress={(t) => console.log("Toggle favorito:", t.title)}
+                onOptionsPress={(event, track) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  setTrackMenuAnchor({ x: pageX, y: pageY });
+                  setSelectedTrack(track);
+                  setIsTrackMenuVisible(true);
+                }}
               />
             )}
             contentContainerStyle={{ paddingBottom: 40 }}
           />
         </View>
       </SafeAreaView>
-
-      {/* RENDER DEL MENÚ POPOVER */}
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
         items={playlistOptions}
         anchorPosition={menuAnchor}
+      />
+      <MenuPopover
+        isVisible={isTrackMenuVisible}
+        onClose={() => setIsTrackMenuVisible(false)}
+        items={trackOptions}
+        anchorPosition={trackMenuAnchor}
       />
     </View>
   );

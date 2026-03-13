@@ -33,13 +33,14 @@ export const MenuPopover = ({
   anchorPosition,
 }: MenuPopoverProps) => {
   const isBottom = anchorPosition.y > SCREEN_HEIGHT / 2;
-  const menuWidth = 180;
+  const menuWidth = 210;
+
   const dynamicStyles = {
     top: isBottom ? undefined : anchorPosition.y + 10,
     bottom: isBottom ? SCREEN_HEIGHT - anchorPosition.y + 10 : undefined,
     left: Math.min(
-      anchorPosition.x - menuWidth + 20,
-      SCREEN_WIDTH - menuWidth - 20,
+      anchorPosition.x - menuWidth + 40,
+      SCREEN_WIDTH - menuWidth - 15,
     ),
   };
 
@@ -53,37 +54,36 @@ export const MenuPopover = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={[styles.menuCard, dynamicStyles, { width: menuWidth }]}>
-            {items.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.menuItem,
-                  index === items.length - 1 && { borderBottomWidth: 0 },
-                  { flexDirection: "row", alignItems: "center" },
-                ]}
-                onPress={() => {
-                  item.onPress();
-                  onClose();
-                }}
-              >
-                {item.icon && (
-                  <Ionicons
-                    name={item.icon as any}
-                    size={18}
-                    color={item.variant === "danger" ? "#E53935" : "#666"}
-                    style={{ marginRight: 12 }}
-                  />
-                )}
-                <Text
+            {items.map((item, index) => {
+              const isDanger = item.variant === "danger";
+              const contentColor = isDanger ? "#E53935" : "#555555";
+              return (
+                <TouchableOpacity
+                  key={index}
                   style={[
-                    styles.itemText,
-                    item.variant === "danger" && { color: "#E53935" },
+                    styles.menuItem,
+                    index === items.length - 1 && { borderBottomWidth: 0 },
                   ]}
+                  onPress={() => {
+                    item.onPress();
+                    onClose();
+                  }}
+                  activeOpacity={0.6}
                 >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  {item.icon && (
+                    <Ionicons
+                      name={item.icon as any}
+                      size={20}
+                      color={contentColor}
+                      style={styles.iconStyle}
+                    />
+                  )}
+                  <Text style={[styles.itemText, { color: contentColor }]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -94,28 +94,36 @@ export const MenuPopover = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(0,0,0,0.02)", 
   },
   menuCard: {
     position: "absolute",
     backgroundColor: Colors.white,
-    borderRadius: 14,
-    paddingVertical: 6,
+    borderRadius: 10, 
+    paddingVertical: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 15,
+    elevation: 10,
   },
   menuItem: {
-    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#F0F0F0",
   },
+  iconStyle: {
+    marginRight: 12,
+    width: 22,
+    textAlign: "center",
+  },
   itemText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#1A1A1A",
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 20,
   },
 });

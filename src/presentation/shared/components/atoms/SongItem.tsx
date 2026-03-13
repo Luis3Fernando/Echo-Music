@@ -1,4 +1,11 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  GestureResponderEvent,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Track } from "@/domain/entities/track.entity";
 import { Colors } from "@theme/colors";
@@ -13,7 +20,7 @@ interface SongItemProps {
   isFavorite?: boolean;
   onPress?: (track: Track) => void;
   onFavoritePress?: (track: Track) => void;
-  onOptionsPress?: (track: Track) => void;
+  onOptionsPress?: (event: GestureResponderEvent, track: Track) => void;
 }
 
 const SongItem = ({
@@ -44,7 +51,11 @@ const SongItem = ({
           <Image source={{ uri: track.artworkUri }} style={styles.artwork} />
         ) : (
           <View style={styles.placeholder}>
-            <Ionicons name="musical-notes" size={20} color={Colors.gray_light} />
+            <Ionicons
+              name="musical-notes"
+              size={20}
+              color={Colors.gray_light}
+            />
           </View>
         )}
       </View>
@@ -73,8 +84,8 @@ const SongItem = ({
         )}
         {showOptions && (
           <TouchableOpacity
-            onPress={() => onOptionsPress?.(track)}
             style={styles.actionButton}
+            onPress={(event) => onOptionsPress?.(event, track)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color="#b3b3b3" />
           </TouchableOpacity>
