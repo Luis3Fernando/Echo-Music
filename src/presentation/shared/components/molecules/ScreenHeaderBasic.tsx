@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from '@theme/colors';
 
@@ -7,7 +7,7 @@ interface ScreenHeaderProps {
   showBack?: boolean;
   showOptions?: boolean;
   onBackPress?: () => void;
-  onOptionsPress?: () => void;
+  onOptionsPress?: (event: GestureResponderEvent) => void; 
   variant?: 'light' | 'dark';
 }
 
@@ -38,7 +38,10 @@ export const ScreenHeaderBasic = ({
         </Text>
       </View>
       {showOptions ? (
-        <TouchableOpacity style={styles.actionButton} onPress={onOptionsPress}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={(event) => onOptionsPress?.(event)} 
+        >
           <Ionicons name="ellipsis-vertical" size={22} color={iconColor} />
         </TouchableOpacity>
       ) : (

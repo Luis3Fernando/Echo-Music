@@ -1,4 +1,5 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
+import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import {
   StyleSheet,
   Text,
@@ -23,17 +24,36 @@ type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
 const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { id } = route.params;
+
+  // Estados para el Menú Popover
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
 
   const playlist = useMemo(() => {
     const allPlaylists = [...USER_PLAYLISTS, ...SYSTEM_PLAYLISTS];
     return allPlaylists.find((p) => p.id === id);
   }, [id]);
 
+  // Opciones del Menú con iconos
+  const playlistOptions: MenuItem[] = [
+    {
+      label: "Editar playlist",
+      icon: "pencil",
+      onPress: () => navigation.navigate("PlaylistForm", { playlist }),
+    },
+    {
+      label: "Eliminar",
+      icon: "trash",
+      variant: "danger",
+      onPress: () => console.log("Lógica para eliminar"),
+    },
+  ];
+
   const { main, dark } = useImageAccentColor(
     playlist?.artworkUri,
-    Colors.gray_dark,
+    Colors.gray_dark
   );
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -63,7 +83,11 @@ const PlaylistScreen = () => {
           showBack={true}
           showOptions={true}
           onBackPress={() => navigation.goBack()}
-          onOptionsPress={() => console.log("Opciones de playlist")}
+          onOptionsPress={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            setMenuAnchor({ x: pageX, y: pageY });
+            setIsMenuVisible(true);
+          }}
           variant="dark"
         />
         <View style={styles.topSection}>
@@ -106,15 +130,21 @@ const PlaylistScreen = () => {
                 showFavorite={true}
                 isFavorite={item.id === "1"}
                 onPress={(t) => console.log("Reproduciendo:", t.title)}
-                onFavoritePress={(t) =>
-                  console.log("Toggle favorito:", t.title)
-                }
+                onFavoritePress={(t) => console.log("Toggle favorito:", t.title)}
               />
             )}
             contentContainerStyle={{ paddingBottom: 40 }}
           />
         </View>
       </SafeAreaView>
+
+      {/* RENDER DEL MENÚ POPOVER */}
+      <MenuPopover
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        items={playlistOptions}
+        anchorPosition={menuAnchor}
+      />
     </View>
   );
 };
@@ -174,7 +204,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 10,
-    paddingTop: 5, 
+    paddingTop: 5,
     overflow: "hidden",
     paddingBottom: 100,
   },
