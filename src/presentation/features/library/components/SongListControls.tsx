@@ -1,22 +1,44 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 
-const SongListControls = () => {
+interface SongListControlsProps {
+  orderLabel: string;
+  onOrderPress: (event: GestureResponderEvent) => void;
+  onShufflePress: () => void;
+  onPlayAllPress: () => void;
+}
+
+const SongListControls = ({ 
+  orderLabel, 
+  onOrderPress, 
+  onShufflePress, 
+  onPlayAllPress 
+}: SongListControlsProps) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.orderButton} activeOpacity={0.7}>
+      <TouchableOpacity 
+        style={styles.orderButton} 
+        activeOpacity={0.7}
+        onPress={(e) => onOrderPress(e)}
+      >
         <Ionicons name="swap-vertical" size={18} color="#666" />
-        <Text style={styles.orderText}>Por nombre</Text>
+        <Text style={styles.orderText}>{orderLabel}</Text>
       </TouchableOpacity>
+
       <View style={styles.rightButtons}>
-        <TouchableOpacity style={styles.iconCircle} activeOpacity={0.7}>
+        <TouchableOpacity 
+          style={styles.iconCircle} 
+          activeOpacity={0.7}
+          onPress={onShufflePress}
+        >
           <Ionicons name="shuffle" size={20} color="#1A1A1A" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.iconCircle, styles.playBtn]}
           activeOpacity={0.8}
+          onPress={onPlayAllPress}
         >
           <Ionicons name="play" size={20} color={Colors.white} />
         </TouchableOpacity>

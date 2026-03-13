@@ -1,3 +1,4 @@
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -32,16 +33,22 @@ export const MenuPopover = ({
   items,
   anchorPosition,
 }: MenuPopoverProps) => {
-  const isBottom = anchorPosition.y > SCREEN_HEIGHT / 2;
   const menuWidth = 210;
+  const screenPadding = 10;
+
+  const isBottomHalf = anchorPosition.y > SCREEN_HEIGHT / 2;
+  const isRightHalf = anchorPosition.x > SCREEN_WIDTH / 2;
+
+  let leftPos = anchorPosition.x;
+  if (isRightHalf) {
+    leftPos = anchorPosition.x - menuWidth;
+  }
+  leftPos = Math.max(screenPadding, Math.min(leftPos, SCREEN_WIDTH - menuWidth - screenPadding));
 
   const dynamicStyles = {
-    top: isBottom ? undefined : anchorPosition.y + 10,
-    bottom: isBottom ? SCREEN_HEIGHT - anchorPosition.y + 10 : undefined,
-    left: Math.min(
-      anchorPosition.x - menuWidth + 40,
-      SCREEN_WIDTH - menuWidth - 15,
-    ),
+    top: isBottomHalf ? undefined : anchorPosition.y + 10,
+    bottom: isBottomHalf ? SCREEN_HEIGHT - anchorPosition.y + 10 : undefined,
+    left: leftPos,
   };
 
   return (
@@ -57,6 +64,7 @@ export const MenuPopover = ({
             {items.map((item, index) => {
               const isDanger = item.variant === "danger";
               const contentColor = isDanger ? "#E53935" : "#555555";
+              
               return (
                 <TouchableOpacity
                   key={index}
@@ -110,7 +118,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 12, // Un pelín más de padding para que sea más fácil tocar
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#F0F0F0",

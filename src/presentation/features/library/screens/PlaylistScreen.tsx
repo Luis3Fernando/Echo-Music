@@ -32,6 +32,9 @@ const PlaylistScreen = () => {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
+  const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
+  const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
+  const [currentSort, setCurrentSort] = useState("Por nombre");
 
   const playlist = useMemo(() => {
     const allPlaylists = [...USER_PLAYLISTS, ...SYSTEM_PLAYLISTS];
@@ -79,6 +82,34 @@ const PlaylistScreen = () => {
       icon: "trash-outline",
       variant: "danger",
       onPress: () => console.log("Borrar"),
+    },
+  ];
+
+  const sortOptions: MenuItem[] = [
+    {
+      label: "Por nombre (A-Z)",
+      icon: "text-outline",
+      onPress: () => setCurrentSort("Por nombre (A-Z)"),
+    },
+    {
+      label: "Por nombre (Z-A)",
+      icon: "text-outline",
+      onPress: () => setCurrentSort("Por nombre (Z-A)"),
+    },
+    {
+      label: "Más recientes",
+      icon: "time-outline",
+      onPress: () => setCurrentSort("Más recientes"),
+    },
+    {
+      label: "Por artista",
+      icon: "person-outline",
+      onPress: () => setCurrentSort("Por artista"),
+    },
+    {
+      label: "Por duración",
+      icon: "hourglass-outline",
+      onPress: () => setCurrentSort("Por duración"),
     },
   ];
 
@@ -147,7 +178,18 @@ const PlaylistScreen = () => {
             data={MOCK_SONGS}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
-            ListHeaderComponent={<SongListControls />}
+            ListHeaderComponent={
+              <SongListControls
+                orderLabel={currentSort}
+                onOrderPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  setSortMenuAnchor({ x: pageX, y: pageY });
+                  setIsSortMenuVisible(true);
+                }}
+                onShufflePress={() => console.log("Shuffle canciones")}
+                onPlayAllPress={() => console.log("Reproducir todo")}
+              />
+            }
             renderItem={({ item }) => (
               <SongItem
                 track={item as any}
@@ -176,6 +218,12 @@ const PlaylistScreen = () => {
         onClose={() => setIsTrackMenuVisible(false)}
         items={trackOptions}
         anchorPosition={trackMenuAnchor}
+      />
+      <MenuPopover
+        isVisible={isSortMenuVisible}
+        onClose={() => setIsSortMenuVisible(false)}
+        items={sortOptions}
+        anchorPosition={sortMenuAnchor}
       />
     </View>
   );
