@@ -1,18 +1,11 @@
-import { useMemo } from "react";
 import { StyleSheet, View, Platform, ScrollView } from "react-native";
 import { Colors } from "@theme/colors";
 import { SYSTEM_PLAYLISTS, USER_PLAYLISTS } from "@mocks/mock-playlists";
-import PlaylistPromoSection from "../components/PlaylistPromoSection";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import PlaylistHorizontalList from "../components/PlaylistHorizontalList";
 import FolderListSection from "../components/FolderListSection";
 
 const LibraryScreen = () => {
-  const featuredPlaylist = useMemo(() => {
-    const randomIndex = Math.floor(Math.random() * USER_PLAYLISTS.length);
-    return USER_PLAYLISTS[randomIndex];
-  }, []);
-
   return (
     <View style={styles.container}>
       <ScreenHeader title="Librería" showAction={false} />
@@ -20,8 +13,6 @@ const LibraryScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        <PlaylistPromoSection playlist={featuredPlaylist} />
-        
         <PlaylistHorizontalList
           sectionTitle="Tus listas de reproducción"
           data={USER_PLAYLISTS}

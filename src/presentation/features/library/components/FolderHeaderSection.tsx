@@ -12,20 +12,6 @@ const FolderHeaderSection = ({ name, path }: FolderHeaderProps) => {
 
   return (
     <View style={styles.headerContainer}>
-      <View style={styles.topNavigationRow}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="chevron-back" size={28} color="#1A1A1A" />
-        </TouchableOpacity>        
-        <View style={styles.titleWrapper}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {name}
-          </Text>
-        </View>
-        <View style={{ width: 40 }} />
-      </View>
       <View style={styles.detailRow}>
         <View style={styles.iconBox}>
           <Ionicons name="folder-open" size={35} color="#666" />
@@ -55,7 +41,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: 20,
     paddingBottom: 5,
-    marginTop: 30,
+    marginTop: 5,
     backgroundColor: '#FFF',
   },
   topNavigationRow: {
