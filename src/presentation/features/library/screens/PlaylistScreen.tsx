@@ -17,9 +17,9 @@ import { USER_PLAYLISTS, SYSTEM_PLAYLISTS } from "@mocks/mock-playlists";
 import { useImageAccentColor } from "@hooks/use-image-accent-color";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MOCK_SONGS } from "@mocks/mock-songs";
+import { Track } from "@entities/track.entity";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
-import { Track } from "@/domain/entities/track.entity";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -78,7 +78,7 @@ const PlaylistScreen = () => {
       onPress: () => console.log("Quitar"),
     },
     {
-      label: "Eliminar del dispositivo",
+      label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
       onPress: () => console.log("Borrar"),

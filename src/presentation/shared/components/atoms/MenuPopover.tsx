@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Dimensions,
+  Animated,
 } from "react-native";
 import { Colors } from "@theme/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -34,37 +35,60 @@ export const MenuPopover = ({
   anchorPosition,
 }: MenuPopoverProps) => {
   const menuWidth = 210;
-  const screenPadding = 10;
+  const screenPadding = 16;
+  const verticalOffset = 10;
+  const opacity = useRef(new Animated.Value(0)).current;
 
-  const isBottomHalf = anchorPosition.y > SCREEN_HEIGHT / 2;
+  useEffect(() => {
+    if (isVisible) {
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      opacity.setValue(0);
+    }
+  }, [isVisible]);
+
   const isRightHalf = anchorPosition.x > SCREEN_WIDTH / 2;
+  const isBottomHalf = anchorPosition.y > SCREEN_HEIGHT / 2;
 
-  let leftPos = anchorPosition.x;
-  if (isRightHalf) {
-    leftPos = anchorPosition.x - menuWidth;
-  }
-  leftPos = Math.max(screenPadding, Math.min(leftPos, SCREEN_WIDTH - menuWidth - screenPadding));
+  let leftPos = isRightHalf ? anchorPosition.x - menuWidth : anchorPosition.x;
+  const finalLeft = Math.max(
+    screenPadding,
+    Math.min(leftPos, SCREEN_WIDTH - menuWidth - screenPadding),
+  );
 
   const dynamicStyles = {
-    top: isBottomHalf ? undefined : anchorPosition.y + 10,
-    bottom: isBottomHalf ? SCREEN_HEIGHT - anchorPosition.y + 10 : undefined,
-    left: leftPos,
+    top: isBottomHalf ? undefined : anchorPosition.y + verticalOffset,
+    bottom: isBottomHalf
+      ? SCREEN_HEIGHT - anchorPosition.y + verticalOffset
+      : undefined,
+    left: finalLeft,
   };
 
   return (
     <Modal
       transparent={true}
       visible={isVisible}
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
+      hardwareAccelerated={true}
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
-          <View style={[styles.menuCard, dynamicStyles, { width: menuWidth }]}>
+          <Animated.View
+            style={[
+              styles.menuCard,
+              dynamicStyles,
+              { width: menuWidth, opacity: opacity },
+            ]}
+          >
             {items.map((item, index) => {
               const isDanger = item.variant === "danger";
               const contentColor = isDanger ? "#E53935" : "#555555";
-              
+
               return (
                 <TouchableOpacity
                   key={index}
@@ -92,7 +116,7 @@ export const MenuPopover = ({
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </Animated.View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -102,36 +126,35 @@ export const MenuPopover = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.02)", 
+    backgroundColor: "rgba(0,0,0,0.03)",
   },
   menuCard: {
     position: "absolute",
     backgroundColor: Colors.white,
-    borderRadius: 10, 
+    borderRadius: 12,
     paddingVertical: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 15,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 13,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: "#F2F2F2",
   },
   iconStyle: {
     marginRight: 12,
-    width: 22,
+    width: 20,
     textAlign: "center",
   },
   itemText: {
     flex: 1,
     fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 20,
+    fontWeight: "500",
   },
 });

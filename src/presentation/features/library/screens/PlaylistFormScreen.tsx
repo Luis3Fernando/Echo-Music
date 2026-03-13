@@ -1,17 +1,10 @@
-import {
-  StyleSheet,
-  Text,
-  ScrollView,
-  View,
-  Platform,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as Yup from "yup";
+import { Colors } from "@theme/colors";
 import { Spacing } from "@theme/spacing";
 import { DynamicForm } from "@components/organisms/DynamicForm";
-import { Colors } from "@theme/colors";
-import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 
 const PLAYLIST_FIELDS: any[] = [
   {
@@ -44,68 +37,51 @@ const PlaylistFormScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-    >
-      <View style={styles.topNavigationRow}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="chevron-back" size={28} color="#1A1A1A" />
-        </TouchableOpacity>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {isEditing ? "Editar playlist" : "Nueva playlist"}
-          </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScreenHeaderBasic
+        title={isEditing ? "Editar playlist" : "Nueva playlist"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
+        variant="light" 
+      />
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.card}>
+          <DynamicForm
+            fields={PLAYLIST_FIELDS}
+            initialValues={{
+              name: playlist?.name || "",
+              artworkUri: playlist?.artworkUri || null,
+            }}
+            validationSchema={PlaylistSchema}
+            onSubmit={handleSubmit}
+            submitLabel={isEditing ? "Guardar cambios" : "Crear playlist"}
+          />
         </View>
-        <View style={{ width: 40 }} />
-      </View>
-      <View style={styles.card}>
-        <DynamicForm
-          fields={PLAYLIST_FIELDS}
-          initialValues={{
-            name: playlist?.name || "",
-            artworkUri: playlist?.artworkUri || null,
-          }}
-          validationSchema={PlaylistSchema}
-          onSubmit={handleSubmit}
-          submitLabel={isEditing ? "Guardar cambios" : "Crear playlist"}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.white },
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    paddingTop: 30
+  },
+  container: {
+    flex: 1,
+  },
   scrollContent: {
-    padding: Spacing.xl,
-    paddingTop: Platform.OS === "ios" ? 70 : 50,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
   },
   card: {
     borderRadius: 24,
-  },
-  topNavigationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 50,
-    marginBottom: 25,
-    paddingHorizontal: 10,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: "center",
-  },
-  titleWrapper: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: Colors.black,
   },
 });
 
