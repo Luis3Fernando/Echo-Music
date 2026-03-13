@@ -1,15 +1,20 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, GestureResponderEvent } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@theme/colors';
 
 interface ScreenHeaderProps {
   title: string;
-  onActionPress?: () => void;
+  onActionPress?: (event: GestureResponderEvent) => void;
   showAction?: boolean;
+  actionIconName?: keyof typeof Ionicons.glyphMap; 
 }
 
-const ScreenHeader = ({ title, onActionPress, showAction = true }: ScreenHeaderProps) => {
+const ScreenHeader = ({ 
+  title, 
+  onActionPress, 
+  showAction = true,
+  actionIconName = "reorder-three-outline"
+}: ScreenHeaderProps) => {
   return (
     <View style={styles.header}>
       <View>
@@ -22,7 +27,7 @@ const ScreenHeader = ({ title, onActionPress, showAction = true }: ScreenHeaderP
           onPress={onActionPress}
           activeOpacity={0.7}
         >
-          <Ionicons name="reorder-three-outline" size={32} color={Colors.black} />
+          <Ionicons name={actionIconName} size={32} color={Colors.gray_dark} />
         </TouchableOpacity>
       )}
     </View>

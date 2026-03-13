@@ -4,11 +4,19 @@ import { SYSTEM_PLAYLISTS, USER_PLAYLISTS } from "@mocks/mock-playlists";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import PlaylistHorizontalList from "../components/PlaylistHorizontalList";
 import FolderListSection from "../components/FolderListSection";
+import { useNavigation } from "@react-navigation/native";
 
 const LibraryScreen = () => {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Librería" showAction={false} />
+      <ScreenHeader
+        title="Librería"
+        showAction={true}
+        actionIconName="add-circle-outline"
+        onActionPress={() => navigation.navigate("PlaylistForm")}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
