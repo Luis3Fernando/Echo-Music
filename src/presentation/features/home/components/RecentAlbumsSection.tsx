@@ -38,7 +38,7 @@ const MOCK_ALBUMS = [
   {
     id: "5",
     title: "Planet Her",
-    artist: "Doja Cat",
+    artist: "Doja Cat, Nicki Minaj, Ariana Grande, Camila Cabello",
     cover: {
       uri: "https://i.scdn.co/image/ab67616d0000b2736b98dbf13791547e637e322f",
     },

@@ -21,7 +21,6 @@ const AlbumInfoSection = ({
     <View style={styles.container}>
       <View style={styles.detailsContainer}>
         <Text style={styles.title} numberOfLines={2}>{title}</Text>
-        <Text style={styles.artists}>{artistName}</Text>
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
             <Ionicons name="musical-notes-outline" size={14} color={Colors.gray_text} />
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     paddingVertical: 20,
   },
   detailsContainer: {

@@ -11,7 +11,6 @@ export type SongsStackParamList = {
     artistName: string;
     artwork?: string;
   };
-
   Artist: { artistId: string; name: string };
 };
 

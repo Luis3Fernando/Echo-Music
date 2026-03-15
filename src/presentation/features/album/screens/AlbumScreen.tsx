@@ -9,10 +9,11 @@ import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import AlbumHeaderSection from "../components/AlbumHeaderSection";
 import AlbumInfoSection from "../components/AlbumInfoSection";
 import AlbumSongsSection from "../components/AlbumSongsSection";
+import AlbumArtistsSection from "../components/AlbumArtistsSection";
 
 const AlbumScreen = () => {
   const route = useRoute<any>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { albumName, artistName, artwork } = route.params || {};
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -20,7 +21,11 @@ const AlbumScreen = () => {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
   const albumTracks = MOCK_SONGS.filter((s) => s.albumName === albumName);
-  const tracksList = MOCK_SONGS;
+  const listTracks = MOCK_SONGS;
+  const artistsArray = artistName
+    ? artistName.split(",").map((s: string) => s.trim())
+    : [];
+
   const trackMenuItems: MenuItem[] = [
     {
       label: "Reproducir",
@@ -59,10 +64,19 @@ const AlbumScreen = () => {
           duration="45 min"
           onPlayPress={() => console.log("Shuffle Album")}
         />
+        <AlbumArtistsSection
+          artists={artistsArray}
+          onArtistPress={(name) =>
+            navigation.navigate("Artist", {
+              artistId: name.toLowerCase().replace(/\s+/g, "-"),
+              name,
+            })
+          }
+        />
         <View style={styles.divider} />
         <AlbumSongsSection
-          tracks={tracksList}
-          onTrackPress={(t) => console.log("Reproduciendo:", t.title)}
+          tracks={listTracks}
+          onTrackPress={(t) => console.log("Playing:", t.title)}
           onFavoritePress={(t) => console.log("Like:", t.title)}
           onOptionsPress={(event, track) => {
             const { pageX, pageY } = event.nativeEvent;
@@ -71,6 +85,7 @@ const AlbumScreen = () => {
             setIsMenuVisible(true);
           }}
         />
+        
       </ScrollView>
       <MenuPopover
         isVisible={isMenuVisible}
@@ -86,12 +101,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+    paddingBottom: 140
   },
   divider: {
     height: 1,
     backgroundColor: "#F2F2F2",
     marginHorizontal: 16,
-    marginBottom: 8,
+    marginVertical: 5,
   },
 });
 

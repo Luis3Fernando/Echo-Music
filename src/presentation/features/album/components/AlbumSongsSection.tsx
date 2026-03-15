@@ -1,6 +1,7 @@
-import { StyleSheet, View } from 'react-native';
-import SongItem from '@components/atoms/SongItem';
-import { Track } from '@/domain/entities/track.entity';
+import { StyleSheet, View } from "react-native";
+import SongItem from "@components/atoms/SongItem";
+import { Track } from "@/domain/entities/track.entity";
+import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 interface AlbumSongsSectionProps {
   tracks: Track[];
@@ -17,6 +18,7 @@ const AlbumSongsSection = ({
 }: AlbumSongsSectionProps) => {
   return (
     <View style={styles.container}>
+      <SectionTitle title="Canciones" />
       {tracks.map((track, index) => (
         <SongItem
           key={track.id}
@@ -27,6 +29,7 @@ const AlbumSongsSection = ({
           showArtist={false}
           showFavorite={true}
           showOptions={true}
+          titleVariant="light"
           onPress={onTrackPress}
           onFavoritePress={onFavoritePress}
           onOptionsPress={onOptionsPress}
@@ -38,8 +41,8 @@ const AlbumSongsSection = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 40,
-    paddingHorizontal: 10
+    paddingBottom: 0,
+    paddingHorizontal: 10,
   },
 });
 

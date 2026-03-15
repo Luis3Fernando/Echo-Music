@@ -20,6 +20,7 @@ interface SongItemProps {
   showFavorite?: boolean;
   showOptions?: boolean;
   isFavorite?: boolean;
+  titleVariant?: "default" | "light";
   onPress?: (track: Track) => void;
   onFavoritePress?: (track: Track) => void;
   onOptionsPress?: (event: GestureResponderEvent, track: Track) => void;
@@ -34,6 +35,7 @@ const SongItem = ({
   showFavorite = true,
   showOptions = true,
   isFavorite = false,
+  titleVariant = "default",
   onPress,
   onFavoritePress,
   onOptionsPress,
@@ -65,7 +67,13 @@ const SongItem = ({
         </View>
       )}
       <View style={styles.infoContainer}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text 
+          style={[
+            styles.title, 
+            titleVariant === "light" && styles.titleLight
+          ]} 
+          numberOfLines={1}
+        >
           {track.title}
         </Text>
         {showArtist && (
@@ -148,6 +156,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     letterSpacing: 0.2,
+  },
+  titleLight: {
+    color: "#000000", 
+    fontWeight: "400",
   },
   artist: {
     color: "#b3b3b3",
