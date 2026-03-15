@@ -1,50 +1,106 @@
-import React from "react";
-import { View, FlatList, StyleSheet, StatusBar, Platform } from "react-native";
+import { useState } from "react";
+import { View, FlatList, StyleSheet, StatusBar, Platform, SafeAreaView } from "react-native";
 import { useLibrary } from "@hooks/use-library.hook";
+import { Track } from "@entities/track.entity";
+import { Colors } from "@theme/colors";
 import SongItem from "@components/atoms/SongItem";
 import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeader";
-import SongOptionsSection from "../components/SongOptionsSection";
-import { Colors } from "@theme/colors";
+import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
+import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
+import SongListControls from "../../library/components/SongListControls";
 
 export const SongsScreen = () => {
-  const { songs, isScanning, scanProgress, totalTracks } = useLibrary();
+  const { songs, isScanning } = useLibrary();
+  const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
+  const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
+  const [currentSort, setCurrentSort] = useState("Por nombre");
 
-  const handleShuffle = () => {
-    console.log("[Acción] Reproducción aleatoria iniciada");
-  };
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+  const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
+  const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const sortOptions: MenuItem[] = [
+    { label: "Por nombre (A-Z)", icon: "text-outline", onPress: () => setCurrentSort("Por nombre") },
+    { label: "Por artista", icon: "person-outline", onPress: () => setCurrentSort("Por artista") },
+    { label: "Añadidas recientemente", icon: "time-outline", onPress: () => setCurrentSort("Recientes") },
+  ];
 
-  const handleSort = (mode: string) => {
-    console.log(`[Acción] Cambiando orden a: ${mode}`);
-  };
+  const trackOptions: MenuItem[] = [
+    { label: "Reproducir", icon: "play-outline", onPress: () => console.log("Play", selectedTrack?.title) },
+    { label: "Añadir a la cola", icon: "list-outline", onPress: () => console.log("Queue") },
+    { label: "Añadir a playlist", icon: "add-circle-outline", onPress: () => console.log("Add Playlist") },
+    { label: "Ir al artista", icon: "person-circle-outline", onPress: () => console.log("Ver artista") },
+    { label: "Ir al álbum", icon: "disc-outline", onPress: () => console.log("Ver álbum") },
+    { 
+      label: "Eliminar canción", 
+      icon: "trash-outline", 
+      variant: "danger", 
+      onPress: () => setIsConfirmVisible(true) 
+    },
+  ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-      <ScreenHeader title="Canciones" showAction={false}/>
+      <ScreenHeader title="Canciones" showAction={false} />
       <FlatList
         data={songs}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <>
-            <SongOptionsSection
-              onShufflePress={handleShuffle}
-              onSortChange={handleSort}
-            />
-          </>
+          <SongListControls
+            orderLabel={currentSort}
+            onOrderPress={(event: any) => {
+              const { pageX, pageY } = event.nativeEvent;
+              setSortMenuAnchor({ x: pageX, y: pageY });
+              setIsSortMenuVisible(true);
+            }}
+            onShufflePress={() => console.log("Shuffle total")}
+            onPlayAllPress={() => console.log("Reproducir todas")}
+          />
         }
         renderItem={({ item, index }) => (
           <SongItem
             track={item}
             index={index}
             showIndex={false}
-            showFavorite={false}
+            showFavorite={true}
             onPress={(t) => console.log("Play", t.title)}
+            onOptionsPress={(event, track) => {
+              const { pageX, pageY } = event.nativeEvent;
+              setTrackMenuAnchor({ x: pageX, y: pageY });
+              setSelectedTrack(track);
+              setIsTrackMenuVisible(true);
+            }}
           />
         )}
       />
-    </View>
+      <MenuPopover
+        isVisible={isSortMenuVisible}
+        onClose={() => setIsSortMenuVisible(false)}
+        items={sortOptions}
+        anchorPosition={sortMenuAnchor}
+      />
+      <MenuPopover
+        isVisible={isTrackMenuVisible}
+        onClose={() => setIsTrackMenuVisible(false)}
+        items={trackOptions}
+        anchorPosition={trackMenuAnchor}
+      />
+      <ConfirmDialog
+        isVisible={isConfirmVisible}
+        title="¿Eliminar canción?"
+        description={`¿Estás seguro de que quieres eliminar "${selectedTrack?.title}" permanentemente de tu dispositivo?`}
+        confirmLabel="Eliminar"
+        isDestructive={true}
+        onConfirm={() => {
+          console.log("Eliminando track...");
+          setIsConfirmVisible(false);
+        }}
+        onCancel={() => setIsConfirmVisible(false)}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -52,11 +108,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
-    paddingHorizontal: 1,
     paddingTop: Platform.OS === "ios" ? 60 : 40,
   },
   listContent: {
-    paddingBottom: 40,
+    paddingBottom: 120,
   },
 });
 
