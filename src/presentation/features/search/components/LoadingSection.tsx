@@ -1,10 +1,9 @@
-import { Colors } from '@/core/theme/colors';
+import { Colors } from '@theme/colors';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 
 const LoadingSection = () => (
   <View style={styles.center}>
     <ActivityIndicator size="large" color={Colors.primary} />
-    <Text style={{marginTop: 10, color: '#666'}}>Buscando...</Text>
   </View>
 );
 

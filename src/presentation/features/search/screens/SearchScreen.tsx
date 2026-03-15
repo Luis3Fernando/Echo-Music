@@ -51,7 +51,8 @@ const SearchScreen = () => {
   };
 
   const renderContent = () => {
-    if (searchQuery.length === 0) return <DiscoverySection />;
+    if (searchQuery.length === 0)
+      return <DiscoverySection onSearchQuery={handleTextChange} />;
     if (isLoading) return <LoadingSection />;
     if (results.length === 0) return <EmptySection query={searchQuery} />;
     return (
@@ -72,8 +73,10 @@ const SearchScreen = () => {
         onClear={() => handleTextChange("")}
       />
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        style={{ flex: 1, paddingTop: 10 }}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {renderContent()}
       </ScrollView>
@@ -87,16 +90,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     paddingTop: Platform.OS === "ios" ? 60 : 40,
   },
-  resultsContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 10,
-  },
-  resultTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Colors.black,
-    marginBottom: 15,
-    marginLeft: 5,
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 100,
   },
 });
 
