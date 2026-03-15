@@ -18,6 +18,7 @@ import { useImageAccentColor } from "@hooks/use-image-accent-color";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MOCK_SONGS } from "@mocks/mock-songs";
 import { Track } from "@entities/track.entity";
+import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
 
@@ -36,6 +37,13 @@ const PlaylistScreen = () => {
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
   const [currentSort, setCurrentSort] = useState("Por nombre");
 
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [confirmData, setConfirmData] = useState({
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
+
   const playlist = useMemo(() => {
     const allPlaylists = [...USER_PLAYLISTS, ...SYSTEM_PLAYLISTS];
     return allPlaylists.find((p) => p.id === id);
@@ -51,7 +59,17 @@ const PlaylistScreen = () => {
       label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
-      onPress: () => console.log("Lógica para eliminar"),
+      onPress: () => {
+        setConfirmData({
+          title: "Eliminar playlist",
+          description: `¿Estás seguro de que quieres borrar "${playlist?.name}"?`,
+          onConfirm: () => {
+            console.log("LOG: Playlist eliminada");
+            setIsConfirmVisible(false);
+          },
+        });
+        setIsConfirmVisible(true);
+      },
     },
   ];
 
@@ -75,13 +93,23 @@ const PlaylistScreen = () => {
     {
       label: "Quitar de esta playlist",
       icon: "remove-circle-outline",
-      onPress: () => console.log("Quitar"),
+      onPress: () => console.log("Quitar de lista"),
     },
     {
-      label: "Eliminar",
+      label: "Eliminar del dispositivo",
       icon: "trash-outline",
       variant: "danger",
-      onPress: () => console.log("Borrar"),
+      onPress: () => {
+        setConfirmData({
+          title: "Eliminar canción",
+          description: `¿Deseas eliminar "${selectedTrack?.title}" permanentemente de tu memoria interna?`,
+          onConfirm: () => {
+            console.log("LOG: Canción eliminada:", selectedTrack?.title);
+            setIsConfirmVisible(false);
+          },
+        });
+        setIsConfirmVisible(true);
+      },
     },
   ];
 
@@ -224,6 +252,16 @@ const PlaylistScreen = () => {
         onClose={() => setIsSortMenuVisible(false)}
         items={sortOptions}
         anchorPosition={sortMenuAnchor}
+      />
+      <ConfirmDialog
+        isVisible={isConfirmVisible}
+        title={confirmData.title}
+        description={confirmData.description}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        isDestructive={true}
+        onConfirm={confirmData.onConfirm}
+        onCancel={() => setIsConfirmVisible(false)}
       />
     </View>
   );

@@ -1,5 +1,4 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, StyleProp } from "react-native";
 import { Colors } from "@/core/theme/colors";
 import { Spacing } from "@/core/theme/spacing";
 
@@ -7,7 +6,7 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   variant?: "primary" | "outline" | "ghost";
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   textColor?: string;
   disabled?: boolean;
 }
