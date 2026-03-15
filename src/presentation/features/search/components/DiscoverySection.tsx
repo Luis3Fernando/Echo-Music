@@ -6,12 +6,12 @@ import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 interface DiscoverySectionProps {
   onSearchQuery: (query: string) => void;
 }
-
+ 
 const SMART_FILTERS = [
-  { id: "1", title: "Menos escuchadas", color: "#673AB7", icon: "trending-down-outline" },
-  { id: "2", title: "Nunca reproducidas", color: "#009688", icon: "eye-off-outline" },
-  { id: "3", title: "Más largas", color: "#FF5722", icon: "hourglass-outline" },
-  { id: "4", title: "Favoritas olvidadas", color: "#E91E63", icon: "heart-dislike-outline" },
+  { id: "1", title: "Menos escuchadas", color: Colors.primary, icon: "trending-down-outline" },
+  { id: "2", title: "Nunca reproducidas",  color: Colors.primary, icon: "eye-off-outline" },
+  { id: "3", title: "Más largas",  color: Colors.primary, icon: "hourglass-outline" },
+  { id: "4", title: "Favoritas olvidadas",  color: Colors.primary, icon: "heart-dislike-outline" },
 ];
 
 const RECENT_HISTORY = ["Rock", "Jazz", "80s", "Rock", "Jazz", "80s", "Rock"];

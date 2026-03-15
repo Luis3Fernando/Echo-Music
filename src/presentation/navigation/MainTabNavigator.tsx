@@ -1,13 +1,14 @@
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
-import { MainTabParamList } from "./types";
-import ExploreScreen from "@features/home/screens/ExploreScreen";
-import SongsScreen from "@features/songs/screens/SongsScreen";
-import SearchScreen from "@features/search/screens/SearchScreen";
+
+import { HomeNavigator } from "./HomeNavigator";
+import { SearchNavigator } from "./SearchNavigator";
+import { SongsNavigator } from "./SongsNavigator";
 import { LibraryNavigator } from "./LibraryNavigator";
 
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator();
 
 export const MainTabNavigator = () => (
   <Tab.Navigator
@@ -25,12 +26,9 @@ export const MainTabNavigator = () => (
         right: 0,
         paddingTop: 5,
         borderTopWidth: 0,
-        elevation: 10, 
+        elevation: 10,
         shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: -5, 
-        },
+        shadowOffset: { width: 0, height: -5 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
       },
@@ -40,14 +38,14 @@ export const MainTabNavigator = () => (
         height: 50,
       },
       tabBarIcon: ({ focused, color }) => {
-        if (route.name === "Explore") {
+        if (route.name === "ExploreTab") {
           return focused ? (
             <FontAwesome6 name="compact-disc" size={24} color={color} />
           ) : (
             <Ionicons name="disc-outline" size={24} color={color} />
           );
         }
-        if (route.name === "Songs") {
+        if (route.name === "SongsTab") {
           return (
             <Ionicons
               name={focused ? "musical-notes" : "musical-notes-outline"}
@@ -56,7 +54,7 @@ export const MainTabNavigator = () => (
             />
           );
         }
-        if (route.name === "Library") {
+        if (route.name === "LibraryTab") {
           return (
             <MaterialCommunityIcons
               name={focused ? "music-box-multiple" : "music-box-multiple-outline"}
@@ -65,7 +63,7 @@ export const MainTabNavigator = () => (
             />
           );
         }
-        if (route.name === "Search") {
+        if (route.name === "SearchTab") {
           return (
             <Ionicons
               name={focused ? "search" : "search-outline"}
@@ -77,9 +75,9 @@ export const MainTabNavigator = () => (
       },
     })}
   >
-    <Tab.Screen name="Explore" component={ExploreScreen} />
-    <Tab.Screen name="Search" component={SearchScreen} />
-    <Tab.Screen name="Songs" component={SongsScreen} />
-    <Tab.Screen name="Library" component={LibraryNavigator} />
+    <Tab.Screen name="ExploreTab" component={HomeNavigator} />
+    <Tab.Screen name="SearchTab" component={SearchNavigator} />
+    <Tab.Screen name="SongsTab" component={SongsNavigator} />
+    <Tab.Screen name="LibraryTab" component={LibraryNavigator} />
   </Tab.Navigator>
 );
