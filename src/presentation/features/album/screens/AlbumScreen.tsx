@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Colors } from '@theme/colors';
+
 import AlbumHeaderSection from '../components/AlbumHeaderSection';
+import AlbumInfoSection from '../components/AlbumInfoSection';
 
 const AlbumScreen = () => {
   const route = useRoute<any>();
@@ -12,24 +14,25 @@ const AlbumScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Sección 1: Imagen y Back Button */}
         <AlbumHeaderSection 
           artwork={artwork} 
           onBackPress={() => navigation.goBack()} 
         />
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.albumTitle}>{albumName || "Sin Título"}</Text>
-          <Text style={styles.artistName}>{artistName || "Artista Desconocido"}</Text>
-          
-          <View style={styles.metaData}>
-            <Text style={styles.metaText}>Álbum • 2026</Text>
-          </View>
-        </View>
+        {/* Sección 2: Info del Álbum y Play Button */}
+        <AlbumInfoSection 
+          title={albumName || "Sin Título"}
+          artistName={artistName || "Artista Desconocido"}
+          songCount={12} // Valor de prueba por ahora
+          duration="45 min" // Valor de prueba por ahora
+          onPlayPress={() => console.log("Reproduciendo álbum...")}
+        />
 
-        <View style={styles.songsContainer}>
-           <Text style={styles.placeholderText}>
-             Listado de canciones para el ID: {id}
-           </Text>
+        {/* Sección 3: Placeholder para la lista de canciones */}
+        <View style={styles.divider} />
+        <View style={{ paddingHorizontal: 20 }}>
+           {/* Aquí mapearemos los SongItems */}
         </View>
       </ScrollView>
     </View>
@@ -41,38 +44,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
   },
-  infoContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  albumTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.black,
-    letterSpacing: -0.5,
-  },
-  artistName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.primary,
-    marginTop: 4,
-  },
-  metaData: {
-    marginTop: 10,
-  },
-  metaText: {
-    fontSize: 14,
-    color: Colors.gray_text,
-    fontWeight: '500',
-  },
-  songsContainer: {
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  placeholderText: {
-    color: Colors.gray_text,
-    fontSize: 14,
-  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginHorizontal: 20,
+    marginBottom: 10,
+  }
 });
 
 export default AlbumScreen;
