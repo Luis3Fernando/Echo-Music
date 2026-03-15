@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, FlatList, Platform } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Colors } from "@theme/colors";
@@ -7,6 +7,7 @@ import { FOLDER_MOCKS } from "@mocks/mock-folder";
 import { Track } from "@entities/track.entity";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
+import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import FolderHeaderSection from "../components/FolderHeaderSection";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
@@ -16,12 +17,22 @@ const FolderScreen = () => {
   const navigation = useNavigation();
   const { folderId, folderName } = route.params || {};
   const folderData = FOLDER_MOCKS.find((f) => f.id === folderId);
+
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
   const [currentSort, setCurrentSort] = useState("Por nombre");
+
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
+
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [confirmData, setConfirmData] = useState({
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
+
   const sortOptions: MenuItem[] = [
     {
       label: "Por nombre (A-Z)",
@@ -55,7 +66,17 @@ const FolderScreen = () => {
       label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
-      onPress: () => console.log("Borrar track"),
+      onPress: () => {
+        setConfirmData({
+          title: "Eliminar canción",
+          description: `¿Deseas eliminar "${selectedTrack?.title}" permanentemente de tu memoria interna?`,
+          onConfirm: () => {
+            console.log("LOG: Canción eliminada físicamente");
+            setIsConfirmVisible(false);
+          },
+        });
+        setIsConfirmVisible(true);
+      },
     },
   ];
 
@@ -117,6 +138,16 @@ const FolderScreen = () => {
         onClose={() => setIsTrackMenuVisible(false)}
         items={trackOptions}
         anchorPosition={trackMenuAnchor}
+      />
+      <ConfirmDialog
+        isVisible={isConfirmVisible}
+        title={confirmData.title}
+        description={confirmData.description}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        isDestructive={true}
+        onConfirm={confirmData.onConfirm}
+        onCancel={() => setIsConfirmVisible(false)}
       />
     </View>
   );

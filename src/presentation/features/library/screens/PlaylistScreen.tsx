@@ -96,7 +96,7 @@ const PlaylistScreen = () => {
       onPress: () => console.log("Quitar de lista"),
     },
     {
-      label: "Eliminar del dispositivo",
+      label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
       onPress: () => {
