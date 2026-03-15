@@ -9,11 +9,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Track } from "@/domain/entities/track.entity";
 import { Colors } from "@theme/colors";
+import { boolean } from "yup";
 
 interface SongItemProps {
   track: Track;
   index?: number;
   showIndex?: boolean;
+  showArtwork?: boolean;
   showArtist?: boolean;
   showFavorite?: boolean;
   showOptions?: boolean;
@@ -27,6 +29,7 @@ const SongItem = ({
   track,
   index,
   showIndex = false,
+  showArtwork = true,
   showArtist = true,
   showFavorite = true,
   showOptions = true,
@@ -46,19 +49,21 @@ const SongItem = ({
           <Text style={styles.indexText}>{index + 1}</Text>
         </View>
       )}
-      <View style={styles.artworkContainer}>
-        {track.artworkUri ? (
-          <Image source={{ uri: track.artworkUri }} style={styles.artwork} />
-        ) : (
-          <View style={styles.placeholder}>
-            <Ionicons
-              name="musical-notes"
-              size={20}
-              color={Colors.gray_light}
-            />
-          </View>
-        )}
-      </View>
+      {showArtwork && (
+        <View style={styles.artworkContainer}>
+          {track.artworkUri ? (
+            <Image source={{ uri: track.artworkUri }} style={styles.artwork} />
+          ) : (
+            <View style={styles.placeholder}>
+              <Ionicons
+                name="musical-notes"
+                size={20}
+                color={Colors.gray_light}
+              />
+            </View>
+          )}
+        </View>
+      )}
       <View style={styles.infoContainer}>
         <Text style={styles.title} numberOfLines={1}>
           {track.title}

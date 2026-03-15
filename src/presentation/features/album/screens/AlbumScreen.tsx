@@ -1,40 +1,83 @@
-import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { Colors } from '@theme/colors';
+import React, { useState } from "react";
+import { StyleSheet, View, ScrollView } from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { Colors } from "@theme/colors";
+import { MOCK_SONGS } from "@mocks/mock-songs";
+import { Track } from "@/domain/entities/track.entity";
+import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 
-import AlbumHeaderSection from '../components/AlbumHeaderSection';
-import AlbumInfoSection from '../components/AlbumInfoSection';
+import AlbumHeaderSection from "../components/AlbumHeaderSection";
+import AlbumInfoSection from "../components/AlbumInfoSection";
+import AlbumSongsSection from "../components/AlbumSongsSection";
 
 const AlbumScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
-  const { id, albumName, artistName, artwork } = route.params || {};
+  const { albumName, artistName, artwork } = route.params || {};
+
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+
+  const albumTracks = MOCK_SONGS.filter((s) => s.albumName === albumName);
+  const tracksList = MOCK_SONGS;
+  const trackMenuItems: MenuItem[] = [
+    {
+      label: "Reproducir",
+      icon: "play-outline",
+      onPress: () => console.log("Play", selectedTrack?.title),
+    },
+    {
+      label: "Añadir a la cola",
+      icon: "list-outline",
+      onPress: () => console.log("Add Queue", selectedTrack?.title),
+    },
+    {
+      label: "Añadir a playlist",
+      icon: "add-circle-outline",
+      onPress: () => console.log("Add Playlist", selectedTrack?.title),
+    },
+    {
+      label: "Eliminar",
+      icon: "trash-outline",
+      variant: "danger",
+      onPress: () => console.log("Delete", selectedTrack?.title),
+    },
+  ];
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Sección 1: Imagen y Back Button */}
-        <AlbumHeaderSection 
-          artwork={artwork} 
-          onBackPress={() => navigation.goBack()} 
+        <AlbumHeaderSection
+          artwork={artwork}
+          onBackPress={() => navigation.goBack()}
         />
-
-        {/* Sección 2: Info del Álbum y Play Button */}
-        <AlbumInfoSection 
-          title={albumName || "Sin Título"}
-          artistName={artistName || "Artista Desconocido"}
-          songCount={12} // Valor de prueba por ahora
-          duration="45 min" // Valor de prueba por ahora
-          onPlayPress={() => console.log("Reproduciendo álbum...")}
+        <AlbumInfoSection
+          title={albumName}
+          artistName={artistName}
+          songCount={albumTracks.length}
+          duration="45 min"
+          onPlayPress={() => console.log("Shuffle Album")}
         />
-
-        {/* Sección 3: Placeholder para la lista de canciones */}
         <View style={styles.divider} />
-        <View style={{ paddingHorizontal: 20 }}>
-           {/* Aquí mapearemos los SongItems */}
-        </View>
+        <AlbumSongsSection
+          tracks={tracksList}
+          onTrackPress={(t) => console.log("Reproduciendo:", t.title)}
+          onFavoritePress={(t) => console.log("Like:", t.title)}
+          onOptionsPress={(event, track) => {
+            const { pageX, pageY } = event.nativeEvent;
+            setMenuAnchor({ x: pageX, y: pageY });
+            setSelectedTrack(track);
+            setIsMenuVisible(true);
+          }}
+        />
       </ScrollView>
+      <MenuPopover
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+        anchorPosition={menuAnchor}
+        items={trackMenuItems}
+      />
     </View>
   );
 };
@@ -46,10 +89,10 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#F0F0F0',
-    marginHorizontal: 20,
-    marginBottom: 10,
-  }
+    backgroundColor: "#F2F2F2",
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
 });
 
 export default AlbumScreen;
