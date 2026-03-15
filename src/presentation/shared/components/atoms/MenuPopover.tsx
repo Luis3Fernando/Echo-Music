@@ -88,7 +88,6 @@ export const MenuPopover = ({
             {items.map((item, index) => {
               const isDanger = item.variant === "danger";
               const contentColor = isDanger ? "#E53935" : "#555555";
-
               return (
                 <TouchableOpacity
                   key={index}
