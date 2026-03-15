@@ -1,10 +1,10 @@
-import { Colors } from "@/core/theme/colors";
+import { Colors } from "@theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 
 export const EmptySection = ({ query }: { query: string }) => (
   <View style={styles.center}>
-    <Ionicons name="search-outline" size={80} color="#DDD" />
+    <Ionicons name="musical-note-outline" size={80} color="#DDD" />
     <Text style={styles.title}>Sin resultados</Text>
     <Text style={{ textAlign: "center", color: "#666" }}>
       No pudimos encontrar nada para "{query}"
