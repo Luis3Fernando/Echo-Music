@@ -42,7 +42,7 @@ const AlbumSongsSection = ({
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 0,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
   },
 });
 
