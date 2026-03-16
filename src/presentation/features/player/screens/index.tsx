@@ -66,12 +66,23 @@ export const PlayerController = () => {
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
-      enableOverDrag={true}
-      enablePanDownToClose={false}
       enableContentPanningGesture={true}
+      enableHandlePanningGesture={true}
+      enablePanDownToClose={false}
+      
+      // SOLUCIÓN GESTOS: 
+      // Aumentamos la zona de "fallo" del gesto vertical del BottomSheet
+      // para que el ScrollView interno tenga prioridad al deslizar arriba.
+      activeOffsetY={[-5, 5]} 
+      failOffsetX={[-5, 5]}
+      
       style={animatedContainerStyle}
     >
-      <View style={{ flex: 1 }}>
+      {/* IMPORTANTE: Usamos un View con un Z-Index alto y 
+         StyleSheet.absoluteFill para que el contenido no se 
+         "pierda" por el absolute de la TabBar.
+      */}
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>
