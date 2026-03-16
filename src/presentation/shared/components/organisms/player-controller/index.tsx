@@ -1,10 +1,16 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { View } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import Animated, { useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolation,
+} from "react-native-reanimated";
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 const MINI_PLAYER_HEIGHT = 70;
 
@@ -29,8 +35,18 @@ export const PlayerController = () => {
   const miniPlayerStyle = useAnimatedStyle(() => {
     const isHidden = animatedIndex.value > 0.05;
     return {
-      opacity: interpolate(animatedIndex.value, [0, 0.05], [1, 0], Extrapolation.CLAMP),
-      height: interpolate(animatedIndex.value, [0, 0.1], [MINI_PLAYER_HEIGHT, 0], Extrapolation.CLAMP),
+      opacity: interpolate(
+        animatedIndex.value,
+        [0, 0.05],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
+      height: interpolate(
+        animatedIndex.value,
+        [0, 0.1],
+        [MINI_PLAYER_HEIGHT, 0],
+        Extrapolation.CLAMP,
+      ),
       display: isHidden ? "none" : "flex",
     };
   });
@@ -46,27 +62,23 @@ export const PlayerController = () => {
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
-      snapPoints={[70, "100%"]}
+      snapPoints={[MINI_PLAYER_HEIGHT, "100%"]}
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
-      enableOverDrag={false}
+      enableOverDrag={true}
       enablePanDownToClose={false}
-      enableContentPanningGesture={false}
+      enableContentPanningGesture={true}
       style={animatedContainerStyle}
     >
-      <BottomSheetView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}> 
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>
         <View style={{ flex: 1 }}>
-          <FullPlayer
-            onClose={closePlayer}
-            animatedStyle={{ opacity: 1 }}
-            pointerEvents="auto"
-          />
+          <FullPlayer onClose={closePlayer} animatedStyle={{ opacity: 1 }} />
         </View>
-      </BottomSheetView>
+      </View>
     </BottomSheet>
   );
 };
