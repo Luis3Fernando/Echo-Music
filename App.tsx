@@ -6,7 +6,7 @@ import { navigationRef } from '@navigation/navigation-ref';
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { appInitializerService } from "@services/app-initializer.service";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { PlayerController } from "@components/organisms/player-controller";
+import { PlayerController } from "@features/player/screens";
 import LoadingScreen from "@features/onboarding/screens/LoadingScreen";
 
 const AppContent = () => {

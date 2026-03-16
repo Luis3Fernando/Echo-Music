@@ -71,7 +71,7 @@ export const PlayerController = () => {
       enableContentPanningGesture={true}
       style={animatedContainerStyle}
     >
-      <View style={{ flex: 1 }}> 
+      <View style={{ flex: 1 }}>
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>
