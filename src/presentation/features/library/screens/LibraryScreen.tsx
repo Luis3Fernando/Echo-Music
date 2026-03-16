@@ -18,6 +18,7 @@ const LibraryScreen = () => {
         onActionPress={() => navigation.navigate("PlaylistForm")}
       />
       <ScrollView
+        style={{ marginTop: 5 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >

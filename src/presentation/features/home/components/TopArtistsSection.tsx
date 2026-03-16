@@ -1,26 +1,33 @@
 import { View, FlatList, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import ArtistCircle from "@/presentation/shared/components/atoms/ArtistCircle";
 import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
 
 const MOCK_ARTISTS = [
-  { id: "1", name: "Kygo" },
-  { id: "2", name: "Romina Gachoy" },
-  { id: "3", name: "Dua Lipa" },
-  { id: "4", name: "Arctic Monkeys" },
-  { id: "5", name: "Post Malone" },
-  { id: "6", name: "Doja Cat" },
-  { id: "7", name: "Imagine Dragons" },
-  { id: "8", name: "Los Puntos del Amor" },
-  { id: "9", name: "Bizarrap" },
-  { id: "10", name: "Grupo 5" },
-  { id: "11", name: "Gian Marco" },
-  { id: "12", name: "Flavia Laos" },
-  { id: "13", name: "Caribeños de Guadalupe" },
-  { id: "14", name: "Avicii" },
-  { id: "15", name: "Juan Gabriel" },
+  { id: "1", name: "Julio Iglesias" },
+  { id: "2", name: "Sigala" },
+  { id: "3", name: "Nervo" },
+  { id: "4", name: "Orion" },
+  { id: "5", name: "Vicetone" },
+  { id: "6", name: "tINI" },
+  { id: "7", name: "Los Caligaris" },
+  { id: "8", name: "Galantis" },
+  { id: "9", name: "Selena Gomez" },
+  { id: "10", name: "Afrojack" },
+  { id: "11", name: "Son del Duke" },
+  { id: "12", name: "Rels B" },
 ];
 
 const TopArtistsSection = () => {
+  const navigation = useNavigation<any>();
+
+  const handleArtistPress = (item: { id: string, name: string }) => {
+    navigation.navigate("Artist", { 
+      artistId: item.id, 
+      name: item.name 
+    });
+  };
+
   return (
     <View style={styles.container}>
       <SectionTitle title="Artistas favoritos" />
@@ -33,7 +40,7 @@ const TopArtistsSection = () => {
         renderItem={({ item }) => (
           <ArtistCircle
             data={item}
-            onPress={() => console.log("Perfil de:", item.name)}
+            onPress={() => handleArtistPress(item)}
           />
         )}
       />
