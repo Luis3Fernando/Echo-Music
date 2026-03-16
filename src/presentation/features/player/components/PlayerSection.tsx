@@ -67,11 +67,9 @@ const PlayerSection = () => {
 const styles = StyleSheet.create({
   section: { 
     flex: 1, 
-    alignItems: "center",
-    paddingTop: 10,
   },
   carouselContainer: {
-    height: SCREEN_WIDTH - 30, // Espacio suficiente para la imagen y su sombra
+    height: SCREEN_WIDTH - 30,
   },
   infoContainer: { 
     marginTop: 40, 

@@ -17,7 +17,7 @@ export type SongsStackParamList = {
 const Stack = createNativeStackNavigator<SongsStackParamList>();
 
 export const SongsNavigator = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false, animation: "fade" }}>
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="SongsIndex" component={SongsScreen} />
     <Stack.Screen name="Album" component={AlbumScreen} />
     <Stack.Screen name="Artist" component={ArtistScreen} />

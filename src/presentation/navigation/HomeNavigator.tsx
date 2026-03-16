@@ -13,7 +13,7 @@ export type SearchStackParamList = {
 const Stack = createNativeStackNavigator<SearchStackParamList>();
 
 export const HomeNavigator = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false, animation: "fade" }}>
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Explore" component={ExploreScreen} />
     <Stack.Screen name="Album" component={AlbumScreen} />
     <Stack.Screen name="Artist" component={ArtistScreen} />

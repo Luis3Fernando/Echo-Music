@@ -12,7 +12,23 @@ export const PlayerController = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentRoute, setCurrentRoute] = useState<string>("");
   const animatedIndex = useSharedValue(0);
+  const [gesturesEnabled, setGesturesEnabled] = useState(false);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setGesturesEnabled(true);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const expandPlayer = useCallback(() => {
+    setGesturesEnabled(false);
+    setTimeout(() => {
+      setGesturesEnabled(true);
+      bottomSheetRef.current?.expand();
+    }, 10);
+  }, []);
+  
   useEffect(() => {
     const initial = navigationRef.getCurrentRoute()?.name;
     if (initial) setCurrentRoute(initial);
@@ -23,7 +39,6 @@ export const PlayerController = () => {
     return unsubscribe;
   }, []);
 
-  const expandPlayer = useCallback(() => bottomSheetRef.current?.expand(), []);
   const closePlayer = useCallback(() => bottomSheetRef.current?.collapse(), []);
 
   const miniPlayerStyle = useAnimatedStyle(() => {
@@ -35,10 +50,6 @@ export const PlayerController = () => {
     };
   });
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    zIndex: animatedIndex.value > 0.01 ? 9999 : 1,
-  }));
-
   const isVisible = currentRoute !== "" && currentRoute !== "Onboarding";
   if (!isVisible) return null;
 
@@ -46,28 +57,22 @@ export const PlayerController = () => {
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
-      snapPoints={[70, "100%"]}
+      snapPoints={[MINI_PLAYER_HEIGHT, "100%"]}
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
-      enableOverDrag={false}
-      enablePanDownToClose={false}
-      enableContentPanningGesture={false}
-      style={animatedContainerStyle}
+      enableContentPanningGesture={gesturesEnabled} 
+      enableHandlePanningGesture={true}
+      enablePanDownToClose={false} 
     >
-      <BottomSheetView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>
         <View style={{ flex: 1 }}>
-          <FullPlayer
-            onClose={closePlayer}
-            animatedStyle={{ opacity: 1 }}
-            pointerEvents="auto"
-
-          />
+          <FullPlayer onClose={closePlayer} animatedStyle={{ opacity: 1 }} />
         </View>
-      </BottomSheetView>
+      </View>
     </BottomSheet>
   );
 };

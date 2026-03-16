@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@theme/colors';
@@ -14,7 +13,6 @@ const FullPlayerHeader = ({ activeTab, setActiveTab, onClose }: Props) => (
     <TouchableOpacity onPress={onClose} style={styles.headerButton}>
       <Ionicons name="chevron-down" size={30} color={Colors.black} />
     </TouchableOpacity>
-
     <View style={styles.tabActions}>
       <TouchableOpacity onPress={() => setActiveTab('player')} style={styles.headerButton}>
         <Ionicons 
@@ -23,7 +21,6 @@ const FullPlayerHeader = ({ activeTab, setActiveTab, onClose }: Props) => (
           color={activeTab === 'player' ? Colors.primary : "#A0A0A0"} 
         />
       </TouchableOpacity>
-
       <TouchableOpacity onPress={() => setActiveTab('lyrics')} style={styles.headerButton}>
         <Ionicons 
           name={activeTab === 'lyrics' ? "text" : "text-outline"} 
@@ -42,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 20,
   },
   tabActions: { flexDirection: "row", gap: 15 },
   headerButton: { padding: 10, justifyContent: "center", alignItems: "center" },

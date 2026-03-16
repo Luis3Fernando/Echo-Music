@@ -20,7 +20,6 @@ export const LibraryNavigator = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
-      animation: "fade",
     }}
   >
     <Stack.Screen name="LibraryIndex" component={LibraryScreen} />
