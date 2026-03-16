@@ -1,16 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { View } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolation,
-} from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 const MINI_PLAYER_HEIGHT = 70;
 
@@ -35,18 +29,8 @@ export const PlayerController = () => {
   const miniPlayerStyle = useAnimatedStyle(() => {
     const isHidden = animatedIndex.value > 0.05;
     return {
-      opacity: interpolate(
-        animatedIndex.value,
-        [0, 0.05],
-        [1, 0],
-        Extrapolation.CLAMP,
-      ),
-      height: interpolate(
-        animatedIndex.value,
-        [0, 0.1],
-        [MINI_PLAYER_HEIGHT, 0],
-        Extrapolation.CLAMP,
-      ),
+      opacity: interpolate(animatedIndex.value, [0, 0.05], [1, 0], Extrapolation.CLAMP),
+      height: interpolate(animatedIndex.value, [0, 0.1], [MINI_PLAYER_HEIGHT, 0], Extrapolation.CLAMP),
       display: isHidden ? "none" : "flex",
     };
   });
@@ -62,34 +46,28 @@ export const PlayerController = () => {
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
-      snapPoints={[MINI_PLAYER_HEIGHT, "100%"]}
+      snapPoints={[70, "100%"]}
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
-      enableContentPanningGesture={true}
-      enableHandlePanningGesture={true}
+      enableOverDrag={false}
       enablePanDownToClose={false}
-      
-      // SOLUCIÓN GESTOS: 
-      // Aumentamos la zona de "fallo" del gesto vertical del BottomSheet
-      // para que el ScrollView interno tenga prioridad al deslizar arriba.
-      activeOffsetY={[-5, 5]} 
-      failOffsetX={[-5, 5]}
-      
+      enableContentPanningGesture={false}
       style={animatedContainerStyle}
     >
-      {/* IMPORTANTE: Usamos un View con un Z-Index alto y 
-         StyleSheet.absoluteFill para que el contenido no se 
-         "pierda" por el absolute de la TabBar.
-      */}
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <BottomSheetView style={{ flex: 1 }}>
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>
         <View style={{ flex: 1 }}>
-          <FullPlayer onClose={closePlayer} animatedStyle={{ opacity: 1 }} />
+          <FullPlayer
+            onClose={closePlayer}
+            animatedStyle={{ opacity: 1 }}
+            pointerEvents="auto"
+
+          />
         </View>
-      </View>
+      </BottomSheetView>
     </BottomSheet>
   );
 };

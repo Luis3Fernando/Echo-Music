@@ -1,53 +1,72 @@
-import { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Dimensions } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
 import LyricsSection from "../components/LyricsSection";
 
 interface FullPlayerProps {
-  onClose: () => void;
   animatedStyle?: any;
+  pointerEvents: "auto" | "none";
+  onClose: () => void;
 }
 
-const FullPlayer = ({ onClose, animatedStyle }: FullPlayerProps) => {
+const FullPlayer = ({ animatedStyle, pointerEvents, onClose }: FullPlayerProps) => {
   const [activeTab, setActiveTab] = useState<"player" | "lyrics">("player");
 
+  const swipeGesture = Gesture.Pan()
+    .activeOffsetY(10)
+    .onUpdate((event) => {
+      if (event.translationY > 80) {
+        onClose();
+      }
+    })
+    .runOnJS(true);
+
   return (
-    <Animated.View style={[styles.root, animatedStyle]}>
-      <FullPlayerHeader
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onClose={onClose}
-      />
-      <View style={styles.content}>
+    <GestureDetector gesture={swipeGesture}>
+      <Animated.View
+        style={[styles.fullPlayerContent, animatedStyle]}
+        pointerEvents={pointerEvents}
+      >
+        <FullPlayerHeader
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          onClose={onClose} 
+        />
         {activeTab === "player" ? (
-          <Animated.View
-            key="player"
-            entering={FadeIn}
-            exiting={FadeOut}
-            style={{ flex: 1 }}
+          <Animated.View 
+            key="player-section" 
+            entering={FadeIn.duration(300)} 
+            exiting={FadeOut.duration(200)} 
+            style={styles.flex1}
           >
             <PlayerSection />
           </Animated.View>
         ) : (
-          <Animated.View
-            key="lyrics"
-            entering={FadeIn}
-            exiting={FadeOut}
-            style={{ flex: 1 }}
+          <Animated.View 
+            key="lyrics-section" 
+            entering={FadeIn.duration(300)} 
+            exiting={FadeOut.duration(200)} 
+            style={styles.flex1}
           >
-            <LyricsSection />
+            <LyricsSection/>
           </Animated.View>
         )}
-      </View>
-    </Animated.View>
+      </Animated.View>
+    </GestureDetector>
   );
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#FFFFFF", paddingTop: 10 },
-  content: { flex: 1, paddingHorizontal: 30 },
+  fullPlayerContent: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  flex1: {
+    flex: 1,
+  },
 });
 
 export default FullPlayer;
