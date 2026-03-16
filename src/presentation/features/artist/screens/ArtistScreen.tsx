@@ -13,20 +13,22 @@ import ArtistInfoSection from "../components/ArtistInfoSection";
 import ArtistSongsSection from "../components/ArtistSongsSection";
 import ArtistAlbumsSection from "../components/ArtistAlbumsSection";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import ArtistCollaborationsSection from "../components/ArtistCollaborationsSection";
 
 export type ArtistStackParamList = {
   Artist: { name: string };
-  Album: { 
-    id: string; 
-    albumName: string; 
-    artistName: string; 
-    artwork?: string 
+  Album: {
+    id: string;
+    albumName: string;
+    artistName: string;
+    artwork?: string;
   };
 };
 
 const ArtistScreen = () => {
   const route = useRoute<any>();
-  const navigation = useNavigation<NativeStackNavigationProp<ArtistStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ArtistStackParamList>>();
 
   const { name } = route.params;
 
@@ -93,6 +95,19 @@ const ArtistScreen = () => {
     },
   ];
 
+  const collaboratorsMock = [
+    "Dua Lipa",
+    "Rihanna",
+    "The Weeknd",
+    "Ellie Goulding",
+    "Sam Smith",
+  ];
+
+  const handleArtistNavigation = (artistName: string) => {
+    navigation.push("Artist", {
+      name: artistName,
+    });
+  };
 
   const handleAlbumPress = (album: any) => {
     navigation.push("Album", {
@@ -141,7 +156,12 @@ const ArtistScreen = () => {
             albums={artistAlbumsMock}
             onAlbumPress={handleAlbumPress}
           />
+          <ArtistCollaborationsSection
+          collaborators={collaboratorsMock}
+          onArtistPress={handleArtistNavigation}
+        />
         </View>
+        
       </ScrollView>
       <MenuPopover
         isVisible={isMenuVisible}
@@ -154,10 +174,9 @@ const ArtistScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingBottom: 120, backgroundColor: 'red' },
+  container: { flex: 1, paddingBottom: 120, backgroundColor: 'white'},
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#000",
     justifyContent: "center",
     alignItems: "center",
   },
