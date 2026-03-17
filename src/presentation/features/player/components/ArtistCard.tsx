@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ArtistCard = () => {
-  const [isFavoriteArtist, setIsFavoriteArtist] = useState(false);
-
   const artistData = {
     name: "Gian Marco",
     image: "https://i.scdn.co/image/ab677762000056b81a5cd183700ad34badcef04d",
     songCount: 154,
-    monthlyListeners: "2.4M"
   };
 
   return (
@@ -21,31 +17,20 @@ const ArtistCard = () => {
       >
         <Image 
           source={{ uri: artistData.image }} 
-          style={styles.artistImage} 
+          style={styles.artistBanner} 
+          resizeMode="cover"
         />
         <View style={styles.infoContainer}>
-          <View style={styles.topRow}>
-            <View>
-              <Text style={styles.label}>Acerca del artista</Text>
-              <Text style={styles.artistName}>{artistData.name}</Text>
-            </View>
-            <TouchableOpacity 
-              onPress={() => setIsFavoriteArtist(!isFavoriteArtist)}
-              style={styles.favoriteBtn}
-            >
-              <Ionicons 
-                name={isFavoriteArtist ? "heart" : "heart-outline"} 
-                size={22} 
-                color={isFavoriteArtist ? "#1DB954" : "rgba(255,255,255,0.6)"} 
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.bottomRow}>
-            <View style={styles.stats}>
-              <Ionicons name="musical-notes-outline" size={14} color="rgba(255,255,255,0.5)" />
+          <View style={styles.leftSection}>
+            <Text style={styles.label}>Acerca del artista</Text>
+            <Text style={styles.artistName}>{artistData.name}</Text>            
+            <View style={styles.statsBadge}>
+              <Ionicons name="musical-notes" size={12} color="rgba(255,255,255,0.5)" />
               <Text style={styles.statsText}>{artistData.songCount} canciones</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.4)" />
+          </View>
+          <View style={styles.rightSection}>
+            <Ionicons name="chevron-forward" size={22} color="rgba(255,255,255,0.3)" />
           </View>
         </View>
       </TouchableOpacity>
@@ -56,31 +41,25 @@ const ArtistCard = () => {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginTop: 10,
+    marginTop: 15,
   },
   card: {
     backgroundColor: '#161616',
     borderRadius: 15,
-    flexDirection: 'row',
     overflow: 'hidden',
-    height: 130,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
   },
-  artistImage: {
-    width: 130,
-    height: '100%',
-    backgroundColor: '#222',
+  artistBanner: {
+    width: '100%',
+    height: 160,
   },
   infoContainer: {
-    flex: 1,
-    padding: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  leftSection: {
+    flex: 1,
   },
   label: {
     color: 'rgba(255,255,255,0.4)',
@@ -91,31 +70,23 @@ const styles = StyleSheet.create({
   },
   artistName: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
-    marginTop: 2,
+    marginTop: 4,
   },
-  favoriteBtn: {
-    padding: 4,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  stats: {
+  statsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    gap: 5,
+    marginTop: 8,
   },
   statsText: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 13,
     fontWeight: '600',
+  },
+  rightSection: {
+    paddingLeft: 10,
   },
 });
 

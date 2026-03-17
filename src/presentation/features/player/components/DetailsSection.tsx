@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   detailsContainer: { 
     flex: 1, 
     width: "100%",
-    paddingBottom: 60,
+    paddingBottom: 20,
     paddingHorizontal: 0, 
   }
 });

@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   lyricsWrapper: {
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
   },
 });
 

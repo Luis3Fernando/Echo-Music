@@ -67,7 +67,6 @@ const LyricsCard = () => {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginBottom: 40,
   },
   card: {
     backgroundColor: '#121212', 
