@@ -1,48 +1,71 @@
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@theme/colors';
 
-interface Props {
-  activeTab: 'player' | 'lyrics';
-  setActiveTab: (tab: 'player' | 'lyrics') => void;
+interface FullPlayerHeaderProps {
   onClose: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
-const FullPlayerHeader = ({ activeTab, setActiveTab, onClose }: Props) => (
-  <View style={styles.header}>
-    <TouchableOpacity onPress={onClose} style={styles.headerButton}>
-      <Ionicons name="chevron-down" size={30} color={Colors.black} />
-    </TouchableOpacity>
-    <View style={styles.tabActions}>
-      <TouchableOpacity onPress={() => setActiveTab('player')} style={styles.headerButton}>
-        <Ionicons 
-          name={activeTab === 'player' ? "musical-notes" : "musical-notes-outline"} 
-          size={26} 
-          color={activeTab === 'player' ? Colors.primary : "#A0A0A0"} 
-        />
+const FullPlayerHeader = ({ 
+  onClose, 
+  isFavorite = false, 
+  onToggleFavorite 
+}: FullPlayerHeaderProps) => {
+
+  const handleFavoritePress = () => {
+    console.log("Evento: Toggle Favorito");
+    if (onToggleFavorite) onToggleFavorite();
+  };
+
+  return (
+    <View style={styles.header}>
+      <TouchableOpacity onPress={onClose} style={styles.headerButton}>
+        <Ionicons name="chevron-down" size={30} color="#1A1A1A" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setActiveTab('lyrics')} style={styles.headerButton}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.headerTitle}>Reproductor</Text>
+      </View>
+      <TouchableOpacity onPress={handleFavoritePress} style={styles.headerButton}>
         <Ionicons 
-          name={activeTab === 'lyrics' ? "text" : "text-outline"} 
+          name={isFavorite ? "heart" : "heart-outline"} 
           size={26} 
-          color={activeTab === 'lyrics' ? Colors.primary : "#A0A0A0"} 
+          color={isFavorite ? Colors.primary : "#1A1A1A"} 
         />
       </TouchableOpacity>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   header: {
-    height: 70,
+    height: 60,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 20,
+    paddingHorizontal: 15,
+    marginTop: 10,
+    width: '100%',
   },
-  tabActions: { flexDirection: "row", gap: 15 },
-  headerButton: { padding: 10, justifyContent: "center", alignItems: "center" },
+  headerButton: {
+    padding: 10,
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#666",
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
 });
 
 export default FullPlayerHeader;
