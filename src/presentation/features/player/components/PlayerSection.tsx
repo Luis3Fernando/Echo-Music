@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler'; 
 import { Colors } from '@theme/colors';
 import { MOCK_SONGS } from '@mocks/mock-songs';
 import PlayerArtwork from './PlayerArtwork';
+import PlayerInfo from './PlayerInfo';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -21,6 +22,12 @@ const PlayerSection = () => {
     }
   };
 
+  // Evento que pide el usuario
+  const handleArtistPress = () => {
+    console.log(`Navegando al perfil del artista: ${currentTrack.artistName}`);
+    // Aquí en el futuro harás navigation.navigate('ArtistProfile', { id: ... })
+  };
+
   return (
     <View style={styles.section}>
       <View style={styles.carouselContainer}>
@@ -36,14 +43,14 @@ const PlayerSection = () => {
           disallowInterruption={true} 
         />
       </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.fullTitle} numberOfLines={1}>
-          {currentTrack.title}
-        </Text>
-        <Text style={styles.fullArtist} numberOfLines={1}>
-          {currentTrack.artistName}
-        </Text>
-      </View>
+
+      {/* --- NUEVA SECCIÓN MODULARIZADA --- */}
+      <PlayerInfo 
+        title={currentTrack.title}
+        artistName={currentTrack.artistName}
+        onArtistPress={handleArtistPress}
+      />
+
       <View style={styles.controlsWrapper}>
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: '45%' }]} /> 
@@ -73,14 +80,6 @@ const styles = StyleSheet.create({
     height: 380,
     width: SCREEN_WIDTH,
   },
-  infoContainer: { 
-    marginTop: 30, 
-    width: "100%", 
-    alignItems: "center",
-    paddingHorizontal: 30 
-  },
-  fullTitle: { fontSize: 26, fontWeight: "800", color: "#1A1A1A", textAlign: 'center' },
-  fullArtist: { fontSize: 18, color: "#707070", marginTop: 6, textAlign: 'center' },
   controlsWrapper: { width: "100%", marginTop: 35, paddingHorizontal: 35 },
   progressBar: { width: "100%", height: 6, backgroundColor: "#F0F0F0", borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: "100%", backgroundColor: Colors.primary },
