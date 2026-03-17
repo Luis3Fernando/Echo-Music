@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
-import LyricsSection from "../components/LyricsSection";
-
+import DetailsSection from "../components/DetailsSection";
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface FullPlayerProps {
@@ -32,7 +30,7 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
           <PlayerSection />
         </View>
         <View style={styles.lyricsWrapper}>
-          <LyricsSection />
+          <DetailsSection />
         </View>
       </BottomSheetScrollView>
     </View>
@@ -54,8 +52,6 @@ const styles = StyleSheet.create({
   },
   lyricsWrapper: {
     paddingHorizontal: 30,
-    marginTop: 20,
-    minHeight: 400,
   },
 });
 
