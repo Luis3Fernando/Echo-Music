@@ -2,9 +2,8 @@ import React from 'react';
 import { StyleSheet, View, Image, Dimensions } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 interface PlayerArtworkProps {
-  artworkUri?: string;
+  artworkUri?: string | null; 
 }
 
 const PlayerArtwork = ({ artworkUri }: PlayerArtworkProps) => (
@@ -18,12 +17,12 @@ const PlayerArtwork = ({ artworkUri }: PlayerArtworkProps) => (
     </View>
   </View>
 );
-
 const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: -10
   },
   artworkContainer: {
     shadowColor: "#000",
@@ -33,8 +32,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   bigArt: {
-    width: SCREEN_WIDTH - 50,
-    height: SCREEN_WIDTH - 50,
+    width: SCREEN_WIDTH - 30,
+    height: SCREEN_WIDTH - 30,
     borderRadius: 20,
     backgroundColor: "#F0F0F0",
   },
