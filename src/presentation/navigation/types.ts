@@ -1,6 +1,7 @@
 export type RootStackParamList = {
   Onboarding: undefined;
   Main: undefined;
+  Settings: undefined
 };
 
 export type MainTabParamList = {

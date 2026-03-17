@@ -8,12 +8,13 @@ import RecentAlbumsSection from "../components/RecentAlbumsSection";
 import MostPlayedSection from "../components/MostPlayedSection";
 import TopArtistsSection from "../components/TopArtistsSection";
 import LibraryStatsSection from "../components/LibraryStatsSection";
+import { useNavigation } from "@react-navigation/native";
 
 const ExploreScreen = () => {
   const { recommendedTracks, loading } = useRecommendations();
   const [isScanning, setIsScanning] = useState(true);
   const [progress, setProgress] = useState(0);
-
+  const navigation = useNavigation<any>();
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -33,7 +34,7 @@ const ExploreScreen = () => {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <ScreenHeader
         title="Explorar"
-        onActionPress={() => console.log("Abrir Ajustes")}
+        onActionPress={() => navigation.navigate('Settings')}
       />
       <RecommendedSection data={recommendedTracks}></RecommendedSection>
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
