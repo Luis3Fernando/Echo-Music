@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { LinearGradient } from "expo-linear-gradient";
+
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
 import DetailsSection from "../components/DetailsSection";
+
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface FullPlayerProps {
@@ -16,22 +19,28 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
 
   return (
     <View style={[styles.fullPlayerContent, animatedStyle]}>
-      <BottomSheetScrollView 
+      <BottomSheetScrollView
         key="full-player-scroll"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
-        <FullPlayerHeader 
-          onClose={onClose} 
-          isFavorite={isFavorite}
-          onToggleFavorite={() => setIsFavorite(!isFavorite)}
-        />
-        <View style={styles.mainPlayerWrapper}>
-          <PlayerSection />
-        </View>
-        <View style={styles.lyricsWrapper}>
-          <DetailsSection />
-        </View>
+        <LinearGradient
+          colors={["#ffffff", "#e1e1e1", "#4d4d4d", "#161616"]}
+          locations={[0, 0.4, 0.6, 1]}
+          style={styles.gradientBackground}
+        >
+          <FullPlayerHeader
+            onClose={onClose}
+            isFavorite={isFavorite}
+            onToggleFavorite={() => setIsFavorite(!isFavorite)}
+          />
+          <View style={styles.mainPlayerWrapper}>
+            <PlayerSection />
+          </View>
+          <View style={styles.detailsWrapper}>
+            <DetailsSection />
+          </View>
+        </LinearGradient>
       </BottomSheetScrollView>
     </View>
   );
@@ -40,18 +49,20 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
 const styles = StyleSheet.create({
   fullPlayerContent: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#000",
   },
-  scrollContainer: {
+  gradientBackground: {
+    flex: 1,
+    paddingTop: 10,
     paddingBottom: 60,
-    paddingTop: 10
   },
   mainPlayerWrapper: {
-    height: SCREEN_HEIGHT * 0.8, 
+    height: SCREEN_HEIGHT * 0.82,
     justifyContent: "flex-start",
   },
-  lyricsWrapper: {
+  detailsWrapper: {
     paddingHorizontal: 20,
+    marginTop: 20,
   },
 });
 

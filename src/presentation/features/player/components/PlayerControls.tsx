@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
+import { Colors } from '@/core/theme/colors';
 
 interface Props {
   onNext: () => void;
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.black,
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,

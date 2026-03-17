@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   backgroundBar: {
     height: 4,
     width: "100%",
-    backgroundColor: "#F0F0F0",
+    backgroundColor: "#bababa",
     borderRadius: 2,
     position: "relative",
   },
