@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { useState, useEffect } from "react";
+import { View, StyleSheet, Dimensions, BackHandler } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -16,6 +16,20 @@ interface FullPlayerProps {
 
 const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      onClose();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [onClose]);
 
   return (
     <View style={[styles.fullPlayerContent, animatedStyle]}>

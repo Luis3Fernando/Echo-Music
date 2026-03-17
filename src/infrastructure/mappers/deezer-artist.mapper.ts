@@ -5,7 +5,7 @@ export const deezerArtistMapper = {
     return {
       id: String(raw.id),
       name: raw.name,
-      pictureUrl: raw.picture_xl,
+      pictureUrl: raw.picture_big,
       description: null,
       socialLinks: null,
       reels: null,
