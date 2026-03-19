@@ -7,6 +7,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import { Colors } from "@/core/theme/colors";
 
 interface Props {
   currentTime: string;
@@ -73,13 +74,13 @@ const styles = StyleSheet.create({
   backgroundBar: {
     height: 4,
     width: "100%",
-    backgroundColor: "#bababa",
+    backgroundColor: "#696969",
     borderRadius: 2,
     position: "relative",
   },
   filledBar: {
     height: "100%",
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.white,
     borderRadius: 2,
   },
   snakeHead: {
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.white,
     top: -5,
     marginLeft: -7,
     shadowColor: "#000",

@@ -1,5 +1,6 @@
 export const Colors = {
   primary: "#372add",
+  secondary: "#4564FB",
   background: "#0F0F0F",
   background_light: "#EAE7EE",
   light: "#F8F9FA",
@@ -16,5 +17,5 @@ export const Colors = {
   gray_text: "#707070",
   gray_light: "#C2C0C5",
   gray: '#858585',
-  gray_dark: '#2D2D2D'
+  gray_dark: '#2D2D2D',
 };

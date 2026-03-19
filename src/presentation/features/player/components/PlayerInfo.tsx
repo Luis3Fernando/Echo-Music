@@ -35,12 +35,12 @@ const styles = StyleSheet.create({
   fullTitle: { 
     fontSize: 24, 
     fontWeight: "800", 
-    color: Colors.black,
+    color: Colors.white,
     textAlign: 'center' 
   },
   fullArtist: { 
     fontSize: 18, 
-    color: "#707070", 
+    color: "#c2c2c2", 
     marginTop: 6, 
     textAlign: 'center',
     textDecorationLine: 'none'

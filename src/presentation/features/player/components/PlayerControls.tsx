@@ -25,11 +25,11 @@ const PlayerControls = ({ onNext, onPrev }: Props) => {
         <Ionicons 
           name="shuffle-outline" 
           size={24} 
-          color={isShuffleActive ? "#1A1A1A" : "#A0A0A0"} 
+          color={isShuffleActive ? Colors.secondary : "#A0A0A0"} 
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={onPrev}>
-        <Ionicons name="play-skip-back-outline" size={32} color="#1A1A1A" />
+        <Ionicons name="play-skip-back-outline" size={32} color="#dfdfdf" />
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.playButton} 
@@ -39,12 +39,12 @@ const PlayerControls = ({ onNext, onPrev }: Props) => {
         <Ionicons 
           name={isPlaying ? "pause" : "play"} 
           size={38} 
-          color="#FFF" 
+          color="#000" 
           style={{ marginLeft: isPlaying ? 0 : 4 }} 
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={onNext}>
-        <Ionicons name="play-skip-forward-outline" size={32} color="#1A1A1A" />
+        <Ionicons name="play-skip-forward-outline" size={32} color="#dfdfdf" />
       </TouchableOpacity>
       <TouchableOpacity 
         onPress={() => {
@@ -56,7 +56,7 @@ const PlayerControls = ({ onNext, onPrev }: Props) => {
         <Ionicons 
           name="repeat-outline" 
           size={24} 
-          color={isRepeatActive ? "#1A1A1A" : "#A0A0A0"} 
+          color={isRepeatActive ? Colors.secondary : "#A0A0A0"} 
         />
       </TouchableOpacity>
     </View>
@@ -76,11 +76,11 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: Colors.black,
+    backgroundColor: "#e7e7e7",
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,
-    shadowColor: "#000",
+    shadowColor: "#1A1A1A",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,

@@ -14,7 +14,6 @@ import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { Colors } from "@theme/colors";
 import { LibraryStackParamList } from "@navigation/LibraryNavigator";
 import { USER_PLAYLISTS, SYSTEM_PLAYLISTS } from "@mocks/mock-playlists";
-import { useImageAccentColor } from "@hooks/use-image-accent-color";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MOCK_SONGS } from "@mocks/mock-songs";
 import { Track } from "@entities/track.entity";
@@ -73,10 +72,6 @@ const PlaylistScreen = () => {
     },
   ];
 
-  const { main, dark } = useImageAccentColor(
-    playlist?.artworkUri,
-    Colors.gray_dark,
-  );
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const trackOptions: MenuItem[] = [
@@ -141,26 +136,10 @@ const PlaylistScreen = () => {
     },
   ];
 
-  useEffect(() => {
-    if (main !== Colors.gray_dark) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: false,
-      }).start();
-    }
-  }, [main]);
-
   if (!playlist) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors.gray_dark }]}>
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { backgroundColor: dark, opacity: fadeAnim },
-        ]}
-      />
+    <View style={[styles.container, { backgroundColor: '#F9F9F8' }]}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScreenHeaderBasic
           title="Playlist"
@@ -172,11 +151,11 @@ const PlaylistScreen = () => {
             setMenuAnchor({ x: pageX, y: pageY });
             setIsMenuVisible(true);
           }}
-          variant="dark"
+          variant="light"
         />
         <View style={styles.topSection}>
           <View style={styles.imageColumn}>
-            <View style={[styles.shadowWrapper, { shadowColor: main }]}>
+            <View style={[styles.shadowWrapper, { shadowColor: '#4A4A48' }]}>
               <Image
                 source={
                   playlist.artworkUri
@@ -305,17 +284,18 @@ const styles = StyleSheet.create({
   playlistName: {
     fontSize: 22,
     fontWeight: "900",
-    color: Colors.white,
+    color: Colors.black,
     marginBottom: 10,
   },
   tagContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tag: {
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    borderWidth: 0.5,
+    borderColor: Colors.black,
     paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 6,
+    borderRadius: 20,
   },
-  tagText: { color: "#EEE", fontSize: 12, fontWeight: "600" },
+  tagText: { color: Colors.black, fontSize: 12, fontWeight: "600" },
   bottomSection: {
     flex: 1,
     backgroundColor: Colors.white,

@@ -39,7 +39,7 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <LinearGradient
-          colors={["#ffffff", "#e1e1e1", "#4d4d4d", "#161616"]}
+          colors={["#181818", "#181818"]}
           locations={[0, 0.4, 0.6, 1]}
           style={styles.gradientBackground}
         >

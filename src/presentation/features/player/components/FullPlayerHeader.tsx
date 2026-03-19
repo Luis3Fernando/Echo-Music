@@ -22,7 +22,7 @@ const FullPlayerHeader = ({
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onClose} style={styles.headerButton}>
-        <Ionicons name="chevron-down" size={30} color="#1A1A1A" />
+        <Ionicons name="chevron-down" size={30} color="#ffffff" />
       </TouchableOpacity>
       <View style={styles.titleContainer}>
         <Text style={styles.headerTitle}>Reproductor</Text>
@@ -31,7 +31,7 @@ const FullPlayerHeader = ({
         <Ionicons 
           name={isFavorite ? "heart" : "heart-outline"} 
           size={26} 
-          color={isFavorite ? Colors.primary : "#1A1A1A"} 
+          color={isFavorite ? Colors.secondary : "#ffffff"} 
         />
       </TouchableOpacity>
     </View>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
+    color: "#e3e3e3",
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
