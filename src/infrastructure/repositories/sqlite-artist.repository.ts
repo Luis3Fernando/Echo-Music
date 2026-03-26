@@ -1,28 +1,28 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { Artist } from "../../domain/entities/artist.entity";
-import { ArtistRepository } from "../../domain/repositories/artist.repository";
+import { Artist } from "@entities/artist.entity";
+import { ArtistRepository } from "@interfaces/artist.repository";
+import { ArtistMapper } from "@mappers/artist.mapper";
 
 export class SqliteArtistRepository implements ArtistRepository {
   constructor(private db: SQLiteDatabase) {}
 
   async save(artist: Artist): Promise<void> {
-    const socialLinks = artist.socialLinks ? JSON.stringify(artist.socialLinks) : null;
-    const reels = artist.reels ? JSON.stringify(artist.reels) : null;
+    const p = ArtistMapper.toPersistence(artist);
 
     await this.db.runAsync(
       `INSERT OR REPLACE INTO artists 
       (id, name, pictureUrl, description, socialLinks, reels, isProcessed) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        artist.id,
-        artist.name,
-        artist.pictureUrl,
-        artist.description ?? null,
-        socialLinks,
-        reels,
-        artist.isProcessed ? 1 : 0
-      ]
+      [p.id, p.name, p.pictureUrl, p.description, p.socialLinks, p.reels, p.isProcessed]
     );
+  }
+
+  async findByName(name: string): Promise<Artist | null> {
+    const result = await this.db.getFirstAsync<any>(
+      "SELECT * FROM artists WHERE name = ?",
+      [name]
+    );
+    return result ? ArtistMapper.toDomain(result) : null;
   }
 
   async findById(id: string): Promise<Artist | null> {
@@ -30,24 +30,11 @@ export class SqliteArtistRepository implements ArtistRepository {
       "SELECT * FROM artists WHERE id = ?",
       [id]
     );
-
-    if (!result) return null;
-
-    return {
-      ...result,
-      socialLinks: result.socialLinks ? JSON.parse(result.socialLinks) : null,
-      reels: result.reels ? JSON.parse(result.reels) : null,
-      isProcessed: result.isProcessed === 1
-    };
+    return result ? ArtistMapper.toDomain(result) : null;
   }
 
   async findAll(): Promise<Artist[]> {
     const results = await this.db.getAllAsync<any>("SELECT * FROM artists ORDER BY name ASC");
-    return results.map(row => ({
-      ...row,
-      socialLinks: row.socialLinks ? JSON.parse(row.socialLinks) : null,
-      reels: row.reels ? JSON.parse(row.reels) : null,
-      isProcessed: row.isProcessed === 1
-    }));
+    return results.map(row => ArtistMapper.toDomain(row));
   }
 }

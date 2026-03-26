@@ -39,7 +39,7 @@ export const TrackMapper = {
       duration: track.duration,
       format: track.format,
       size: track.size,
-      artworkUri: track.artworkUri,
+      artworkUri: track.artworkUri ?? null,
       isFavorite: track.isFavorite ? 1 : 0,
       isProcessed: track.isProcessed ? 1 : 0,
       dateAdded: track.dateAdded,
@@ -50,9 +50,9 @@ export const TrackMapper = {
     };
   },
 
-
   fromFile(fileInfo: any, metadata: any, artistId: string, albumId?: string): Track {
     const cleanFileName = fileInfo.filename.replace(/\.[^/.]+$/, "");
+    
     return {
       id: generateUUID(),
       url: fileInfo.uri,
@@ -69,7 +69,7 @@ export const TrackMapper = {
       isProcessed: true,
       dateAdded: Date.now(),
       playCount: 0,
-      lyrics: null,
+      lyrics: metadata.embeddedLyrics || null,
     };
   },
 };

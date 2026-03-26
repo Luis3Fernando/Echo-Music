@@ -10,6 +10,7 @@ export interface Track {
   albumName: string;
   duration: number;
   format: string;
+  year?: number | null;
   size: number;
   artworkUri?: string | null;
   lyrics?: Lyrics | null; 

@@ -37,6 +37,7 @@ export const createTables = async (db: any) => {
       duration INTEGER NOT NULL,
       format TEXT NOT NULL,
       size INTEGER NOT NULL,
+      bitrate INTEGER,
       artworkUri TEXT,
       
       lyricsContent TEXT,

@@ -1,6 +1,7 @@
 import { TrackRepository } from "@interfaces/track.repository";
 import { Track } from "@entities/track.entity";
 import { SQLiteDatabase } from "expo-sqlite";
+import { TrackMapper } from "@mappers/track.mapper";
 
 export class SqliteTrackRepository implements TrackRepository {
   constructor(private db: SQLiteDatabase) {}
@@ -8,32 +9,36 @@ export class SqliteTrackRepository implements TrackRepository {
   async saveAll(tracks: Track[]): Promise<void> {
     await this.db.withTransactionAsync(async () => {
       for (const track of tracks) {
+        const p = TrackMapper.toPersistence(track);
+
         await this.db.runAsync(
           `INSERT OR REPLACE INTO tracks 
-        (
-          id, url, title, artistName, albumName, 
-          duration, format, bitrate, size, genre, 
-          year, trackNumber, diskNumber, artworkUri, 
-          isProcessed, dateAdded
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          (
+            id, url, title, artistId, albumId, artistName, albumName, 
+            duration, format, size, artworkUri, 
+            lyricsContent, lyricsType, lyricsSource,
+            isFavorite, isProcessed, dateAdded, playCount
+          ) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            track.id,
-            track.url,
-            track.title,
-            track.artistName ?? "Artista Desconocido",
-            track.albumName ?? "Álbum Desconocido",
-            track.duration,
-            track.format,
-            track.bitrate ?? null,
-            track.size,
-            track.genre ?? null,
-            track.year ?? null,
-            track.trackNumber ?? null,
-            track.diskNumber ?? null,
-            track.artworkUri ?? null,
-            track.isProcessed ? 1 : 0,
-            track.dateAdded,
+            p.id,
+            p.url,
+            p.title,
+            p.artistId,
+            p.albumId,
+            p.artistName,
+            p.albumName,
+            p.duration,
+            p.format,
+            p.size,
+            p.artworkUri,
+            p.lyricsContent,
+            p.lyricsType,
+            p.lyricsSource,
+            p.isFavorite,
+            p.isProcessed,
+            p.dateAdded,
+            p.playCount,
           ],
         );
       }
@@ -44,38 +49,49 @@ export class SqliteTrackRepository implements TrackRepository {
     const results = await this.db.getAllAsync<any>(
       "SELECT * FROM tracks WHERE isProcessed = 0",
     );
-    return results.map((row) => ({
-      ...row,
-      isProcessed: row.isProcessed === 1,
-    }));
+    return results.map((row) => TrackMapper.toDomain(row));
   }
 
   async updateMetadata(id: string, metadata: Partial<Track>): Promise<void> {
-    const fields = Object.keys(metadata)
-      .map((key) => `${key} = ?`)
-      .join(", ");
-    const values = Object.values(metadata).map((v) =>
+    const { lyrics, ...rest } = metadata;
+    const updateData: any = { ...rest };
+
+    if (lyrics) {
+      updateData.lyricsContent = lyrics.content;
+      updateData.lyricsType = lyrics.type;
+      updateData.lyricsSource = lyrics.source;
+    }
+
+    const keys = Object.keys(updateData);
+    if (keys.length === 0) return;
+
+    const fields = keys.map((key) => `${key} = ?`).join(", ");
+    const values = Object.values(updateData).map((v) =>
       typeof v === "boolean" ? (v ? 1 : 0) : v,
     );
 
     await this.db.runAsync(`UPDATE tracks SET ${fields} WHERE id = ?`, [
       ...values,
       id,
-    ]);
-  }
-
-  async deleteAll(): Promise<void> {
-    await this.db.runAsync("DELETE FROM tracks");
+    ] as any[]);
   }
 
   async findAll(): Promise<Track[]> {
     const results = await this.db.getAllAsync<any>(
       "SELECT * FROM tracks ORDER BY title ASC",
     );
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
 
-    return results.map((row) => ({
-      ...row,
-      isProcessed: row.isProcessed === 1,
-    }));
+  async findById(id: string): Promise<Track | null> {
+    const row = await this.db.getFirstAsync<any>(
+      "SELECT * FROM tracks WHERE id = ?",
+      [id],
+    );
+    return row ? TrackMapper.toDomain(row) : null;
+  }
+
+  async deleteAll(): Promise<void> {
+    await this.db.runAsync("DELETE FROM tracks");
   }
 }
