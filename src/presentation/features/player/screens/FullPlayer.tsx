@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, StyleSheet, Dimensions, BackHandler } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { LinearGradient } from "expo-linear-gradient";
 
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
@@ -38,11 +37,7 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <LinearGradient
-          colors={["#181818", "#181818"]}
-          locations={[0, 0.4, 0.6, 1]}
-          style={styles.gradientBackground}
-        >
+        <View style={styles.staticBackground}>
           <FullPlayerHeader
             onClose={onClose}
             isFavorite={isFavorite}
@@ -54,7 +49,7 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
           <View style={styles.detailsWrapper}>
             <DetailsSection />
           </View>
-        </LinearGradient>
+        </View>
       </BottomSheetScrollView>
     </View>
   );
@@ -65,8 +60,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000",
   },
-  gradientBackground: {
+  staticBackground: {
     flex: 1,
+    backgroundColor: "#181818",
     paddingTop: 10,
     paddingBottom: 60,
   },
