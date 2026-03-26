@@ -11,6 +11,7 @@ module.exports = function (api) {
             "@": "./src",
             "@theme": "./src/core/theme",
             "@constants": "./src/core/constants",
+            "@utils": "./src/core/utils",
             "@entities": "./src/domain/entities",
             "@value-objects": "./src/domain/value-objects",
             "@interfaces": "./src/domain/repositories",
