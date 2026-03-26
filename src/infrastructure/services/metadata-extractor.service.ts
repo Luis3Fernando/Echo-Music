@@ -4,7 +4,7 @@ import { Buffer } from "buffer";
 
 const ARTWORK_CACHE_DIR = `${FileSystem.cacheDirectory}artworks/`;
 
-export const metadataExtractorService = {
+export const MetadataExtractorService = {
   async extract(fileUri: string, trackId: string) {
     try {
       const isFlac = fileUri.toLowerCase().endsWith(".flac");
@@ -22,21 +22,43 @@ export const metadataExtractorService = {
       });
 
       const { common } = metadata;
-      let artworkUri = null;
 
+      let artworkUri = null;
       if (common.picture && common.picture.length > 0) {
         artworkUri = await this.saveArtwork(trackId, common.picture[0]);
+      }
+
+      let lyricsData = null;
+      const lrcUri = fileUri.substring(0, fileUri.lastIndexOf(".")) + ".lrc";
+      const lrcInfo = await FileSystem.getInfoAsync(lrcUri);
+
+      if (lrcInfo.exists) {
+        const lrcContent = await FileSystem.readAsStringAsync(lrcUri);
+        lyricsData = {
+          content: lrcContent,
+          type: 'synced',
+          source: 'external_file'
+        };
+      } 
+      else if (common.lyrics?.[0]) {
+        const embedded = common.lyrics[0];
+        lyricsData = {
+          content: typeof embedded === 'string' ? embedded : (embedded as any).text,
+          type: 'plain',
+          source: 'embedded'
+        };
       }
 
       return {
         title: common.title,
         artist: common.artist || "Artista Desconocido",
         album: common.album || "Álbum Desconocido",
-        genre: common.genre?.[0],
-        year: common.year,
-        trackNumber: common.track?.no,
-        diskNumber: common.disk?.no,
+        genre: common.genre?.[0] || null,
+        year: common.year || null,
+        trackNumber: common.track?.no || null,
+        diskNumber: common.disk?.no || null,
         artworkUri,
+        lyrics: lyricsData,
       };
     } catch (error) {
       console.error(`[MetadataExtractor] Error en ${fileUri}:`, error);
@@ -48,18 +70,15 @@ export const metadataExtractorService = {
     try {
       const fileUri = `${ARTWORK_CACHE_DIR}thumb_${trackId}.jpg`;
       const dirInfo = await FileSystem.getInfoAsync(ARTWORK_CACHE_DIR);
+      
       if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(ARTWORK_CACHE_DIR, {
-          intermediates: true,
-        });
+        await FileSystem.makeDirectoryAsync(ARTWORK_CACHE_DIR, { intermediates: true });
       }
 
       await FileSystem.writeAsStringAsync(
         fileUri,
         Buffer.from(picture.data).toString("base64"),
-        {
-          encoding: FileSystem.EncodingType.Base64,
-        },
+        { encoding: FileSystem.EncodingType.Base64 }
       );
 
       return fileUri;
