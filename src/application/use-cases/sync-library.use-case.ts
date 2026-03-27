@@ -45,12 +45,15 @@ export class SyncLibraryUseCase {
           track.id,
         );
 
-        if (metadata) {
-          let artist = await this.artistRepo.findByName(metadata.artist);
+        if (metadata && (metadata.title || metadata.artist !== "Artista Desconocido")) {
+          const artistName = metadata.artist || "Artista Desconocido";
+          const albumTitle = metadata.album || "Álbum Desconocido";
+
+          let artist = await this.artistRepo.findByName(artistName);
           if (!artist) {
             artist = {
               id: generateUUID(),
-              name: metadata.artist,
+              name: artistName,
               pictureUrl: "",
               isProcessed: false,
             };
@@ -58,17 +61,19 @@ export class SyncLibraryUseCase {
           }
 
           let album = await this.albumRepo.findByNameAndArtist(
-            metadata.album,
+            albumTitle,
             artist.id,
           );
+          
           if (!album) {
             album = {
               id: generateUUID(),
-              title: metadata.album,
+              title: albumTitle,
               artistId: artist.id,
               artistName: artist.name,
-              artworkUri: metadata.artworkUri,
-              year: metadata.year,
+              artworkUri: metadata.artworkUri || null,
+              // Eliminamos metadata.year porque tu servicio ya no lo extrae
+              year: null, 
               trackCount: 1,
               isCompilation: false,
             };
@@ -81,13 +86,14 @@ export class SyncLibraryUseCase {
             albumId: album.id,
             artistName: artist.name,
             albumName: album.title,
-            year: metadata.year,
-            artworkUri: metadata.artworkUri,
+            artworkUri: metadata.artworkUri || track.artworkUri,
             lyrics: metadata.lyrics ? (metadata.lyrics as Lyrics) : null,
             isProcessed: true,
           });
         } else {
-          await this.trackRepo.updateMetadata(track.id, { isProcessed: true });
+          await this.trackRepo.updateMetadata(track.id, { 
+            isProcessed: true 
+          });
         }
 
         processedCount++;

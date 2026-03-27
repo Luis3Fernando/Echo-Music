@@ -21,8 +21,7 @@ export const createTables = async (db: any) => {
       artworkUri TEXT,
       year INTEGER,
       trackCount INTEGER DEFAULT 0,
-      isCompilation INTEGER DEFAULT 0,
-      folderPath TEXT,
+      playCount INTEGER DEFAULT 0,
       FOREIGN KEY (artistId) REFERENCES artists (id) ON DELETE CASCADE
     );
 
@@ -36,8 +35,12 @@ export const createTables = async (db: any) => {
       albumName TEXT NOT NULL,
       duration INTEGER NOT NULL,
       format TEXT NOT NULL,
-      size INTEGER NOT NULL,
       bitrate INTEGER,
+      size INTEGER NOT NULL,
+      genre TEXT,
+      year INTEGER,
+      trackNumber INTEGER,
+      diskNumber INTEGER,
       artworkUri TEXT,
       
       lyricsContent TEXT,

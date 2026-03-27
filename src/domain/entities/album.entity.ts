@@ -6,6 +6,5 @@ export interface Album {
   artworkUri?: string | null;
   year?: number | null;
   trackCount: number;
-  isCompilation: boolean;
-  folderPath?: string;
+  playCount: number;
 }
