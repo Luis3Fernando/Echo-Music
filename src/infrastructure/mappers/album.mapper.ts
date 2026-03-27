@@ -10,8 +10,7 @@ export const AlbumMapper = {
       artworkUri: row.artworkUri ?? null,
       year: row.year || null,
       trackCount: row.trackCount || 0,
-      isCompilation: row.isCompilation === 1,
-      folderPath: row.folderPath || undefined,
+      playCount: row.playCount || 0,
     };
   },
 
@@ -24,8 +23,7 @@ export const AlbumMapper = {
       artworkUri: album.artworkUri ?? null,
       year: album.year ?? null,
       trackCount: album.trackCount ?? 0,
-      isCompilation: album.isCompilation ? 1 : 0,
-      folderPath: album.folderPath ?? null,
+      playCount: album.playCount ?? 0,
     };
   }
 };

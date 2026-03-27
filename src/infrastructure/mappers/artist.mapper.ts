@@ -1,4 +1,4 @@
-import { Artist } from "@/domain/entities/artist.entity";
+import { Artist } from "@entities/artist.entity";
 
 export const ArtistMapper = {
   toDomain(row: any): Artist {
@@ -19,8 +19,8 @@ export const ArtistMapper = {
       name: artist.name,
       pictureUrl: artist.pictureUrl ?? '',
       description: artist.description ?? null,
-      socialLinks: artist.socialLinks ? JSON.stringify(artist.socialLinks) : null,
-      reels: artist.reels ? JSON.stringify(artist.reels) : null,
+      socialLinks: artist.socialLinks ? JSON.stringify(artist.socialLinks) : JSON.stringify([]),
+      reels: artist.reels ? JSON.stringify(artist.reels) : JSON.stringify([]),
       isProcessed: artist.isProcessed ? 1 : 0,
     };
   }
