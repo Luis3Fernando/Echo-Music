@@ -6,6 +6,7 @@ export const AlbumMapper = {
       id: row.id,
       title: row.title,
       artistId: row.artistId,
+      artistIds: row.artistIds ? JSON.parse(row.artistIds) : [row.artistId],
       artistName: row.artistName,
       artworkUri: row.artworkUri ?? null,
       year: row.year || null,
