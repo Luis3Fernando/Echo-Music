@@ -11,7 +11,10 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     artistId: string,
   ): Promise<Album | null> {
     const row = await this.db.getFirstAsync<any>(
-      "SELECT * FROM albums WHERE title = ? AND artistId = ?",
+      `SELECT a.*, 
+        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+       FROM albums a 
+       WHERE a.title = ? AND a.artistId = ?`,
       [title, artistId],
     );
     return row ? AlbumMapper.toDomain(row) : null;
@@ -20,26 +23,43 @@ export class SQLiteAlbumRepository implements AlbumRepository {
   async save(album: Album): Promise<void> {
     const p = AlbumMapper.toPersistence(album);
 
-    await this.db.runAsync(
-      `INSERT OR REPLACE INTO albums 
-      (id, title, artistId, artistName, artworkUri, year, trackCount, playCount) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        p.id,
-        p.title,
-        p.artistId,
-        p.artistName,
-        p.artworkUri,
-        p.year,
-        p.trackCount,
-        p.playCount,
-      ] as any[],
-    );
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `INSERT OR REPLACE INTO albums 
+        (id, title, artistId, artistName, artworkUri, year, trackCount, playCount) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          p.id,
+          p.title,
+          p.artistId,
+          p.artistName,
+          p.artworkUri,
+          p.year,
+          p.trackCount,
+          p.playCount,
+        ] as any[],
+      );
+
+      await this.db.runAsync(
+        "DELETE FROM album_artists WHERE albumId = ?",
+        [p.id]
+      );
+
+      for (const aId of album.artistIds) {
+        await this.db.runAsync(
+          "INSERT INTO album_artists (albumId, artistId) VALUES (?, ?)",
+          [p.id, aId]
+        );
+      }
+    });
   }
 
   async findById(id: string): Promise<Album | null> {
     const row = await this.db.getFirstAsync<any>(
-      "SELECT * FROM albums WHERE id = ?",
+      `SELECT a.*, 
+        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+       FROM albums a 
+       WHERE a.id = ?`,
       [id],
     );
     return row ? AlbumMapper.toDomain(row) : null;
@@ -47,7 +67,10 @@ export class SQLiteAlbumRepository implements AlbumRepository {
 
   async findAll(): Promise<Album[]> {
     const rows = await this.db.getAllAsync<any>(
-      "SELECT * FROM albums ORDER BY title ASC",
+      `SELECT a.*, 
+        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+       FROM albums a 
+       ORDER BY a.title ASC`,
     );
     return rows.map((row) => AlbumMapper.toDomain(row));
   }
