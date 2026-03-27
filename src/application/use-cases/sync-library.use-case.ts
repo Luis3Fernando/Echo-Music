@@ -26,11 +26,13 @@ export class SyncLibraryUseCase {
     try {
       const rawFiles = await nativeMediaService.fetchAllAudioFiles();
       if (rawFiles.length === 0) return;
-      const UNKNOWN_ARTIST_ID = "unknown-artist-uuid";
+      const unknownArtist = await this.artistManager.getOrCreate(
+        "Artista Desconocido",
+      );
       await this.artistManager.getOrCreate("Artista Desconocido");
 
       const initialTracks = rawFiles.map((file) =>
-        TrackMapper.fromFile(file, {}, UNKNOWN_ARTIST_ID),
+        TrackMapper.fromFile(file, {}, unknownArtist.id),
       );
       await this.trackRepo.saveAll(initialTracks);
 
