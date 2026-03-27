@@ -1,7 +1,7 @@
 import { SQLiteDatabase } from "expo-sqlite";
-import { AlbumRepository } from "@/domain/repositories/album.repository";
-import { Album } from "@/domain/entities/album.entity";
-import { AlbumMapper } from "../mappers/album.mapper";
+import { AlbumRepository } from "@interfaces/album.repository";
+import { Album } from "@entities/album.entity";
+import { AlbumMapper } from "@mappers/album.mapper";
 
 export class SQLiteAlbumRepository implements AlbumRepository {
   constructor(private db: SQLiteDatabase) {}
@@ -10,7 +10,7 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     title: string,
     artistId: string,
   ): Promise<Album | null> {
-    const row = await this.db.getFirstAsync(
+    const row = await this.db.getFirstAsync<any>(
       "SELECT * FROM albums WHERE title = ? AND artistId = ?",
       [title, artistId],
     );
@@ -22,8 +22,8 @@ export class SQLiteAlbumRepository implements AlbumRepository {
 
     await this.db.runAsync(
       `INSERT OR REPLACE INTO albums 
-    (id, title, artistId, artistName, artworkUri, year, trackCount, isCompilation, folderPath) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, title, artistId, artistName, artworkUri, year, trackCount, playCount) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         p.id,
         p.title,
@@ -32,14 +32,13 @@ export class SQLiteAlbumRepository implements AlbumRepository {
         p.artworkUri,
         p.year,
         p.trackCount,
-        p.isCompilation,
-        p.folderPath,
-      ],
+        p.playCount,
+      ] as any[],
     );
   }
 
   async findById(id: string): Promise<Album | null> {
-    const row = await this.db.getFirstAsync(
+    const row = await this.db.getFirstAsync<any>(
       "SELECT * FROM albums WHERE id = ?",
       [id],
     );
@@ -47,7 +46,7 @@ export class SQLiteAlbumRepository implements AlbumRepository {
   }
 
   async findAll(): Promise<Album[]> {
-    const rows = await this.db.getAllAsync(
+    const rows = await this.db.getAllAsync<any>(
       "SELECT * FROM albums ORDER BY title ASC",
     );
     return rows.map((row) => AlbumMapper.toDomain(row));

@@ -13,7 +13,15 @@ export class SqliteArtistRepository implements ArtistRepository {
       `INSERT OR REPLACE INTO artists 
       (id, name, pictureUrl, description, socialLinks, reels, isProcessed) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [p.id, p.name, p.pictureUrl, p.description, p.socialLinks, p.reels, p.isProcessed]
+      [
+        p.id, 
+        p.name, 
+        p.pictureUrl, 
+        p.description, 
+        p.socialLinks, 
+        p.reels, 
+        p.isProcessed
+      ] as any[]
     );
   }
 
@@ -34,7 +42,9 @@ export class SqliteArtistRepository implements ArtistRepository {
   }
 
   async findAll(): Promise<Artist[]> {
-    const results = await this.db.getAllAsync<any>("SELECT * FROM artists ORDER BY name ASC");
+    const results = await this.db.getAllAsync<any>(
+      "SELECT * FROM artists ORDER BY name ASC"
+    );
     return results.map(row => ArtistMapper.toDomain(row));
   }
 }

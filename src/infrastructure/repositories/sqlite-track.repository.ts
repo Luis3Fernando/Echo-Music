@@ -15,11 +15,11 @@ export class SqliteTrackRepository implements TrackRepository {
           `INSERT OR REPLACE INTO tracks 
           (
             id, url, title, artistId, albumId, artistName, albumName, 
-            duration, format, size, artworkUri, 
-            lyricsContent, lyricsType, lyricsSource,
+            duration, format, bitrate, size, genre, year, trackNumber, diskNumber, 
+            artworkUri, lyricsContent, lyricsType, lyricsSource,
             isFavorite, isProcessed, dateAdded, playCount
           ) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             p.id,
             p.url,
@@ -30,7 +30,12 @@ export class SqliteTrackRepository implements TrackRepository {
             p.albumName,
             p.duration,
             p.format,
+            p.bitrate,
             p.size,
+            p.genre,
+            p.year,
+            p.trackNumber,
+            p.diskNumber,
             p.artworkUri,
             p.lyricsContent,
             p.lyricsType,
@@ -39,7 +44,7 @@ export class SqliteTrackRepository implements TrackRepository {
             p.isProcessed,
             p.dateAdded,
             p.playCount,
-          ],
+          ]
         );
       }
     });
