@@ -3,6 +3,7 @@ export interface Playlist {
   name: string;
   artworkUri?: string | null;  
   isUserCreated: boolean;
+  trackCount: number;
   createdAt: number;
   updatedAt: number;
 }

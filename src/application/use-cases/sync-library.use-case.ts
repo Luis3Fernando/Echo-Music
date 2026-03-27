@@ -1,9 +1,9 @@
 import { TrackRepository } from "@interfaces/track.repository";
 import { ArtistRepository } from "@interfaces/artist.repository";
 import { AlbumRepository } from "@interfaces/album.repository";
-import { MetadataExtractorService } from "@services/metadata-extractor.service";
-import { TrackMapper } from "@mappers/track.mapper";
 import { nativeMediaService } from "@services/native-media.service";
+import { metadataExtractorService } from "@services/metadata-extractor.service";
+import { TrackMapper } from "@mappers/track.mapper";
 import { generateUUID } from "@utils/uuid";
 import { Lyrics } from "@value-objects/lyrics.object";
 
@@ -40,12 +40,12 @@ export class SyncLibraryUseCase {
       let processedCount = 0;
 
       for (const track of pending) {
-        const metadata = await MetadataExtractorService.extract(
+        const metadata = await metadataExtractorService.extract(
           track.url,
           track.id,
         );
 
-        if (metadata && (metadata.title || metadata.artist !== "Artista Desconocido")) {
+        if (metadata) {
           const artistName = metadata.artist || "Artista Desconocido";
           const albumTitle = metadata.album || "Álbum Desconocido";
 
@@ -64,7 +64,6 @@ export class SyncLibraryUseCase {
             albumTitle,
             artist.id,
           );
-          
           if (!album) {
             album = {
               id: generateUUID(),
@@ -72,10 +71,9 @@ export class SyncLibraryUseCase {
               artistId: artist.id,
               artistName: artist.name,
               artworkUri: metadata.artworkUri || null,
-              // Eliminamos metadata.year porque tu servicio ya no lo extrae
-              year: null, 
+              year: metadata.year ?? null,
               trackCount: 1,
-              isCompilation: false,
+              playCount: 0,
             };
             await this.albumRepo.save(album);
           }
@@ -86,21 +84,24 @@ export class SyncLibraryUseCase {
             albumId: album.id,
             artistName: artist.name,
             albumName: album.title,
-            artworkUri: metadata.artworkUri || track.artworkUri,
+            genre: metadata.genre ?? undefined,
+            year: metadata.year ?? undefined,
+            bitrate: metadata.bitrate ?? undefined,
+            trackNumber: metadata.trackNumber ?? undefined,
+            diskNumber: metadata.diskNumber ?? undefined,
+            artworkUri: metadata.artworkUri ?? null,
             lyrics: metadata.lyrics ? (metadata.lyrics as Lyrics) : null,
             isProcessed: true,
           });
         } else {
-          await this.trackRepo.updateMetadata(track.id, { 
-            isProcessed: true 
-          });
+          await this.trackRepo.updateMetadata(track.id, { isProcessed: true });
         }
 
         processedCount++;
         onProgress(Math.round((processedCount / pending.length) * 100));
 
         if (processedCount % 5 === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 1));
+          await new Promise((resolve) => setTimeout(resolve, 10));
         }
       }
     } catch (error) {

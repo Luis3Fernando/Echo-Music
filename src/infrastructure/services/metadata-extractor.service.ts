@@ -1,15 +1,15 @@
 import * as FileSystem from "expo-file-system/legacy";
 import * as mmb from "music-metadata-browser";
 import { Buffer } from "buffer";
+import { LyricsType, LyricsSource } from "@value-objects/lyrics.object";
 
 const ARTWORK_CACHE_DIR = `${FileSystem.cacheDirectory}artworks/`;
 
-export const MetadataExtractorService = {
+export const metadataExtractorService = {
   async extract(fileUri: string, trackId: string) {
     try {
-      // --- Restauramos tu lógica de Chunks exacta ---
       const isFlac = fileUri.toLowerCase().endsWith(".flac");
-      const readSize = isFlac ? 1024 * 1024 * 4 : 1024 * 512;
+      const readSize = isFlac ? 1024 * 1024 * 2 : 1024 * 512;
 
       const base64 = await FileSystem.readAsStringAsync(fileUri, {
         encoding: FileSystem.EncodingType.Base64,
@@ -22,21 +22,35 @@ export const MetadataExtractorService = {
         mimeType: isFlac ? "audio/flac" : "audio/mpeg",
       });
 
-      const { common } = metadata;
+      const { common, format } = metadata;
       let artworkUri = null;
 
       if (common.picture && common.picture.length > 0) {
         artworkUri = await this.saveArtwork(trackId, common.picture[0]);
       }
 
-      // Retornamos solo lo que tu entidad Track necesita
-      // Sin búsquedas de archivos .lrc externos
+      let embeddedLyrics = null;
+      if (common.lyrics && common.lyrics.length > 0) {
+        const rawLyrics = common.lyrics[0];
+        embeddedLyrics = {
+          content:
+            typeof rawLyrics === "string" ? rawLyrics : (rawLyrics as any).text,
+          type: LyricsType.PLAIN,
+          source: LyricsSource.EMBEDDED,
+        };
+      }
+
       return {
         title: common.title,
         artist: common.artist || "Artista Desconocido",
         album: common.album || "Álbum Desconocido",
+        genre: common.genre?.[0] || null,
+        year: common.year || null,
+        trackNumber: common.track?.no || null,
+        diskNumber: common.disk?.no || null,
+        bitrate: format.bitrate || null,
         artworkUri,
-        lyrics: null, // Ponemos null como pediste
+        lyrics: embeddedLyrics,
       };
     } catch (error) {
       console.error(`[MetadataExtractor] Error en ${fileUri}:`, error);

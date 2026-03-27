@@ -42,16 +42,13 @@ export const createTables = async (db: any) => {
       trackNumber INTEGER,
       diskNumber INTEGER,
       artworkUri TEXT,
-      
       lyricsContent TEXT,
       lyricsType TEXT,
       lyricsSource TEXT,
-      
       isFavorite INTEGER DEFAULT 0,
       isProcessed INTEGER DEFAULT 0,
       dateAdded INTEGER NOT NULL,
       playCount INTEGER DEFAULT 0,
-
       FOREIGN KEY (artistId) REFERENCES artists (id) ON DELETE CASCADE,
       FOREIGN KEY (albumId) REFERENCES albums (id) ON DELETE SET NULL
     );
@@ -61,6 +58,7 @@ export const createTables = async (db: any) => {
       name TEXT NOT NULL,
       artworkUri TEXT,
       isUserCreated INTEGER DEFAULT 1,
+      trackCount INTEGER DEFAULT 0,
       createdAt INTEGER NOT NULL,
       updatedAt INTEGER NOT NULL
     );
@@ -83,6 +81,22 @@ export const createTables = async (db: any) => {
       repeatMode TEXT DEFAULT 'none',
       currentIndex INTEGER DEFAULT 0,
       FOREIGN KEY (currentTrackId) REFERENCES tracks (id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS track_artists (
+      trackId TEXT NOT NULL,
+      artistId TEXT NOT NULL,
+      PRIMARY KEY (trackId, artistId),
+      FOREIGN KEY (trackId) REFERENCES tracks (id) ON DELETE CASCADE,
+      FOREIGN KEY (artistId) REFERENCES artists (id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS album_artists (
+      albumId TEXT NOT NULL,
+      artistId TEXT NOT NULL,
+      PRIMARY KEY (albumId, artistId),
+      FOREIGN KEY (albumId) REFERENCES albums (id) ON DELETE CASCADE,
+      FOREIGN KEY (artistId) REFERENCES artists (id) ON DELETE CASCADE
     );
   `);
 };

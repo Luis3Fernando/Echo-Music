@@ -4,9 +4,10 @@ export interface Track {
   readonly id: string;
   readonly url: string;
   title: string;
-  artistId: string;
+  artistId: string;    
+  artistIds: string[]; 
+  artistName: string; 
   albumId?: string;
-  artistName: string;
   albumName: string;
   duration: number;
   format: string;
