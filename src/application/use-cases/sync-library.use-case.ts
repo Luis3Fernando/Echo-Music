@@ -4,32 +4,30 @@ import { AlbumRepository } from "@interfaces/album.repository";
 import { nativeMediaService } from "@services/native-media.service";
 import { metadataExtractorService } from "@services/metadata-extractor.service";
 import { TrackMapper } from "@mappers/track.mapper";
-import { generateUUID } from "@utils/uuid";
 import { Lyrics } from "@value-objects/lyrics.object";
+import { ArtistManager } from "@services/artist-manager.service";
+import { AlbumManager } from "@services/album-manager.service";
+import { ArtistSplitter } from "@utils/artist-splitter";
 
 export class SyncLibraryUseCase {
+  private artistManager: ArtistManager;
+  private albumManager: AlbumManager;
+
   constructor(
     private trackRepo: TrackRepository,
     private artistRepo: ArtistRepository,
     private albumRepo: AlbumRepository,
-  ) {}
+  ) {
+    this.artistManager = new ArtistManager(this.artistRepo);
+    this.albumManager = new AlbumManager(this.albumRepo);
+  }
 
   async execute(onProgress: (percent: number) => void): Promise<void> {
     try {
       const rawFiles = await nativeMediaService.fetchAllAudioFiles();
       if (rawFiles.length === 0) return;
-
       const UNKNOWN_ARTIST_ID = "unknown-artist-uuid";
-      let unknownArtist = await this.artistRepo.findById(UNKNOWN_ARTIST_ID);
-
-      if (!unknownArtist) {
-        await this.artistRepo.save({
-          id: UNKNOWN_ARTIST_ID,
-          name: "Artista Desconocido",
-          pictureUrl: "",
-          isProcessed: false,
-        });
-      }
+      await this.artistManager.getOrCreate("Artista Desconocido");
 
       const initialTracks = rawFiles.map((file) =>
         TrackMapper.fromFile(file, {}, UNKNOWN_ARTIST_ID),
@@ -46,43 +44,29 @@ export class SyncLibraryUseCase {
         );
 
         if (metadata) {
-          const artistName = metadata.artist || "Artista Desconocido";
+          const rawArtistName = metadata.artist || "Artista Desconocido";
+          const artistNames = ArtistSplitter.split(rawArtistName);
+          const artists = await this.artistManager.getOrCreateMany(artistNames);
+
+          const mainArtist = artists[0];
+
           const albumTitle = metadata.album || "Álbum Desconocido";
-
-          let artist = await this.artistRepo.findByName(artistName);
-          if (!artist) {
-            artist = {
-              id: generateUUID(),
-              name: artistName,
-              pictureUrl: "",
-              isProcessed: false,
-            };
-            await this.artistRepo.save(artist);
-          }
-
-          let album = await this.albumRepo.findByNameAndArtist(
+          const album = await this.albumManager.getOrCreate(
             albumTitle,
-            artist.id,
+            rawArtistName,
+            artists,
+            {
+              year: metadata.year,
+              artworkUri: metadata.artworkUri,
+            },
           );
-          if (!album) {
-            album = {
-              id: generateUUID(),
-              title: albumTitle,
-              artistId: artist.id,
-              artistName: artist.name,
-              artworkUri: metadata.artworkUri || null,
-              year: metadata.year ?? null,
-              trackCount: 1,
-              playCount: 0,
-            };
-            await this.albumRepo.save(album);
-          }
 
           await this.trackRepo.updateMetadata(track.id, {
             title: metadata.title || track.title,
-            artistId: artist.id,
+            artistId: mainArtist.id,
+            artistIds: artists.map((a) => a.id),
+            artistName: rawArtistName,
             albumId: album.id,
-            artistName: artist.name,
             albumName: album.title,
             genre: metadata.genre ?? undefined,
             year: metadata.year ?? undefined,
@@ -101,11 +85,14 @@ export class SyncLibraryUseCase {
         onProgress(Math.round((processedCount / pending.length) * 100));
 
         if (processedCount % 5 === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          await new Promise((resolve) => setTimeout(resolve, 1));
         }
       }
     } catch (error) {
-      console.error("[SyncLibraryUseCase] Error fatal:", error);
+      console.error(
+        "[SyncLibraryUseCase] Error fatal en la sincronización:",
+        error,
+      );
       throw error;
     }
   }
