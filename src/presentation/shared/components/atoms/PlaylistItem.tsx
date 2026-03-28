@@ -11,8 +11,8 @@ const PlaylistItem = ({ name, artworkUri, onPress }: PlaylistItemProps) => {
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={onPress} activeOpacity={0.7}>
       <Image 
-        source={artworkUri ? { uri: artworkUri } : require("@assets/img/album_default.png")} 
-        style={styles.coverImage} 
+        source={artworkUri ? { uri: artworkUri } : require("@assets/img/playlist_default.png")} 
+        style={styles.coverImage}
       />
       <Text style={styles.playlistName} numberOfLines={2}>
         {name}
