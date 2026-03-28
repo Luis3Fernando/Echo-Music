@@ -72,8 +72,6 @@ const PlaylistScreen = () => {
     },
   ];
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
   const trackOptions: MenuItem[] = [
     {
       label: "Reproducir",

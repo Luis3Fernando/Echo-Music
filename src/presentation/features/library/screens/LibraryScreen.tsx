@@ -4,7 +4,7 @@ import ScreenHeader from "@components/organisms/ScreenHeader";
 import PlaylistHorizontalList from "../components/PlaylistHorizontalList";
 import FolderListSection from "../components/FolderListSection";
 import { useNavigation } from "@react-navigation/native";
-import { usePlaylists } from "@hooks/use-playlists"; 
+import { usePlaylists } from "@/presentation/shared/hooks/use-playlists.hook"; 
 
 const LibraryScreen = () => {
   const navigation = useNavigation<any>();
