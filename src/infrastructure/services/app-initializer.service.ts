@@ -1,11 +1,12 @@
 import * as MediaLibrary from "expo-media-library";
-import { SyncLibraryUseCase } from "@use-cases/sync-library.use-case";
 import { SQLiteDatabase } from "expo-sqlite";
 import { createTables } from "@persistence/sqlite/migrations";
-
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
 import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
+import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
+import { SyncLibraryUseCase } from "@use-cases/sync-library.use-case";
+import { CreateInitialPlaylistsUseCase } from "@use-cases/init-app/create-initial-playlists.use-case";
 
 export const appInitializerService = {
   async init(db: SQLiteDatabase) {
@@ -36,6 +37,7 @@ export const appInitializerService = {
         const trackRepo = new SqliteTrackRepository(db);
         const artistRepo = new SqliteArtistRepository(db);
         const albumRepo = new SQLiteAlbumRepository(db);
+        const playlistRepo = new SqlitePlaylistRepository(db);
         
         const syncUseCase = new SyncLibraryUseCase(
           trackRepo, 
@@ -43,12 +45,22 @@ export const appInitializerService = {
           albumRepo
         );
 
+        const playlistUseCase = new CreateInitialPlaylistsUseCase(
+          playlistRepo,
+          trackRepo
+        );
+
         syncUseCase
           .execute((percent) => {
              if (percent % 10 === 0) console.log(`[Sync] Progreso: ${percent}%`);
           })
-          .then(() => console.log("[Init] ¡Biblioteca sincronizada con éxito!"))
-          .catch((err) => console.error("[Init] Error en SyncLibraryUseCase:", err));
+          .then(async () => {
+            console.log("[Init] ¡Biblioteca sincronizada! Generando playlists iniciales...");
+            await playlistUseCase.execute();
+            
+            console.log("[Init] Playlists creadas y listas para usar.");
+          })
+          .catch((err) => console.error("[Init] Error en el proceso de fondo:", err));
 
       } else {
         console.log("[Init] Permisos pendientes. El escaneo se hará tras el Onboarding.");
@@ -56,7 +68,7 @@ export const appInitializerService = {
 
       return true;
     } catch (error) {
-      console.error("[Init] Error crítico:", error);
+      console.error("[Init] Error crítico en inicialización:", error);
       return false;
     }
   },
