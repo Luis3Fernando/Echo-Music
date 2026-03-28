@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Animated,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { Colors } from "@theme/colors";
@@ -20,6 +21,9 @@ import { Track } from "@entities/track.entity";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
+import { usePlaylistDetail } from "@hooks/use-playlists.hook";
+import { formatPlaylistDuration } from "@/core/utils/time";
+import PlaylistEmptyState from "../components/PlaylistEmptyState";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -27,6 +31,7 @@ const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
+  const { playlist, tracks, isLoading } = usePlaylistDetail(id);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -42,11 +47,6 @@ const PlaylistScreen = () => {
     description: "",
     onConfirm: () => {},
   });
-
-  const playlist = useMemo(() => {
-    const allPlaylists = [...USER_PLAYLISTS, ...SYSTEM_PLAYLISTS];
-    return allPlaylists.find((p) => p.id === id);
-  }, [id]);
 
   const playlistOptions: MenuItem[] = [
     {
@@ -133,16 +133,18 @@ const PlaylistScreen = () => {
       onPress: () => setCurrentSort("Por duración"),
     },
   ];
+  const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
 
+  if (isLoading) return <View style={styles.container}><ActivityIndicator color={Colors.primary} /></View>;
   if (!playlist) return null;
 
   return (
     <View style={[styles.container, { backgroundColor: '#F9F9F8' }]}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScreenHeaderBasic
-          title="Playlist"
+          title="Playlist" 
           showBack={true}
-          showOptions={true}
+          showOptions={playlist.isUserCreated} 
           onBackPress={() => navigation.goBack()}
           onOptionsPress={(event) => {
             const { pageX, pageY } = event.nativeEvent;
@@ -158,7 +160,7 @@ const PlaylistScreen = () => {
                 source={
                   playlist.artworkUri
                     ? { uri: playlist.artworkUri }
-                    : require("@assets/img/album_default.png")
+                    : require("@assets/img/playlist_default.png")
                 }
                 style={styles.coverImage}
               />
@@ -170,31 +172,34 @@ const PlaylistScreen = () => {
             </Text>
             <View style={styles.tagContainer}>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>48 canciones</Text>
+                <Text style={styles.tagText}>{playlist.trackCount} canciones</Text>
               </View>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>2h 15m</Text>
+                <Text style={styles.tagText}>{formatPlaylistDuration(totalDuration)}</Text>
               </View>
             </View>
           </View>
         </View>
         <View style={styles.bottomSection}>
           <FlatList
-            data={MOCK_SONGS}
+            data={tracks}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
-              <SongListControls
-                orderLabel={currentSort}
-                onOrderPress={(event) => {
-                  const { pageX, pageY } = event.nativeEvent;
-                  setSortMenuAnchor({ x: pageX, y: pageY });
-                  setIsSortMenuVisible(true);
-                }}
-                onShufflePress={() => console.log("Shuffle canciones")}
-                onPlayAllPress={() => console.log("Reproducir todo")}
-              />
+              tracks.length > 0 ? (
+                <SongListControls
+                  orderLabel={currentSort}
+                  onOrderPress={(event) => {
+                    const { pageX, pageY } = event.nativeEvent;
+                    setSortMenuAnchor({ x: pageX, y: pageY });
+                    setIsSortMenuVisible(true);
+                  }}
+                  onShufflePress={() => console.log("Shuffle canciones")}
+                  onPlayAllPress={() => console.log("Reproducir todo")}
+                />
+              ) : null
             }
+            ListEmptyComponent={<PlaylistEmptyState />}
             renderItem={({ item }) => (
               <SongItem
                 track={item as any}
@@ -278,20 +283,32 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "rgba(0,0,0,0.1)",
   },
-  infoColumn: { flex: 0.55, justifyContent: "center" },
+  infoColumn: { 
+    flex: 0.55, 
+    justifyContent: "center",
+    paddingLeft: 5 
+  },
   playlistName: {
     fontSize: 22,
     fontWeight: "900",
     color: Colors.black,
-    marginBottom: 10,
+    marginBottom: 6,
+    lineHeight: 26,
   },
-  tagContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  tagContainer: { 
+    flexDirection: "row", 
+    flexWrap: "wrap",
+    rowGap: 6, 
+    columnGap: 8,
+    alignItems: 'center'
+  },
   tag: {
     borderWidth: 0.5,
     borderColor: Colors.black,
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 20,
+    alignSelf: 'flex-start', 
   },
   tagText: { color: Colors.black, fontSize: 12, fontWeight: "600" },
   bottomSection: {
