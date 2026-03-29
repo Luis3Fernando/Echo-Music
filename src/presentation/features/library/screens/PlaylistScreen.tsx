@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import {
   StyleSheet,
@@ -7,10 +7,8 @@ import {
   Platform,
   Image,
   SafeAreaView,
-  Animated,
   FlatList,
   ActivityIndicator,
-  BackHandler,
 } from "react-native";
 import {
   useRoute,
@@ -26,9 +24,13 @@ import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
 import { usePlaylistDetail } from "@hooks/use-playlists.hook";
-import { formatPlaylistDuration } from "@/core/utils/time";
+import { formatPlaylistDuration } from "@utils/time";
 import PlaylistEmptyState from "../components/PlaylistEmptyState";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
+import {
+  useDeletePlaylist,
+  useRemoveTrackFromPlaylist,
+} from "@hooks/use-playlists.hook";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -45,7 +47,8 @@ const PlaylistScreen = () => {
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
   const [currentSort, setCurrentSort] = useState("Por nombre");
-
+  const { deletePlaylist } = useDeletePlaylist();
+  const { removeTrack } = useRemoveTrackFromPlaylist();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [confirmData, setConfirmData] = useState({
     title: "",
@@ -70,29 +73,36 @@ const PlaylistScreen = () => {
     }, [refresh]),
   );
 
-  const playlistOptions: MenuItem[] = [
-    {
-      label: "Editar playlist",
-      icon: "pencil",
-      onPress: () => navigation.navigate("PlaylistForm", { playlist }),
-    },
-    {
-      label: "Eliminar",
-      icon: "trash-outline",
-      variant: "danger",
-      onPress: () => {
-        setConfirmData({
-          title: "Eliminar playlist",
-          description: `¿Estás seguro de que quieres borrar "${playlist?.name}"?`,
-          onConfirm: () => {
-            console.log("LOG: Playlist eliminada");
-            setIsConfirmVisible(false);
-          },
-        });
-        setIsConfirmVisible(true);
+  const playlistOptions: MenuItem[] = useMemo(() => {
+    if (!playlist) return [];
+
+    return [
+      {
+        label: "Editar playlist",
+        icon: "pencil",
+        onPress: () => navigation.navigate("PlaylistForm", { playlist }),
       },
-    },
-  ];
+      {
+        label: "Eliminar",
+        icon: "trash-outline",
+        variant: "danger",
+        onPress: () => {
+          setConfirmData({
+            title: "Eliminar playlist",
+            description: `¿Estás seguro de que quieres borrar "${playlist.name}"?`,
+            onConfirm: async () => {
+              const success = await deletePlaylist(playlist.id);
+              if (success) {
+                setIsConfirmVisible(false);
+                navigation.goBack();
+              }
+            },
+          });
+          setIsConfirmVisible(true);
+        },
+      },
+    ];
+  }, [playlist, navigation, deletePlaylist]);
 
   const trackOptions: MenuItem[] = useMemo(() => {
     const options: MenuItem[] = [
@@ -112,9 +122,14 @@ const PlaylistScreen = () => {
       options.push({
         label: "Quitar de esta playlist",
         icon: "remove-circle-outline",
-        onPress: () => {
-          console.log("LOG: Quitando de la lista:", selectedTrack?.title);
-          setIsTrackMenuVisible(false);
+        onPress: async () => {
+          if (!selectedTrack) return;
+
+          const success = await removeTrack(playlist.id, selectedTrack.id);
+          if (success) {
+            setIsTrackMenuVisible(false);
+            refresh();
+          }
         },
       });
     }
