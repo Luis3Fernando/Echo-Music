@@ -1,4 +1,3 @@
-import React from "react";
 import { StyleSheet, Text, View, Modal } from "react-native";
 import { Colors } from "@theme/colors";
 import { Spacing } from "@theme/spacing";

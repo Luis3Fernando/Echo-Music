@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, FlatList, StyleSheet, StatusBar, Platform, SafeAreaView } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+  Platform,
+  SafeAreaView,
+} from "react-native";
 import { useLibrary } from "@hooks/use-library.hook";
 import { Track } from "@entities/track.entity";
 import { Colors } from "@theme/colors";
@@ -8,6 +15,12 @@ import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeade
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../../library/components/SongListControls";
+import { useNavigation } from "@react-navigation/native";
+import {
+  usePlaylists,
+  useAddTracksToPlaylist,
+} from "@hooks/use-playlists.hook";
+import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 
 export const SongsScreen = () => {
   const { songs, isScanning } = useLibrary();
@@ -19,25 +32,81 @@ export const SongsScreen = () => {
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+
+  const navigation = useNavigation<any>();
+  const { userPlaylists } = usePlaylists();
+  const { addTracks } = useAddTracksToPlaylist();
+
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
   const sortOptions: MenuItem[] = [
-    { label: "Por nombre (A-Z)", icon: "text-outline", onPress: () => setCurrentSort("Por nombre") },
-    { label: "Por artista", icon: "person-outline", onPress: () => setCurrentSort("Por artista") },
-    { label: "Añadidas recientemente", icon: "time-outline", onPress: () => setCurrentSort("Recientes") },
+    {
+      label: "Por nombre (A-Z)",
+      icon: "text-outline",
+      onPress: () => setCurrentSort("Por nombre"),
+    },
+    {
+      label: "Por artista",
+      icon: "person-outline",
+      onPress: () => setCurrentSort("Por artista"),
+    },
+    {
+      label: "Añadidas recientemente",
+      icon: "time-outline",
+      onPress: () => setCurrentSort("Recientes"),
+    },
   ];
 
   const trackOptions: MenuItem[] = [
-    { label: "Reproducir", icon: "play-outline", onPress: () => console.log("Play", selectedTrack?.title) },
-    { label: "Añadir a la cola", icon: "list-outline", onPress: () => console.log("Queue") },
-    { label: "Añadir a playlist", icon: "add-circle-outline", onPress: () => console.log("Add Playlist") },
-    { label: "Ir al artista", icon: "person-circle-outline", onPress: () => console.log("Ver artista") },
-    { label: "Ir al álbum", icon: "disc-outline", onPress: () => console.log("Ver álbum") },
-    { 
-      label: "Eliminar canción", 
-      icon: "trash-outline", 
-      variant: "danger", 
-      onPress: () => setIsConfirmVisible(true) 
+    {
+      label: "Reproducir",
+      icon: "play-outline",
+      onPress: () => console.log("Play", selectedTrack?.title),
+    },
+    {
+      label: "Añadir a la cola",
+      icon: "list-outline",
+      onPress: () => console.log("Queue"),
+    },
+    {
+      label: "Añadir a playlist",
+      icon: "add-circle-outline",
+      onPress: () => {
+        setIsTrackMenuVisible(false);
+        setIsAddModalVisible(true);
+      },
+    },
+    {
+      label: "Ir al artista",
+      icon: "person-circle-outline",
+      onPress: () => console.log("Ver artista"),
+    },
+    {
+      label: "Ir al álbum",
+      icon: "disc-outline",
+      onPress: () => console.log("Ver álbum"),
+    },
+    {
+      label: "Eliminar canción",
+      icon: "trash-outline",
+      variant: "danger",
+      onPress: () => setIsConfirmVisible(true),
     },
   ];
+
+  const handleSelectPlaylist = async (playlist: any) => {
+    if (!selectedTrack) return;
+
+    const success = await addTracks(playlist.id, [selectedTrack.id]);
+    if (success) {
+      setIsAddModalVisible(false);
+    }
+  };
+
+  const handleCreateNewPlaylist = () => {
+    setIsAddModalVisible(false);
+    navigation.navigate("PlaylistForm");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -99,6 +168,13 @@ export const SongsScreen = () => {
           setIsConfirmVisible(false);
         }}
         onCancel={() => setIsConfirmVisible(false)}
+      />
+      <AddToPlaylistModal
+        isVisible={isAddModalVisible}
+        playlists={userPlaylists}
+        onClose={() => setIsAddModalVisible(false)}
+        onSelect={handleSelectPlaylist}
+        onCreateNew={handleCreateNewPlaylist}
       />
     </SafeAreaView>
   );

@@ -205,7 +205,7 @@ export const useAddTracksToPlaylist = () => {
       const useCase = new AddTracksToPlaylistUseCase(repo);
 
       await useCase.execute({ playlistId, trackIds });
-      showSuccess("Se añadieron las canciones");
+      showSuccess("Agregado correctamente");
       return true;
     } catch (error: any) {
       showError(error.message || "Error al añadir canciones");
