@@ -8,7 +8,7 @@ interface PlaylistEmptyStateProps {
 }
 
 const PlaylistEmptyState = ({
-  message = "Tu lista está vacio",
+  message = "Tu lista está vacía",
   description = "No hay canciones aquí todavía. Empieza a armar tu ritmo agregando algunas canciones.",
 }: PlaylistEmptyStateProps) => {
   const { height: screenHeight } = useWindowDimensions();

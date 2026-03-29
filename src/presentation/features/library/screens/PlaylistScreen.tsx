@@ -12,7 +12,12 @@ import {
   ActivityIndicator,
   BackHandler,
 } from "react-native";
-import { useRoute, useNavigation, RouteProp, useFocusEffect } from "@react-navigation/native";
+import {
+  useRoute,
+  useNavigation,
+  RouteProp,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { Colors } from "@theme/colors";
 import { LibraryStackParamList } from "@navigation/LibraryNavigator";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
@@ -53,9 +58,9 @@ const PlaylistScreen = () => {
       setIsMenuVisible(false);
       setIsTrackMenuVisible(false);
       setIsSortMenuVisible(false);
-      return true; 
+      return true;
     }
-    
+
     return false;
   });
 
@@ -83,39 +88,51 @@ const PlaylistScreen = () => {
     },
   ];
 
-  const trackOptions: MenuItem[] = [
-    {
-      label: "Reproducir",
-      icon: "play-outline",
-      onPress: () => console.log("Play", selectedTrack?.title),
-    },
-    {
-      label: "Añadir a la cola",
-      icon: "list-outline",
-      onPress: () => console.log("A cola"),
-    },
-    {
-      label: "Quitar de esta playlist",
-      icon: "remove-circle-outline",
-      onPress: () => console.log("Quitar de lista"),
-    },
-    {
+  const trackOptions: MenuItem[] = useMemo(() => {
+    const options: MenuItem[] = [
+      {
+        label: "Reproducir",
+        icon: "play-outline",
+        onPress: () => console.log("Play", selectedTrack?.title),
+      },
+      {
+        label: "Añadir a la cola",
+        icon: "list-outline",
+        onPress: () => console.log("A cola"),
+      },
+    ];
+
+    if (playlist?.isUserCreated) {
+      options.push({
+        label: "Quitar de esta playlist",
+        icon: "remove-circle-outline",
+        onPress: () => {
+          console.log("LOG: Quitando de la lista:", selectedTrack?.title);
+          setIsTrackMenuVisible(false);
+        },
+      });
+    }
+
+    options.push({
       label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
       onPress: () => {
         setConfirmData({
           title: "Eliminar canción",
-          description: `¿Deseas eliminar "${selectedTrack?.title}" permanentemente de tu memoria interna?`,
+          description: `¿Deseas eliminar permanentemente de tu memoria interna?`,
           onConfirm: () => {
-            console.log("LOG: Canción eliminada:", selectedTrack?.title);
+            console.log("LOG: Canción eliminada físicamente");
             setIsConfirmVisible(false);
           },
         });
         setIsConfirmVisible(true);
+        setIsTrackMenuVisible(false);
       },
-    },
-  ];
+    });
+
+    return options;
+  }, [playlist, selectedTrack]);
 
   const sortOptions: MenuItem[] = [
     {
@@ -144,18 +161,24 @@ const PlaylistScreen = () => {
       onPress: () => setCurrentSort("Por duración"),
     },
   ];
+
   const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
 
-  if (isLoading) return <View style={styles.container}><ActivityIndicator color={Colors.primary} /></View>;
+  if (isLoading)
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color={Colors.primary} />
+      </View>
+    );
   if (!playlist) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: '#F9F9F8' }]}>
+    <View style={[styles.container, { backgroundColor: "#F9F9F8" }]}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScreenHeaderBasic
-          title="Playlist" 
+          title="Playlist"
           showBack={true}
-          showOptions={playlist.isUserCreated} 
+          showOptions={playlist.isUserCreated}
           onBackPress={() => navigation.goBack()}
           onOptionsPress={(event) => {
             const { pageX, pageY } = event.nativeEvent;
@@ -166,7 +189,7 @@ const PlaylistScreen = () => {
         />
         <View style={styles.topSection}>
           <View style={styles.imageColumn}>
-            <View style={[styles.shadowWrapper, { shadowColor: '#4A4A48' }]}>
+            <View style={[styles.shadowWrapper, { shadowColor: "#4A4A48" }]}>
               <Image
                 source={
                   playlist.artworkUri
@@ -183,10 +206,14 @@ const PlaylistScreen = () => {
             </Text>
             <View style={styles.tagContainer}>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>{playlist.trackCount} canciones</Text>
+                <Text style={styles.tagText}>
+                  {playlist.trackCount} canciones
+                </Text>
               </View>
               <View style={styles.tag}>
-                <Text style={styles.tagText}>{formatPlaylistDuration(totalDuration)}</Text>
+                <Text style={styles.tagText}>
+                  {formatPlaylistDuration(totalDuration)}
+                </Text>
               </View>
             </View>
           </View>
@@ -294,10 +321,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "rgba(0,0,0,0.1)",
   },
-  infoColumn: { 
-    flex: 0.55, 
+  infoColumn: {
+    flex: 0.55,
     justifyContent: "center",
-    paddingLeft: 5 
+    paddingLeft: 5,
   },
   playlistName: {
     fontSize: 22,
@@ -306,12 +333,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     lineHeight: 26,
   },
-  tagContainer: { 
-    flexDirection: "row", 
+  tagContainer: {
+    flexDirection: "row",
     flexWrap: "wrap",
-    rowGap: 6, 
+    rowGap: 6,
     columnGap: 8,
-    alignItems: 'center'
+    alignItems: "center",
   },
   tag: {
     borderWidth: 0.5,
@@ -319,7 +346,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 20,
-    alignSelf: 'flex-start', 
+    alignSelf: "flex-start",
   },
   tagText: { color: Colors.black, fontSize: 12, fontWeight: "600" },
   bottomSection: {
