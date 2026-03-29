@@ -25,7 +25,7 @@ export const usePlaylists = () => {
       const repo = new SqlitePlaylistRepository(db);
       const useCase = new GetAllPlaylistsUseCase(repo);
       const { systemPlaylists, userPlaylists } = await useCase.execute();
-      
+
       setSystemPlaylists(systemPlaylists);
       setUserPlaylists(userPlaylists);
     } catch (error) {
@@ -39,7 +39,12 @@ export const usePlaylists = () => {
     fetchPlaylists();
   }, [fetchPlaylists]);
 
-  return { systemPlaylists, userPlaylists, isLoading, refreshPlaylists: fetchPlaylists };
+  return {
+    systemPlaylists,
+    userPlaylists,
+    isLoading,
+    refreshPlaylists: fetchPlaylists,
+  };
 };
 
 export const usePlaylistDetail = (playlistId: string) => {
@@ -50,23 +55,26 @@ export const usePlaylistDetail = (playlistId: string) => {
 
   const loadDetail = useCallback(async () => {
     if (!playlistId) return;
-    setIsLoading(true);
+
+    if (!playlist) {
+      setIsLoading(true);
+    }
+
     try {
       const repo = new SqlitePlaylistRepository(db);
       const useCase = new GetPlaylistByIdUseCase(repo);
-      
+
       const data = await useCase.execute(playlistId);
       setPlaylist(data);
 
       const playlistTracks = await repo.getTracksByPlaylistId(playlistId);
       setTracks(playlistTracks);
-      
     } catch (error) {
       console.error("[usePlaylistDetail] Error:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [db, playlistId]);
+  }, [db, playlistId, playlist]);
 
   useEffect(() => {
     loadDetail();
@@ -95,7 +103,6 @@ export const useCreatePlaylist = () => {
       setTimeout(() => {
         navigation.goBack();
       }, 100);
-
     } catch (error: any) {
       showError(error.message || "Error al crear la playlist");
     } finally {
@@ -112,7 +119,11 @@ export const useUpdatePlaylist = () => {
   const { showSuccess, showError } = useAppToast();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const updatePlaylist = async (id: string, name: string, artworkUri?: string | null) => {
+  const updatePlaylist = async (
+    id: string,
+    name: string,
+    artworkUri?: string | null,
+  ) => {
     if (isUpdating) return;
     setIsUpdating(true);
 
@@ -123,7 +134,7 @@ export const useUpdatePlaylist = () => {
       await useCase.execute({ id, name, artworkUri });
 
       showSuccess("Playlist actualizada");
-      
+
       setTimeout(() => {
         navigation.goBack();
       }, 100);

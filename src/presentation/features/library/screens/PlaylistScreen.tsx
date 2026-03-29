@@ -9,6 +9,8 @@ import {
   SafeAreaView,
   FlatList,
   ActivityIndicator,
+  LayoutAnimation,
+  UIManager,
 } from "react-native";
 import {
   useRoute,
@@ -55,6 +57,13 @@ const PlaylistScreen = () => {
     description: "",
     onConfirm: () => {},
   });
+
+  if (
+    Platform.OS === "android" &&
+    UIManager.setLayoutAnimationEnabledExperimental
+  ) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
 
   useHardwareBack(() => {
     if (isMenuVisible || isTrackMenuVisible || isSortMenuVisible) {
@@ -124,6 +133,7 @@ const PlaylistScreen = () => {
         icon: "remove-circle-outline",
         onPress: async () => {
           if (!selectedTrack) return;
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
           const success = await removeTrack(playlist.id, selectedTrack.id);
           if (success) {
@@ -185,12 +195,13 @@ const PlaylistScreen = () => {
 
   const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
 
-  if (isLoading)
+  if (isLoading && !playlist) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator color={Colors.primary} />
+        <ActivityIndicator color={Colors.primary} size="large" />
       </View>
     );
+  }
   if (!playlist) return null;
 
   return (
