@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useState } from "react";
+import { useMemo, useEffect, useRef, useState, useCallback } from "react";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import {
   StyleSheet,
@@ -10,13 +10,12 @@ import {
   Animated,
   FlatList,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { Colors } from "@theme/colors";
 import { LibraryStackParamList } from "@navigation/LibraryNavigator";
-import { USER_PLAYLISTS, SYSTEM_PLAYLISTS } from "@mocks/mock-playlists";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
-import { MOCK_SONGS } from "@mocks/mock-songs";
 import { Track } from "@entities/track.entity";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../components/SongListControls";
@@ -24,6 +23,7 @@ import SongItem from "@components/atoms/SongItem";
 import { usePlaylistDetail } from "@hooks/use-playlists.hook";
 import { formatPlaylistDuration } from "@/core/utils/time";
 import PlaylistEmptyState from "../components/PlaylistEmptyState";
+import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -46,6 +46,17 @@ const PlaylistScreen = () => {
     title: "",
     description: "",
     onConfirm: () => {},
+  });
+
+  useHardwareBack(() => {
+    if (isMenuVisible || isTrackMenuVisible || isSortMenuVisible) {
+      setIsMenuVisible(false);
+      setIsTrackMenuVisible(false);
+      setIsSortMenuVisible(false);
+      return true; 
+    }
+    
+    return false;
   });
 
   const playlistOptions: MenuItem[] = [
