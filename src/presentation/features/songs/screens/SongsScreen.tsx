@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   FlatList,
@@ -15,7 +15,7 @@ import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeade
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../../library/components/SongListControls";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   usePlaylists,
   useAddTracksToPlaylist,
@@ -34,7 +34,7 @@ export const SongsScreen = () => {
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
   const navigation = useNavigation<any>();
-  const { userPlaylists } = usePlaylists();
+  const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -96,10 +96,10 @@ export const SongsScreen = () => {
 
   const handleSelectPlaylist = async (playlist: any) => {
     if (!selectedTrack) return;
-
+    setIsAddModalVisible(false);
     const success = await addTracks(playlist.id, [selectedTrack.id]);
     if (success) {
-      setIsAddModalVisible(false);
+      refreshPlaylists();
     }
   };
 
@@ -107,6 +107,12 @@ export const SongsScreen = () => {
     setIsAddModalVisible(false);
     navigation.navigate("PlaylistForm");
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
 
   return (
     <SafeAreaView style={styles.container}>
