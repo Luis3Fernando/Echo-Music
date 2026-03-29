@@ -1,18 +1,32 @@
-import { StyleSheet, View, Platform, ScrollView, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Platform,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { Colors } from "@theme/colors";
 import ScreenHeader from "@components/organisms/ScreenHeader";
 import PlaylistHorizontalList from "../components/PlaylistHorizontalList";
 import FolderListSection from "../components/FolderListSection";
-import { useNavigation } from "@react-navigation/native";
-import { usePlaylists } from "@/presentation/shared/hooks/use-playlists.hook"; 
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { usePlaylists } from "@hooks/use-playlists.hook";
+import { useCallback } from "react";
 
 const LibraryScreen = () => {
   const navigation = useNavigation<any>();
-  const { systemPlaylists, userPlaylists, isLoading } = usePlaylists();
+  const { systemPlaylists, userPlaylists, isLoading, refreshPlaylists } =
+    usePlaylists();
 
-  if (isLoading) {
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
+
+  if (isLoading && systemPlaylists.length === 0 && userPlaylists.length === 0) {
     return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
+      <View style={[styles.container, { justifyContent: "center" }]}>
         <ActivityIndicator color={Colors.primary} size="large" />
       </View>
     );

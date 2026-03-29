@@ -2,7 +2,11 @@ import { useEffect, useCallback } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import { useLibraryStore } from "@store/use-library.store";
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
+import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
+import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
+import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
 import { SyncLibraryUseCase } from "@use-cases/sync-library.use-case";
+import { CreateInitialPlaylistsUseCase } from "@/application/use-cases/init-app/create-initial-playlists.use-case";
 
 export const useLibrary = () => {
   const db = useSQLiteContext();
@@ -23,15 +27,24 @@ export const useLibrary = () => {
     setTracks(allTracks);
   }, [db, setTracks]);
 
-  useEffect(() => {
-    loadSongs();
-  }, [isScanning, loadSongs]);
-
   const startScan = async () => {
     if (isScanning) return;
 
-    const repository = new SqliteTrackRepository(db);
-    const syncUseCase = new SyncLibraryUseCase(repository);
+    const trackRepo = new SqliteTrackRepository(db);
+    const artistRepo = new SqliteArtistRepository(db);
+    const albumRepo = new SQLiteAlbumRepository(db);
+    const playlistRepo = new SqlitePlaylistRepository(db);
+
+    const syncUseCase = new SyncLibraryUseCase(
+      trackRepo, 
+      artistRepo, 
+      albumRepo
+    );
+
+    const initialPlaylistsUseCase = new CreateInitialPlaylistsUseCase(
+      playlistRepo, 
+      trackRepo
+    );
 
     try {
       setScanning(true);
@@ -40,8 +53,10 @@ export const useLibrary = () => {
       });
 
       await loadSongs();
+      await initialPlaylistsUseCase.execute();
+
     } catch (error) {
-      console.error("[useLibrary] Error durante el escaneo:", error);
+      console.error("[useLibrary] Error crítico en el escaneo:", error);
     } finally {
       setScanning(false);
       setScanProgress(0);
