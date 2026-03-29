@@ -9,7 +9,9 @@ import { GetAllPlaylistsUseCase } from "@use-cases/playlists/get-all-playlists.u
 import { GetPlaylistByIdUseCase } from "@use-cases/playlists/get-playlist-by-id.use-case";
 import { CreatePlaylistUseCase } from "@use-cases/playlists/create-playlist.use-case";
 import { UpdatePlaylistUseCase } from "@use-cases/playlists/update-playlist.use-case";
-
+import { DeletePlaylistUseCase } from "@use-cases/playlists/delete-playlist.use-case";
+import { RemoveTrackFromPlaylistUseCase } from "@use-cases/playlists/remove-track-from-playlist.use-case";
+import { AddTracksToPlaylistUseCase } from "@use-cases/playlists/add-tracks-to-playlist.use-case";
 
 export const usePlaylists = () => {
   const db = useSQLiteContext();
@@ -133,4 +135,85 @@ export const useUpdatePlaylist = () => {
   };
 
   return { updatePlaylist, isUpdating };
+};
+
+export const useDeletePlaylist = () => {
+  const db = useSQLiteContext();
+  const { showSuccess, showError } = useAppToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deletePlaylist = async (id: string) => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
+    try {
+      const repo = new SqlitePlaylistRepository(db);
+      const useCase = new DeletePlaylistUseCase(repo);
+
+      await useCase.execute(id);
+      showSuccess("Playlist eliminada");
+      return true;
+    } catch (error: any) {
+      showError(error.message || "No se pudo eliminar la playlist");
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return { deletePlaylist, isDeleting };
+};
+
+export const useRemoveTrackFromPlaylist = () => {
+  const db = useSQLiteContext();
+  const { showSuccess, showError } = useAppToast();
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const removeTrack = async (playlistId: string, trackId: string) => {
+    if (isRemoving) return;
+    setIsRemoving(true);
+
+    try {
+      const repo = new SqlitePlaylistRepository(db);
+      const useCase = new RemoveTrackFromPlaylistUseCase(repo);
+
+      await useCase.execute({ playlistId, trackId });
+      showSuccess("Canción quitada de la playlist");
+      return true;
+    } catch (error: any) {
+      showError(error.message || "No se pudo quitar la canción");
+      return false;
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  return { removeTrack, isRemoving };
+};
+
+export const useAddTracksToPlaylist = () => {
+  const db = useSQLiteContext();
+  const { showSuccess, showError } = useAppToast();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const addTracks = async (playlistId: string, trackIds: string[]) => {
+    if (isAdding) return;
+    setIsAdding(true);
+
+    try {
+      const repo = new SqlitePlaylistRepository(db);
+      const useCase = new AddTracksToPlaylistUseCase(repo);
+
+      await useCase.execute({ playlistId, trackIds });
+      showSuccess("Se añadieron las canciones");
+      return true;
+    } catch (error: any) {
+      showError(error.message || "Error al añadir canciones");
+      return false;
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  return { addTracks, isAdding };
 };
