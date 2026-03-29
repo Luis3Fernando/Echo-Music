@@ -36,7 +36,7 @@ const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
-  const { playlist, tracks, isLoading } = usePlaylistDetail(id);
+  const { playlist, tracks, isLoading, refresh } = usePlaylistDetail(id);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -63,6 +63,12 @@ const PlaylistScreen = () => {
 
     return false;
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh]),
+  );
 
   const playlistOptions: MenuItem[] = [
     {

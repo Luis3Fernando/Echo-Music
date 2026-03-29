@@ -13,7 +13,7 @@ import { Colors } from "@theme/colors";
 import { Spacing } from "@theme/spacing";
 import { DynamicForm } from "@components/organisms/DynamicForm";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
-import { useCreatePlaylist } from "@hooks/use-playlists.hook";
+import { useCreatePlaylist, useUpdatePlaylist } from "@hooks/use-playlists.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 
 const PLAYLIST_FIELDS: any[] = [
@@ -37,10 +37,13 @@ const PlaylistSchema = Yup.object().shape({
 const PlaylistFormScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<any>();
+  
   const { createPlaylist, isCreating } = useCreatePlaylist();
+  const { updatePlaylist, isUpdating } = useUpdatePlaylist();
 
   const { playlist } = route.params || {};
   const isEditing = !!playlist;
+  const isLoading = isCreating || isUpdating;
 
   useHardwareBack(() => {
     navigation.goBack();
@@ -49,6 +52,7 @@ const PlaylistFormScreen = () => {
 
   const handleSubmit = async (values: any) => {
     if (isEditing) {
+      await updatePlaylist(playlist.id, values.name, values.artworkUri);
     } else {
       await createPlaylist(values.name, values.artworkUri);
     }
@@ -84,7 +88,7 @@ const PlaylistFormScreen = () => {
               submitLabel={isEditing ? "Guardar cambios" : "Crear playlist"}
             />
           </View>
-          {isCreating && (
+          {isLoading && (
             <View style={styles.loaderContainer}>
               <ActivityIndicator size="large" color={Colors.primary} />
             </View>

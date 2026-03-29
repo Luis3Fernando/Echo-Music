@@ -8,6 +8,7 @@ import { useAppToast } from "@services/toast.service";
 import { GetAllPlaylistsUseCase } from "@use-cases/playlists/get-all-playlists.use-case";
 import { GetPlaylistByIdUseCase } from "@use-cases/playlists/get-playlist-by-id.use-case";
 import { CreatePlaylistUseCase } from "@use-cases/playlists/create-playlist.use-case";
+import { UpdatePlaylistUseCase } from "@use-cases/playlists/update-playlist.use-case";
 
 
 export const usePlaylists = () => {
@@ -101,4 +102,35 @@ export const useCreatePlaylist = () => {
   };
 
   return { createPlaylist, isCreating };
+};
+
+export const useUpdatePlaylist = () => {
+  const db = useSQLiteContext();
+  const navigation = useNavigation();
+  const { showSuccess, showError } = useAppToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const updatePlaylist = async (id: string, name: string, artworkUri?: string | null) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
+
+    try {
+      const repo = new SqlitePlaylistRepository(db);
+      const useCase = new UpdatePlaylistUseCase(repo);
+
+      await useCase.execute({ id, name, artworkUri });
+
+      showSuccess("Playlist actualizada");
+      
+      setTimeout(() => {
+        navigation.goBack();
+      }, 100);
+    } catch (error: any) {
+      showError(error.message || "No se pudo actualizar");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return { updatePlaylist, isUpdating };
 };
