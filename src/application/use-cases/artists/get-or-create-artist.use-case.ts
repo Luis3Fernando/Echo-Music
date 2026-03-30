@@ -12,11 +12,14 @@ export class GetOrCreateArtistUseCase {
 
   async execute(artistName: string): Promise<Artist> {
     const cleanName = artistName.trim();
+    console.log(`\n[DEBUG-CREATE] 1. Buscando a: "${cleanName}"`);
 
     try {
       const existing = await this.artistRepo.findByName(cleanName);
+      console.log(`[DEBUG-CREATE] 2. ¿Existe local?:`, existing ? `SI (ID: ${existing.id})` : "NO");
 
-      if (existing && existing.pictureUrl) {
+      if (existing && existing.pictureUrl && existing.isProcessed) {
+        console.log(`[DEBUG-CREATE] 3. Retornando caché local.`);
         return existing;
       }
 
@@ -29,21 +32,23 @@ export class GetOrCreateArtistUseCase {
           ) || remoteResults[0];
 
           const localPath = await imageDownloaderService.downloadArtistImage(
-            bestMatch.id,
+            bestMatch.id.toString(),
             bestMatch.pictureUrl
           );
 
           const enrichedArtist: Artist = {
             ...bestMatch,
+            id: existing ? existing.id : Crypto.randomUUID(),
             pictureUrl: localPath || bestMatch.pictureUrl,
             isProcessed: true,
           };
 
+          console.log(`[DEBUG-CREATE] 4. Guardando enriquecido con ID: ${enrichedArtist.id}`);
           await this.artistRepo.save(enrichedArtist);
           return enrichedArtist;
         }
       } catch (apiError) {
-        console.warn(`[API] Fallo de red para ${artistName}. Se mostrará sin imagen.`);
+        console.warn(`[API] Error: ${artistName}`);
       }
 
       if (existing) return existing;
@@ -58,11 +63,12 @@ export class GetOrCreateArtistUseCase {
         isProcessed: false,
       };
 
+      console.log(`[DEBUG-CREATE] 5. Creando NUEVO local con ID: ${newArtist.id}`);
       await this.artistRepo.save(newArtist);
       return newArtist;
 
     } catch (error) {
-      console.error("[GetOrCreateArtist] Error crítico:", error);
+      console.error("[GetOrCreateArtist] Error:", error);
       return { id: "temp", name: artistName, pictureUrl: "", isProcessed: false };
     }
   }

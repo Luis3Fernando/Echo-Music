@@ -10,9 +10,16 @@ export class SqliteArtistRepository implements ArtistRepository {
     const p = ArtistMapper.toPersistence(artist);
 
     await this.db.runAsync(
-      `INSERT OR REPLACE INTO artists 
+      `INSERT INTO artists 
       (id, name, pictureUrl, description, socialLinks, reels, isProcessed) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        pictureUrl = excluded.pictureUrl,
+        description = excluded.description,
+        socialLinks = excluded.socialLinks,
+        reels = excluded.reels,
+        isProcessed = excluded.isProcessed`,
       [
         p.id,
         p.name,

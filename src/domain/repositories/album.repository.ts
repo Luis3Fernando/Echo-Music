@@ -7,6 +7,10 @@ export interface AlbumRepository {
   findAll(): Promise<Album[]>;
   delete(id: string): Promise<void>;
   findByNameAndArtist(title: string, artistId: string): Promise<Album | null>;
-  findByArtistId(artistId: string): Promise<Album[]>;
-  getRelatedAlbums(artistId: string, excludeAlbumId: string, limit?: number): Promise<Album[]>;
+  findByArtistId(artistId: string, artistName?: string): Promise<Album[]>;
+  getRelatedAlbums(
+    artistId: string,
+    excludeAlbumId: string,
+    limit?: number,
+  ): Promise<Album[]>;
 }

@@ -1,50 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { StyleSheet, View, ScrollView, ActivityIndicator } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Colors } from "@theme/colors";
-import { useArtist } from "@hooks/use-artist.hook";
-import { Artist } from "@entities/artist.entity";
-import { MOCK_SONGS } from "@mocks/mock-songs";
-import { Track } from "@/domain/entities/track.entity";
+import { Track } from "@entities/track.entity";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
-
+import { useArtistProfile } from "@hooks/use-artist-profile.hook";
+import { formatPlaylistDuration } from "@utils/time";
 import ArtistHeaderSection from "../components/ArtistHeaderSection";
 import ArtistInfoSection from "../components/ArtistInfoSection";
 import ArtistSongsSection from "../components/ArtistSongsSection";
 import ArtistAlbumsSection from "../components/ArtistAlbumsSection";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import ArtistCollaborationsSection from "../components/ArtistCollaborationsSection";
-
-export type ArtistStackParamList = {
-  Artist: { name: string };
-  Album: {
-    id: string;
-    albumName: string;
-    artistName: string;
-    artwork?: string;
-  };
-};
 
 const ArtistScreen = () => {
   const route = useRoute<any>();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<ArtistStackParamList>>();
-
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { name } = route.params;
 
-  const { fetchArtist, loading } = useArtist();
-  const [artistData, setArtistData] = useState<Artist | null>(null);
+  const { artist, tracks, albums, collaborators, isLoading } = useArtistProfile(name);
+
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
-  const artistSongs = MOCK_SONGS;
+  const totalDuration = useMemo(() => {
+    if (!tracks || tracks.length === 0) return "0 min";
+    const totalMs = tracks.reduce((acc, t) => acc + t.duration, 0);
+    return formatPlaylistDuration(totalMs);
+  }, [tracks]);
 
-  useEffect(() => {
-    fetchArtist(name).then(setArtistData);
-  }, [name]);
-
-  const trackMenuItems: MenuItem[] = [
+  const trackMenuItems: MenuItem[] = useMemo(() => [
     {
       label: "Reproducir",
       icon: "play-outline",
@@ -66,59 +52,9 @@ const ArtistScreen = () => {
       variant: "danger",
       onPress: () => console.log("Eliminar", selectedTrack?.id),
     },
-  ];
+  ], [selectedTrack]);
 
-  const artistAlbumsMock = [
-    {
-      id: "alb-1",
-      title: "Summer Vibes",
-      artist: name,
-      cover: {
-        uri: "https://i.scdn.co/image/ab67616d0000b273e7f9be224ecc91e1ddf3e6f2",
-      },
-    },
-    {
-      id: "alb-2",
-      title: "Electric Night",
-      artist: name,
-      cover: {
-        uri: "https://cdn-images.dzcdn.net/images/cover/dd156011ef7406e8223f4d97a68a094a/0x1900-000000-80-0-0.jpg",
-      },
-    },
-    {
-      id: "alb-3",
-      title: "Golden Hour",
-      artist: name,
-      cover: {
-        uri: "https://i.scdn.co/image/ab67616d0000b2736b98dbf13791547e637e322f",
-      },
-    },
-  ];
-
-  const collaboratorsMock = [
-    "Dua Lipa",
-    "Rihanna",
-    "The Weeknd",
-    "Ellie Goulding",
-    "Sam Smith",
-  ];
-
-  const handleArtistNavigation = (artistName: string) => {
-    navigation.push("Artist", {
-      name: artistName,
-    });
-  };
-
-  const handleAlbumPress = (album: any) => {
-    navigation.push("Album", {
-      id: album.id,
-      albumName: album.title,
-      artistName: album.artist,
-      artwork: album.cover?.uri,
-    });
-  };
-
-  if (loading && !artistData) {
+  if (isLoading && !artist) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
@@ -130,39 +66,47 @@ const ArtistScreen = () => {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <ArtistHeaderSection
-          pictureUrl={artistData?.pictureUrl}
+          pictureUrl={artist?.pictureUrl}
           onBackPress={() => navigation.goBack()}
         />
         <View style={styles.contentCard}>
           <ArtistInfoSection
-            name={name}
-            songCount={artistSongs.length}
-            duration="Varía"
-            onPlayPress={() => console.log("Reproducir éxitos")}
-            onShufflePress={() => console.log("Modo aleatorio")}
+            name={artist?.name || name}
+            songCount={tracks.length}
+            duration={totalDuration}
+            onPlayPress={() => console.log("Shuffle total")}
+            onShufflePress={() => console.log("Shuffle")}
           />
+          
           <ArtistSongsSection
-            tracks={artistSongs}
-            onTrackPress={(t) => console.log("Reproduciendo:", t.title)}
-            onFavoritePress={(t) => console.log("Like:", t.title)}
+            tracks={tracks}
+            onTrackPress={(t) => console.log("Play", t.title)}
+            onFavoritePress={(t) => console.log("Fav", t.id)}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
-              setMenuAnchor({ x: pageX, y: pageY });
               setSelectedTrack(track);
+              setMenuAnchor({ x: pageX, y: pageY });
               setIsMenuVisible(true);
             }}
           />
+
           <ArtistAlbumsSection
-            albums={artistAlbumsMock}
-            onAlbumPress={handleAlbumPress}
+            albums={albums}
+            onAlbumPress={(alb) => navigation.push("Album", { 
+              id: alb.id, 
+              albumName: alb.title,
+              artistName: alb.artistName,
+              artwork: alb.artworkUri
+            })}
           />
+
           <ArtistCollaborationsSection
-          collaborators={collaboratorsMock}
-          onArtistPress={handleArtistNavigation}
-        />
+            collaborators={collaborators}
+            onArtistPress={(colab) => navigation.push("Artist", { name: colab.name })}
+          />
         </View>
-        
       </ScrollView>
+
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
@@ -174,12 +118,8 @@ const ArtistScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingBottom: 120, backgroundColor: 'white'},
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  container: { flex: 1, backgroundColor: Colors.white },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   contentCard: {
     backgroundColor: Colors.white,
     marginTop: -50,
@@ -187,11 +127,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 40,
     paddingHorizontal: 10,
     paddingTop: 35,
-    minHeight: 800,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -15 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
+    paddingBottom: 140,
+    minHeight: 600,
     elevation: 20,
   },
 });

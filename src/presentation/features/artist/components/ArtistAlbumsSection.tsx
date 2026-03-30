@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
+import { Album } from '@entities/album.entity';
 import AlbumCard from '@/presentation/shared/components/atoms/AlbumCard';
 import SectionTitle from '@/presentation/shared/components/atoms/SectionTitle';
 
 interface ArtistAlbumsSectionProps {
-  albums: any[];
-  onAlbumPress: (album: any) => void;
+  albums: Album[];
+  onAlbumPress: (album: Album) => void;
 }
 
 const ArtistAlbumsSection = ({ albums, onAlbumPress }: ArtistAlbumsSectionProps) => {
@@ -25,8 +26,8 @@ const ArtistAlbumsSection = ({ albums, onAlbumPress }: ArtistAlbumsSectionProps)
             type="album"
             data={{
               title: item.title,
-              artist: item.artist,
-              cover: item.cover
+              artist: item.artistName,
+              cover: item.artworkUri ? { uri: item.artworkUri } : undefined,
             }}
             onPress={() => onAlbumPress(item)}
           />

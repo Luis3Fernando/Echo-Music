@@ -1,15 +1,16 @@
-import { StyleSheet, View, ScrollView } from 'react-native';
-import ArtistCircle from '@components/atoms/ArtistCircle';
-import SectionTitle from '@components/atoms/SectionTitle';
+import { StyleSheet, View, ScrollView } from "react-native";
+import ArtistCircle from "@components/atoms/ArtistCircle";
+import SectionTitle from "@components/atoms/SectionTitle";
+import { Artist } from "@entities/artist.entity";
 
 interface ArtistCollaborationsSectionProps {
-  collaborators: string[];
-  onArtistPress: (name: string) => void;
+  collaborators: Artist[];
+  onArtistPress: (artist: Artist) => void;
 }
 
-const ArtistCollaborationsSection = ({ 
-  collaborators, 
-  onArtistPress 
+const ArtistCollaborationsSection = ({
+  collaborators,
+  onArtistPress,
 }: ArtistCollaborationsSectionProps) => {
   if (!collaborators || collaborators.length === 0) return null;
 
@@ -21,11 +22,11 @@ const ArtistCollaborationsSection = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {collaborators.map((name, index) => (
+        {collaborators.map((artist) => (
           <ArtistCircle
-            key={`${name}-${index}`}
-            data={{ name }}
-            onPress={() => onArtistPress(name)}
+            key={artist.id}
+            data={{ name: artist.name }}
+            onPress={() => onArtistPress(artist)}
           />
         ))}
       </ScrollView>
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 20,
     marginBottom: 20,
-    backgroundColor: 'white'
+    backgroundColor: "white",
   },
   scrollContent: {
     paddingHorizontal: 15,

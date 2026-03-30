@@ -75,17 +75,27 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     await this.db.runAsync("DELETE FROM albums WHERE id = ?", [id]);
   }
 
-  async findByArtistId(artistId: string): Promise<Album[]> {
+  async findByArtistId(
+    artistId: string,
+    artistName?: string,
+  ): Promise<Album[]> {
+    const searchName = artistName ? `%${artistName}%` : null;
+
     const query = `
-      SELECT a.*, 
-        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
-      FROM albums a
-      INNER JOIN album_artists aa ON a.id = aa.albumId
-      WHERE aa.artistId = ?
+      ${this.BASE_SELECT}
+      LEFT JOIN album_artists aa ON a.id = aa.albumId
+      WHERE a.artistId = ? 
+         OR aa.artistId = ?
+         ${searchName ? "OR a.artistName LIKE ?" : ""}
+      GROUP BY a.id
       ORDER BY a.year DESC, a.title ASC
     `;
 
-    const rows = await this.db.getAllAsync<any>(query, [artistId]);
+    const params = searchName
+      ? [artistId, artistId, searchName]
+      : [artistId, artistId];
+
+    const rows = await this.db.getAllAsync<any>(query, params);
     return rows.map((row) => AlbumMapper.toDomain(row));
   }
 
