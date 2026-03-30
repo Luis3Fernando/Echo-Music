@@ -1,8 +1,7 @@
-import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Album } from '@entities/album.entity';
-import AlbumCard from '@/presentation/shared/components/atoms/AlbumCard';
-import SectionTitle from '@/presentation/shared/components/atoms/SectionTitle';
+import AlbumCard from '@components/atoms/AlbumCard';
+import SectionTitle from '@components/atoms/SectionTitle';
 
 interface ArtistAlbumsSectionProps {
   albums: Album[];
