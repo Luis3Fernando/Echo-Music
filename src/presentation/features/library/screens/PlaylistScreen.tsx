@@ -32,6 +32,7 @@ import {
   useDeletePlaylist,
   useRemoveTrackFromPlaylist,
 } from "@hooks/use-playlists.hook";
+import { useTrack } from "@hooks/use-track.hook";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -51,6 +52,7 @@ const PlaylistScreen = () => {
   const { deletePlaylist } = useDeletePlaylist();
   const { removeTrack } = useRemoveTrackFromPlaylist();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const { toggleFavorite } = useTrack();
   const [confirmData, setConfirmData] = useState({
     title: "",
     description: "",
@@ -196,6 +198,16 @@ const PlaylistScreen = () => {
   }
   if (!playlist) return null;
 
+  const handleToggleFavorite = async (track: Track) => {
+    if (playlist.id === 'playlist-favorites' && track.isFavorite) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+    const newState = await toggleFavorite(track.id);
+    if (newState !== null) {
+      refresh();
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: "#F9F9F8" }]}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -267,6 +279,7 @@ const PlaylistScreen = () => {
                 track={item as any}
                 showIndex={false}
                 showFavorite={true}
+                onFavoritePress={() => handleToggleFavorite(item as any)}
                 onOptionsPress={(event, track) => {
                   const { pageX, pageY } = event.nativeEvent;
                   setTrackMenuAnchor({ x: pageX, y: pageY });

@@ -27,7 +27,7 @@ import {
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { useFolderDetail } from "@hooks/use-folders.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
-import { useTrack } from "@/presentation/shared/hooks/use-track.hook";
+import { useTrack } from "@hooks/use-track.hook";
 
 const FolderScreen = () => {
   const route = useRoute<any>();
@@ -124,6 +124,20 @@ const FolderScreen = () => {
     [selectedTrack],
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
+
+  if (isLoading && tracks.length === 0) {
+    return (
+      <View style={[styles.container, { justifyContent: "center" }]}>
+        <ActivityIndicator color={Colors.primary} size="large" />
+      </View>
+    );
+  }
+
   const handleSelectPlaylist = async (playlist: any) => {
     if (!selectedTrack) return;
     setIsAddModalVisible(false);
@@ -141,21 +155,6 @@ const FolderScreen = () => {
       refreshPlaylists();
     }
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      refreshPlaylists();
-    }, [refreshPlaylists]),
-  );
-
-  if (isLoading) {
-    return (
-      <View style={[styles.container, { justifyContent: "center" }]}>
-        <ActivityIndicator color={Colors.primary} size="large" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <ScreenHeaderBasic
