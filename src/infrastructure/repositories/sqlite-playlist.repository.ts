@@ -108,4 +108,26 @@ export class SqlitePlaylistRepository implements PlaylistRepository {
   async delete(id: string): Promise<void> {
     await this.db.runAsync("DELETE FROM playlists WHERE id = ?", [id]);
   }
+
+  async getLatestTrackArtwork(playlistId: string): Promise<string | null> {
+    const row = await this.db.getFirstAsync<{ artworkUri: string }>(
+      `SELECT t.artworkUri 
+     FROM tracks t
+     JOIN playlist_tracks pt ON t.id = pt.trackId
+     WHERE pt.playlistId = ?
+     ORDER BY pt.orderIndex DESC LIMIT 1`,
+      [playlistId],
+    );
+    return row?.artworkUri || null;
+  }
+
+  async updateArtwork(
+    playlistId: string,
+    artworkUri: string | null,
+  ): Promise<void> {
+    await this.db.runAsync(
+      "UPDATE playlists SET artworkUri = ?, updatedAt = ? WHERE id = ?",
+      [artworkUri, Date.now(), playlistId],
+    );
+  }
 }

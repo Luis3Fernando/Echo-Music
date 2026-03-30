@@ -7,9 +7,8 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Track } from "@/domain/entities/track.entity";
+import { Track } from "@entities/track.entity";
 import { Colors } from "@theme/colors";
-import { boolean } from "yup";
 
 interface SongItemProps {
   track: Track;
@@ -34,12 +33,14 @@ const SongItem = ({
   showArtist = true,
   showFavorite = true,
   showOptions = true,
-  isFavorite = false,
+  isFavorite,
   titleVariant = "default",
   onPress,
   onFavoritePress,
   onOptionsPress,
 }: SongItemProps) => {
+  const favoriteStatus = isFavorite ?? track.isFavorite;
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -67,11 +68,8 @@ const SongItem = ({
         </View>
       )}
       <View style={styles.infoContainer}>
-        <Text 
-          style={[
-            styles.title, 
-            titleVariant === "light" && styles.titleLight
-          ]} 
+        <Text
+          style={[styles.title, titleVariant === "light" && styles.titleLight]}
           numberOfLines={1}
         >
           {track.title}
@@ -89,9 +87,9 @@ const SongItem = ({
             style={styles.actionButton}
           >
             <Ionicons
-              name={isFavorite ? "heart" : "heart-outline"}
+              name={favoriteStatus ? "heart" : "heart-outline"}
               size={22}
-              color={isFavorite ? Colors.primary : "#b3b3b3"}
+              color={favoriteStatus ? Colors.primary : "#b3b3b3"}
             />
           </TouchableOpacity>
         )}
@@ -158,7 +156,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   titleLight: {
-    color: "#000000", 
+    color: "#000000",
     fontWeight: "400",
   },
   artist: {

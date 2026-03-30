@@ -27,15 +27,17 @@ import {
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { useFolderDetail } from "@hooks/use-folders.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
+import { useTrack } from "@/presentation/shared/hooks/use-track.hook";
 
 const FolderScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { folderId, folderName } = route.params || {};
 
-  const { tracks, isLoading } = useFolderDetail(folderId);
+  const { tracks, isLoading, refresh } = useFolderDetail(folderId);
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
+  const { toggleFavorite } = useTrack();
 
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
@@ -131,6 +133,15 @@ const FolderScreen = () => {
     }
   };
 
+  const handleToggleFavorite = async (track: Track) => {
+    const newState = await toggleFavorite(track.id);
+
+    if (newState !== null) {
+      refresh();
+      refreshPlaylists();
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       refreshPlaylists();
@@ -184,6 +195,7 @@ const FolderScreen = () => {
             showArtist={true}
             showOptions={true}
             onPress={(t) => console.log("Reproduciendo:", t.title)}
+            onFavoritePress={() => handleToggleFavorite(item)}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
               setTrackMenuAnchor({ x: pageX, y: pageY });
@@ -195,7 +207,6 @@ const FolderScreen = () => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-
       <MenuPopover
         isVisible={isSortMenuVisible}
         onClose={() => setIsSortMenuVisible(false)}

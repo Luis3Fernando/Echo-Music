@@ -10,4 +10,6 @@ export interface PlaylistRepository {
   addTracks(playlistId: string, trackIds: string[]): Promise<void>;
   getTracksByPlaylistId(playlistId: string): Promise<Track[]>;
   removeTrackFromPlaylist(playlistId: string, trackId: string): Promise<void>;
+  getLatestTrackArtwork(playlistId: string): Promise<string | null>;
+  updateArtwork(playlistId: string, artworkUri: string | null): Promise<void>;
 }

@@ -2,12 +2,7 @@ import { TrackRepository } from "@interfaces/track.repository";
 import { PlaylistRepository } from "@interfaces/playlist.repository";
 import { Playlist } from "@entities/playlist.entity";
 import { Track } from "@entities/track.entity";
-
-const SYSTEM_PLAYLISTS = {
-  FAVORITES: "playlist-favorites",
-  RECENT: "playlist-recent",
-  POPULAR: "playlist-popular",
-};
+import { SYSTEM_PLAYLISTS } from "@constants/system-playlists.constant";
 
 export class CreateInitialPlaylistsUseCase {
   constructor(

@@ -11,7 +11,7 @@ import { useLibrary } from "@hooks/use-library.hook";
 import { Track } from "@entities/track.entity";
 import { Colors } from "@theme/colors";
 import SongItem from "@components/atoms/SongItem";
-import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeader";
+import ScreenHeader from "@components/organisms/ScreenHeader";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../../library/components/SongListControls";
@@ -140,7 +140,7 @@ export const SongsScreen = () => {
             track={item}
             index={index}
             showIndex={false}
-            showFavorite={true}
+            showFavorite={false}
             onPress={(t) => console.log("Play", t.title)}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
