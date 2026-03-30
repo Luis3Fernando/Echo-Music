@@ -5,11 +5,16 @@ import { useNavigation } from "@react-navigation/native";
 interface FolderHeaderProps {
   name: string;
   path: string;
+  trackCount: number;
+  duration?: string;
 }
 
-const FolderHeaderSection = ({ name, path }: FolderHeaderProps) => {
-  const navigation = useNavigation();
-
+const FolderHeaderSection = ({
+  name,
+  path,
+  trackCount,
+  duration = "0m",
+}: FolderHeaderProps) => {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.detailRow}>
@@ -24,11 +29,17 @@ const FolderHeaderSection = ({ name, path }: FolderHeaderProps) => {
           <View style={styles.statsInline}>
             <View style={styles.statItem}>
               <Ionicons name="musical-notes-outline" size={14} color="#888" />
-              <Text style={styles.statText}>124 canciones</Text>
+              <Text style={styles.statText}>
+                {trackCount} {trackCount === 1 ? "canción" : "canciones"}
+              </Text>
             </View>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="clock-time-four-outline" size={14} color="#888" />
-              <Text style={styles.statText}>8h 45m</Text>
+              <MaterialCommunityIcons
+                name="clock-time-four-outline"
+                size={14}
+                color="#888"
+              />
+              <Text style={styles.statText}>{duration}</Text>
             </View>
           </View>
         </View>
@@ -42,7 +53,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 5,
     marginTop: 5,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
   },
   topNavigationRow: {
     flexDirection: "row",
@@ -77,7 +88,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: '#F0F0F0'
+    borderColor: "#F0F0F0",
   },
   infoColumn: {
     flex: 1,
@@ -85,7 +96,7 @@ const styles = StyleSheet.create({
   labelTitle: {
     fontSize: 11,
     color: "#AAA",
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
     fontWeight: "600",
     marginBottom: 2,

@@ -10,7 +10,6 @@ import {
   FlatList,
   ActivityIndicator,
   LayoutAnimation,
-  UIManager,
 } from "react-native";
 import {
   useRoute,
@@ -57,13 +56,6 @@ const PlaylistScreen = () => {
     description: "",
     onConfirm: () => {},
   });
-
-  if (
-    Platform.OS === "android" &&
-    UIManager.setLayoutAnimationEnabledExperimental
-  ) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
 
   useHardwareBack(() => {
     if (isMenuVisible || isTrackMenuVisible || isSortMenuVisible) {

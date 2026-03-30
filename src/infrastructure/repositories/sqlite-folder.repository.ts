@@ -1,6 +1,8 @@
 import { SQLiteDatabase } from "expo-sqlite";
 import { FolderRepository } from "@interfaces/folder.repository";
 import { Folder } from "@entities/folder.entity";
+import { Track } from "@entities/track.entity";
+import { TrackMapper } from "@mappers/track.mapper";
 
 export class SqliteFolderRepository implements FolderRepository {
   constructor(private db: SQLiteDatabase) {}
@@ -31,5 +33,20 @@ export class SqliteFolderRepository implements FolderRepository {
     });
 
     return Array.from(folderMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getTracksByFolder(folderPath: string): Promise<Track[]> {
+    const queryPath = `file://${folderPath}/%`;
+    
+    const rows = await this.db.getAllAsync<any>(
+      `SELECT t.*, 
+       (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds 
+       FROM tracks t 
+       WHERE t.url LIKE ? 
+       ORDER BY t.title ASC`,
+      [queryPath]
+    );
+
+    return rows.map(TrackMapper.toDomain);
   }
 }

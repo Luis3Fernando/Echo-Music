@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { StyleSheet, View, FlatList, Platform } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useState, useMemo, useCallback } from "react";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
+import {
+  useRoute,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { Colors } from "@theme/colors";
-import { MOCK_SONGS } from "@mocks/mock-songs";
-import { FOLDER_MOCKS } from "@mocks/mock-folder";
 import { Track } from "@entities/track.entity";
 import { ScreenHeaderBasic } from "@components/molecules/ScreenHeaderBasic";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
@@ -11,12 +19,23 @@ import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import FolderHeaderSection from "../components/FolderHeaderSection";
 import SongListControls from "../components/SongListControls";
 import SongItem from "@components/atoms/SongItem";
+import { formatPlaylistDuration } from "@utils/time";
+import {
+  usePlaylists,
+  useAddTracksToPlaylist,
+} from "@hooks/use-playlists.hook";
+import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
+import { useFolderDetail } from "@hooks/use-folders.hook";
+import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 
 const FolderScreen = () => {
   const route = useRoute<any>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { folderId, folderName } = route.params || {};
-  const folderData = FOLDER_MOCKS.find((f) => f.id === folderId);
+
+  const { tracks, isLoading } = useFolderDetail(folderId);
+  const { userPlaylists, refreshPlaylists } = usePlaylists();
+  const { addTracks } = useAddTracksToPlaylist();
 
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
@@ -25,6 +44,7 @@ const FolderScreen = () => {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [confirmData, setConfirmData] = useState({
@@ -32,6 +52,21 @@ const FolderScreen = () => {
     description: "",
     onConfirm: () => {},
   });
+
+  useHardwareBack(() => {
+    if (isTrackMenuVisible || isSortMenuVisible) {
+      setIsTrackMenuVisible(false);
+      setIsSortMenuVisible(false);
+      return true;
+    }
+
+    return false;
+  });
+
+  const totalDuration = useMemo(() => {
+    const totalMs = tracks.reduce((acc, track) => acc + track.duration, 0);
+    return formatPlaylistDuration(totalMs);
+  }, [tracks]);
 
   const sortOptions: MenuItem[] = [
     {
@@ -51,50 +86,83 @@ const FolderScreen = () => {
     },
   ];
 
-  const trackOptions: MenuItem[] = [
-    {
-      label: "Reproducir",
-      icon: "play-outline",
-      onPress: () => console.log("Play", selectedTrack?.title),
-    },
-    {
-      label: "Añadir a playlist",
-      icon: "add-circle-outline",
-      onPress: () => console.log("Add to playlist"),
-    },
-    {
-      label: "Eliminar",
-      icon: "trash-outline",
-      variant: "danger",
-      onPress: () => {
-        setConfirmData({
-          title: "Eliminar canción",
-          description: `¿Deseas eliminar "${selectedTrack?.title}" permanentemente de tu memoria interna?`,
-          onConfirm: () => {
-            console.log("LOG: Canción eliminada físicamente");
-            setIsConfirmVisible(false);
-          },
-        });
-        setIsConfirmVisible(true);
+  const trackOptions: MenuItem[] = useMemo(
+    () => [
+      {
+        label: "Reproducir",
+        icon: "play-outline",
+        onPress: () => console.log("Play", selectedTrack?.title),
       },
-    },
-  ];
+      {
+        label: "Añadir a playlist",
+        icon: "add-circle-outline",
+        onPress: () => {
+          setIsTrackMenuVisible(false);
+          setIsAddModalVisible(true);
+        },
+      },
+      {
+        label: "Eliminar",
+        icon: "trash-outline",
+        variant: "danger",
+        onPress: () => {
+          setConfirmData({
+            title: "Eliminar canción",
+            description: `¿Deseas eliminar permanentemente de tu memoria interna?`,
+            onConfirm: () => {
+              console.log("LOG: Eliminación física pendiente");
+              setIsConfirmVisible(false);
+            },
+          });
+          setIsConfirmVisible(true);
+          setIsTrackMenuVisible(false);
+        },
+      },
+    ],
+    [selectedTrack],
+  );
+
+  const handleSelectPlaylist = async (playlist: any) => {
+    if (!selectedTrack) return;
+    setIsAddModalVisible(false);
+    const success = await addTracks(playlist.id, [selectedTrack.id]);
+    if (success) {
+      refreshPlaylists();
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: "center" }]}>
+        <ActivityIndicator color={Colors.primary} size="large" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <ScreenHeaderBasic
         title={folderName}
+        showBack={true}
         onBackPress={() => navigation.goBack()}
         variant="light"
       />
       <FlatList
-        data={MOCK_SONGS}
+        data={tracks}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <>
             <FolderHeaderSection
               name={folderName}
-              path={folderData?.path || ""}
+              path={folderId}
+              trackCount={tracks.length}
+              duration={totalDuration}
             />
             <SongListControls
               orderLabel={currentSort}
@@ -110,9 +178,9 @@ const FolderScreen = () => {
         }
         renderItem={({ item }) => (
           <SongItem
-            track={item as any}
+            track={item}
             showIndex={false}
-            showFavorite={false}
+            showFavorite={true}
             showArtist={true}
             showOptions={true}
             onPress={(t) => console.log("Reproduciendo:", t.title)}
@@ -127,6 +195,7 @@ const FolderScreen = () => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+
       <MenuPopover
         isVisible={isSortMenuVisible}
         onClose={() => setIsSortMenuVisible(false)}
@@ -144,10 +213,19 @@ const FolderScreen = () => {
         title={confirmData.title}
         description={confirmData.description}
         confirmLabel="Eliminar"
-        cancelLabel="Cancelar"
-        isDestructive={true}
         onConfirm={confirmData.onConfirm}
         onCancel={() => setIsConfirmVisible(false)}
+        isDestructive={true}
+      />
+      <AddToPlaylistModal
+        isVisible={isAddModalVisible}
+        playlists={userPlaylists}
+        onClose={() => setIsAddModalVisible(false)}
+        onSelect={handleSelectPlaylist}
+        onCreateNew={() => {
+          setIsAddModalVisible(false);
+          navigation.navigate("PlaylistForm");
+        }}
       />
     </View>
   );

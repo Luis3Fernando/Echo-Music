@@ -87,7 +87,7 @@ export const SongsScreen = () => {
       onPress: () => console.log("Ver álbum"),
     },
     {
-      label: "Eliminar canción",
+      label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
       onPress: () => setIsConfirmVisible(true),
