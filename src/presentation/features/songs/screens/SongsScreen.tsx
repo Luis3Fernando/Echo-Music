@@ -79,18 +79,37 @@ export const SongsScreen = () => {
     {
       label: "Ir al artista",
       icon: "person-circle-outline",
-      onPress: () => console.log("Ver artista"),
+      onPress: () => {
+        if (!selectedTrack) return;
+        setIsTrackMenuVisible(false);
+        navigation.navigate("Artist", {
+          artistId: selectedTrack.artistId,
+          name: selectedTrack.artistName,
+        });
+      },
     },
     {
       label: "Ir al álbum",
       icon: "disc-outline",
-      onPress: () => console.log("Ver álbum"),
+      onPress: () => {
+        if (!selectedTrack || !selectedTrack.albumId) return;
+        setIsTrackMenuVisible(false);
+        navigation.navigate("Album", {
+          id: selectedTrack.albumId,
+          albumName: selectedTrack.albumName,
+          artistName: selectedTrack.artistName,
+          artwork: selectedTrack.artworkUri || undefined,
+        });
+      },
     },
     {
       label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
-      onPress: () => setIsConfirmVisible(true),
+      onPress: () => {
+        setIsTrackMenuVisible(false);
+        setIsConfirmVisible(true);
+      },
     },
   ];
 
