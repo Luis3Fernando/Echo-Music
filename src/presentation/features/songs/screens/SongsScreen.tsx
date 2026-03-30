@@ -165,8 +165,8 @@ export const SongsScreen = () => {
       />
       <ConfirmDialog
         isVisible={isConfirmVisible}
-        title="¿Eliminar canción?"
-        description={`¿Estás seguro de que quieres eliminar "${selectedTrack?.title}" permanentemente de tu dispositivo?`}
+        title="Eliminar canción"
+        description="¿Deseas eliminar permanentemente de tu memoria interna?"
         confirmLabel="Eliminar"
         isDestructive={true}
         onConfirm={() => {

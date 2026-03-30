@@ -96,6 +96,11 @@ const FolderScreen = () => {
         onPress: () => console.log("Play", selectedTrack?.title),
       },
       {
+        label: "Añadir a la cola",
+        icon: "list-outline",
+        onPress: () => console.log("A cola"),
+      },
+      {
         label: "Añadir a playlist",
         icon: "add-circle-outline",
         onPress: () => {
