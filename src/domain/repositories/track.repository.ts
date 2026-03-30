@@ -8,4 +8,5 @@ export interface TrackRepository {
   updateMetadata(id: string, metadata: Partial<Track>): Promise<void>;
   deleteAll(): Promise<void>;
   getTracksByAlbumId(albumId: string): Promise<Track[]>;
+  findByArtistId(artistId: string): Promise<Track[]>;
 }

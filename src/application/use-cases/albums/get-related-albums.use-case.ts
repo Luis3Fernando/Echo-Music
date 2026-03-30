@@ -6,6 +6,6 @@ export class GetRelatedAlbumsUseCase {
 
   async execute(artistId: string, currentAlbumId: string): Promise<Album[]> {
     if (!artistId) return [];
-    return await this.albumRepo.getAlbumsByArtist(artistId, currentAlbumId, 5);
+    return await this.albumRepo.getRelatedAlbums(artistId, currentAlbumId, 5);
   }
 }

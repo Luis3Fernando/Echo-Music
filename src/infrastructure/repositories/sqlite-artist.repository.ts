@@ -41,6 +41,15 @@ export class SqliteArtistRepository implements ArtistRepository {
     return result ? ArtistMapper.toDomain(result) : null;
   }
 
+  async findByIds(ids: string[]): Promise<Artist[]> {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => "?").join(",");
+    const query = `SELECT * FROM artists WHERE id IN (${placeholders})`;
+
+    const results = await this.db.getAllAsync<any>(query, ids);
+    return results.map((row) => ArtistMapper.toDomain(row));
+  }
+
   async findAll(): Promise<Artist[]> {
     const results = await this.db.getAllAsync<any>(
       "SELECT * FROM artists ORDER BY name ASC",

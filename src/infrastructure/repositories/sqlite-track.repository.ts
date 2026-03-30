@@ -137,4 +137,18 @@ export class SqliteTrackRepository implements TrackRepository {
   async deleteAll(): Promise<void> {
     await this.db.runAsync("DELETE FROM tracks");
   }
+
+  async findByArtistId(artistId: string): Promise<Track[]> {
+    const query = `
+      SELECT t.*, 
+        (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds 
+      FROM tracks t
+      INNER JOIN track_artists ta ON t.id = ta.trackId
+      WHERE ta.artistId = ?
+      ORDER BY t.dateAdded DESC, t.title ASC
+    `;
+
+    const results = await this.db.getAllAsync<any>(query, [artistId]);
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
 }

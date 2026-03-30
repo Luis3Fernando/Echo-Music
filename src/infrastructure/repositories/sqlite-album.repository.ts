@@ -6,19 +6,11 @@ import { AlbumMapper } from "@mappers/album.mapper";
 export class SQLiteAlbumRepository implements AlbumRepository {
   constructor(private db: SQLiteDatabase) {}
 
-  async findByNameAndArtist(
-    title: string,
-    artistId: string,
-  ): Promise<Album | null> {
-    const row = await this.db.getFirstAsync<any>(
-      `SELECT a.*, 
-        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
-       FROM albums a 
-       WHERE a.title = ? AND a.artistId = ?`,
-      [title, artistId],
-    );
-    return row ? AlbumMapper.toDomain(row) : null;
-  }
+  private readonly BASE_SELECT = `
+    SELECT a.*, 
+      (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+    FROM albums a
+  `;
 
   async save(album: Album): Promise<void> {
     const p = AlbumMapper.toPersistence(album);
@@ -55,21 +47,26 @@ export class SQLiteAlbumRepository implements AlbumRepository {
 
   async findById(id: string): Promise<Album | null> {
     const row = await this.db.getFirstAsync<any>(
-      `SELECT a.*, 
-        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
-       FROM albums a 
-       WHERE a.id = ?`,
+      `${this.BASE_SELECT} WHERE a.id = ?`,
       [id],
+    );
+    return row ? AlbumMapper.toDomain(row) : null;
+  }
+
+  async findByNameAndArtist(
+    title: string,
+    artistId: string,
+  ): Promise<Album | null> {
+    const row = await this.db.getFirstAsync<any>(
+      `${this.BASE_SELECT} WHERE LOWER(a.title) = ? AND a.artistId = ?`,
+      [title.toLowerCase(), artistId],
     );
     return row ? AlbumMapper.toDomain(row) : null;
   }
 
   async findAll(): Promise<Album[]> {
     const rows = await this.db.getAllAsync<any>(
-      `SELECT a.*, 
-        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
-       FROM albums a 
-       ORDER BY a.title ASC`,
+      `${this.BASE_SELECT} ORDER BY a.title ASC`,
     );
     return rows.map((row) => AlbumMapper.toDomain(row));
   }
@@ -78,22 +75,35 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     await this.db.runAsync("DELETE FROM albums WHERE id = ?", [id]);
   }
 
-  async getAlbumsByArtist(
+  async findByArtistId(artistId: string): Promise<Album[]> {
+    const query = `
+      SELECT a.*, 
+        (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+      FROM albums a
+      INNER JOIN album_artists aa ON a.id = aa.albumId
+      WHERE aa.artistId = ?
+      ORDER BY a.year DESC, a.title ASC
+    `;
+
+    const rows = await this.db.getAllAsync<any>(query, [artistId]);
+    return rows.map((row) => AlbumMapper.toDomain(row));
+  }
+
+  async getRelatedAlbums(
     artistId: string,
-    excludeAlbumId?: string,
+    excludeAlbumId: string,
     limit: number = 5,
   ): Promise<Album[]> {
     const query = `
-    SELECT a.*, 
-      (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
-    FROM albums a 
-    WHERE a.artistId = ? AND a.id != ?
+    ${this.BASE_SELECT}
+    INNER JOIN album_artists aa ON a.id = aa.albumId
+    WHERE aa.artistId = ? AND a.id != ? -- <--- FILTRO CRÍTICO
     LIMIT ?
   `;
 
     const rows = await this.db.getAllAsync<any>(query, [
       artistId,
-      excludeAlbumId || "",
+      excludeAlbumId,
       limit,
     ]);
     return rows.map((row) => AlbumMapper.toDomain(row));
