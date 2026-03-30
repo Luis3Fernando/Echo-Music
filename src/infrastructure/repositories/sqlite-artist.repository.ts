@@ -14,37 +14,37 @@ export class SqliteArtistRepository implements ArtistRepository {
       (id, name, pictureUrl, description, socialLinks, reels, isProcessed) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
-        p.id, 
-        p.name, 
-        p.pictureUrl, 
-        p.description, 
-        p.socialLinks, 
-        p.reels, 
-        p.isProcessed
-      ] as any[]
+        p.id,
+        p.name,
+        p.pictureUrl,
+        p.description,
+        p.socialLinks,
+        p.reels,
+        p.isProcessed,
+      ] as any[],
     );
   }
 
   async findByName(name: string): Promise<Artist | null> {
-    const result = await this.db.getFirstAsync<any>(
-      "SELECT * FROM artists WHERE name = ?",
-      [name]
+    const row = await this.db.getFirstAsync<any>(
+      "SELECT * FROM artists WHERE LOWER(name) = ?",
+      [name.toLowerCase()],
     );
-    return result ? ArtistMapper.toDomain(result) : null;
+    return row ? ArtistMapper.toDomain(row) : null;
   }
 
   async findById(id: string): Promise<Artist | null> {
     const result = await this.db.getFirstAsync<any>(
       "SELECT * FROM artists WHERE id = ?",
-      [id]
+      [id],
     );
     return result ? ArtistMapper.toDomain(result) : null;
   }
 
   async findAll(): Promise<Artist[]> {
     const results = await this.db.getAllAsync<any>(
-      "SELECT * FROM artists ORDER BY name ASC"
+      "SELECT * FROM artists ORDER BY name ASC",
     );
-    return results.map(row => ArtistMapper.toDomain(row));
+    return results.map((row) => ArtistMapper.toDomain(row));
   }
 }

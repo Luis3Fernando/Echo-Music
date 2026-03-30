@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -12,23 +12,22 @@ import { useArtist } from "@hooks/use-artist.hook";
 import { Artist } from "@entities/artist.entity";
 
 interface ArtistCircleProps {
-  data: {
-    name: string;
-  };
+  data: { name: string };
   onPress?: () => void;
 }
 
 const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
-  const { fetchArtist, loading: apiLoading } = useArtist();
+  const { fetchArtist } = useArtist();
   const [artist, setArtist] = useState<Artist | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const skeletonValue = new Animated.Value(0);
+
+  const skeletonValue = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(skeletonValue, {
-          toValue: 1,
+          toValue: 0.7,
           duration: 800,
           useNativeDriver: true,
         }),
@@ -39,27 +38,19 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
         }),
       ]),
     );
-
     animation.start();
     return () => animation.stop();
-  }, []);
+  }, [skeletonValue]);
 
   useEffect(() => {
     let isMounted = true;
     fetchArtist(data.name).then((result) => {
-      if (isMounted) setArtist(result);
+      if (isMounted && result) setArtist(result);
     });
     return () => {
       isMounted = false;
     };
   }, [data.name, fetchArtist]);
-
-  const isCurrentlyLoading = apiLoading || !imageLoaded;
-
-  const skeletonOpacity = skeletonValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0.7],
-  });
 
   return (
     <TouchableOpacity
@@ -68,30 +59,25 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
       activeOpacity={0.8}
     >
       <View style={styles.imageContainer}>
-        {isCurrentlyLoading && (
+        {!imageLoaded && (
           <Animated.View
-            style={[styles.skeleton, { opacity: skeletonOpacity }]}
+            style={[styles.skeleton, { opacity: skeletonValue }]}
           />
         )}
+
         <Image
           source={
             artist?.pictureUrl
               ? { uri: artist.pictureUrl }
               : require("@assets/img/artist_default.png")
           }
-          style={[styles.photo, !imageLoaded && { width: 0, height: 0 }]}
+          style={styles.photo}
           onLoad={() => setImageLoaded(true)}
         />
       </View>
-      {apiLoading ? (
-        <Animated.View
-          style={[styles.skeletonText, { opacity: skeletonOpacity }]}
-        />
-      ) : (
-        <Text style={styles.name} numberOfLines={2}>
-          {data.name}
-        </Text>
-      )}
+      <Text style={styles.name} numberOfLines={2}>
+        {artist?.name || data.name}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -103,28 +89,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageContainer: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: 85,
+    height: 85,
+    borderRadius: 42.5,
     overflow: "hidden",
     backgroundColor: "#E1E9EE",
     marginBottom: 8,
-    justifyContent: "center",
-    alignItems: "center",
+    position: "relative",
   },
   skeleton: {
     position: "absolute",
+    zIndex: 1,
     width: "100%",
     height: "100%",
     backgroundColor: "#ADB5BD",
-    borderRadius: 45,
-  },
-  skeletonText: {
-    width: 60,
-    height: 10,
-    backgroundColor: "#E1E9EE",
-    borderRadius: 4,
-    marginTop: 4,
   },
   photo: {
     width: "100%",
@@ -133,9 +111,10 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 12,
+    fontFamily: "Jakarta-Medium",
     color: Colors.black,
     textAlign: "center",
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
     lineHeight: 14,
   },
 });
