@@ -77,7 +77,7 @@ const ArtistCircle = ({ data, onPress }: ArtistCircleProps) => {
           source={
             artist?.pictureUrl
               ? { uri: artist.pictureUrl }
-              : require("@assets/img/artist_default.jpg")
+              : require("@assets/img/artist_default.png")
           }
           style={[styles.photo, !imageLoaded && { width: 0, height: 0 }]}
           onLoad={() => setImageLoaded(true)}
