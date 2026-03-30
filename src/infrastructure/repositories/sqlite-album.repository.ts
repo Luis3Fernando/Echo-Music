@@ -40,15 +40,14 @@ export class SQLiteAlbumRepository implements AlbumRepository {
         ] as any[],
       );
 
-      await this.db.runAsync(
-        "DELETE FROM album_artists WHERE albumId = ?",
-        [p.id]
-      );
+      await this.db.runAsync("DELETE FROM album_artists WHERE albumId = ?", [
+        p.id,
+      ]);
 
       for (const aId of album.artistIds) {
         await this.db.runAsync(
           "INSERT INTO album_artists (albumId, artistId) VALUES (?, ?)",
-          [p.id, aId]
+          [p.id, aId],
         );
       }
     });
@@ -77,5 +76,26 @@ export class SQLiteAlbumRepository implements AlbumRepository {
 
   async delete(id: string): Promise<void> {
     await this.db.runAsync("DELETE FROM albums WHERE id = ?", [id]);
+  }
+
+  async getAlbumsByArtist(
+    artistId: string,
+    excludeAlbumId?: string,
+    limit: number = 5,
+  ): Promise<Album[]> {
+    const query = `
+    SELECT a.*, 
+      (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+    FROM albums a 
+    WHERE a.artistId = ? AND a.id != ?
+    LIMIT ?
+  `;
+
+    const rows = await this.db.getAllAsync<any>(query, [
+      artistId,
+      excludeAlbumId || "",
+      limit,
+    ]);
+    return rows.map((row) => AlbumMapper.toDomain(row));
   }
 }

@@ -1,12 +1,18 @@
 import { useState, useMemo, useCallback } from "react";
-import { StyleSheet, View, ScrollView, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import {
   useRoute,
   useNavigation,
   useFocusEffect,
 } from "@react-navigation/native";
 import { Colors } from "@theme/colors";
-import { Track } from "@/domain/entities/track.entity";
+import { Track } from "@entities/track.entity";
 import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { useTrack } from "@hooks/use-track.hook";
@@ -21,7 +27,7 @@ import AlbumInfoSection from "../components/AlbumInfoSection";
 import AlbumSongsSection from "../components/AlbumSongsSection";
 import AlbumArtistsSection from "../components/AlbumArtistsSection";
 import RelatedAlbumsSection from "../components/RelatedAlbumsSection";
-import { useAlbumDetail } from "@hooks/use-album.hook";
+import { useAlbumDetail, useRelatedAlbums } from "@hooks/use-album.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 
 const AlbumScreen = () => {
@@ -38,6 +44,7 @@ const AlbumScreen = () => {
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const { relatedAlbums } = useRelatedAlbums(album?.artistId, id);
 
   const totalDuration = useMemo(() => {
     const totalMs = tracks.reduce((acc, t) => acc + t.duration, 0);
@@ -55,6 +62,15 @@ const AlbumScreen = () => {
       refresh();
       refreshPlaylists();
     }
+  };
+
+  const handleAlbumPress = (item: any) => {
+    navigation.push("Album", {
+      id: item.id,
+      albumName: item.title,
+      artistName: item.artistName,
+      artwork: item.artworkUri,
+    });
   };
 
   const handleSelectPlaylist = async (playlist: any) => {
@@ -142,7 +158,6 @@ const AlbumScreen = () => {
           }
         />
         <View style={styles.divider} />
-
         <AlbumSongsSection
           tracks={tracks}
           onTrackPress={(t) => console.log("Playing:", t.title)}
@@ -154,16 +169,22 @@ const AlbumScreen = () => {
             setIsMenuVisible(true);
           }}
         />
-        {/* <RelatedAlbumsSection ... /> */}
+        {relatedAlbums.length > 0 && (
+          <>
+            <View style={styles.divider} />
+            <RelatedAlbumsSection
+              albums={relatedAlbums}
+              onAlbumPress={handleAlbumPress}
+            />
+          </>
+        )}
       </ScrollView>
-
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
         anchorPosition={menuAnchor}
         items={trackMenuItems}
       />
-
       <AddToPlaylistModal
         isVisible={isAddModalVisible}
         playlists={userPlaylists}

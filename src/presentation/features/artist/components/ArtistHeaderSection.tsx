@@ -39,7 +39,7 @@ const ArtistHeaderSection = ({ pictureUrl, onBackPress, onImageChange }: ArtistH
   return (
     <View style={styles.container}>
       <Image
-        source={pictureUrl ? { uri: pictureUrl } : require("@assets/img/artist_default.jpg")}
+        source={pictureUrl ? { uri: pictureUrl } : require("@assets/img/artist_default.png")}
         style={styles.image}
         resizeMode="cover"
       />

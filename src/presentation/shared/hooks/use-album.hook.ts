@@ -5,6 +5,7 @@ import { Track } from "@entities/track.entity";
 import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { GetAlbumDetailsUseCase } from "@use-cases/albums/get-album-details.use-case";
+import { GetRelatedAlbumsUseCase } from "@use-cases/albums/get-related-albums.use-case";
 
 export const useAlbumDetail = (albumId: string) => {
   const db = useSQLiteContext();
@@ -41,4 +42,31 @@ export const useAlbumDetail = (albumId: string) => {
   }, [albumId]);
 
   return { album, tracks, isLoading, error, refresh: fetchAlbumDetails };
+};
+
+export const useRelatedAlbums = (artistId?: string, currentAlbumId?: string) => {
+  const db = useSQLiteContext();
+  const [relatedAlbums, setRelatedAlbums] = useState<Album[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadRelated = useCallback(async () => {
+    if (!artistId || !currentAlbumId) return;
+    setIsLoading(true);
+    try {
+      const repo = new SQLiteAlbumRepository(db);
+      const useCase = new GetRelatedAlbumsUseCase(repo);
+      const data = await useCase.execute(artistId, currentAlbumId);
+      setRelatedAlbums(data);
+    } catch (error) {
+      console.error("[useRelatedAlbums] Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [db, artistId, currentAlbumId]);
+
+  useEffect(() => {
+    loadRelated();
+  }, [loadRelated]);
+
+  return { relatedAlbums, isLoading };
 };

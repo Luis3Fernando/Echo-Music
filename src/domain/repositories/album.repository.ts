@@ -6,4 +6,5 @@ export interface AlbumRepository {
   save(album: Album): Promise<void>;
   findAll(): Promise<Album[]>;
   delete(id: string): Promise<void>;
+  getAlbumsByArtist(artistId: string, excludeAlbumId?: string, limit?: number): Promise<Album[]>;
 }

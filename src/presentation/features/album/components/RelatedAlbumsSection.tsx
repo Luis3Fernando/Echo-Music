@@ -1,16 +1,15 @@
-import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import AlbumCard from '@/presentation/shared/components/atoms/AlbumCard';
-import SectionTitle from '@/presentation/shared/components/atoms/SectionTitle';
+import AlbumCard from '@components/atoms/AlbumCard';
+import SectionTitle from '@components/atoms/SectionTitle';
+import { Album } from '@entities/album.entity';
 
 interface RelatedAlbumsSectionProps {
-  albums: any[];
-  onAlbumPress: (album: any) => void;
+  albums: Album[];
+  onAlbumPress: (album: Album) => void;
 }
 
 const RelatedAlbumsSection = ({ albums, onAlbumPress }: RelatedAlbumsSectionProps) => {
   if (!albums || albums.length === 0) return null;
-
   return (
     <View style={styles.container}>
       <SectionTitle title="Más álbumes" />
@@ -25,8 +24,8 @@ const RelatedAlbumsSection = ({ albums, onAlbumPress }: RelatedAlbumsSectionProp
             type="album"
             data={{
               title: item.title,
-              artist: item.artist,
-              cover: item.cover
+              artist: item.artistName,
+              cover: { uri: item.artworkUri }
             }}
             onPress={() => onAlbumPress(item)}
           />
@@ -39,6 +38,7 @@ const RelatedAlbumsSection = ({ albums, onAlbumPress }: RelatedAlbumsSectionProp
 const styles = StyleSheet.create({
   container: {
     marginVertical: 20,
+    marginBottom: 30
   },
   scrollContent: {
     paddingHorizontal: 15,
