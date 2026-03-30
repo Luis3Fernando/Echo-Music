@@ -7,4 +7,5 @@ export interface TrackRepository {
   getPendingTracks(): Promise<Track[]>;
   updateMetadata(id: string, metadata: Partial<Track>): Promise<void>;
   deleteAll(): Promise<void>;
+  getTracksByAlbumId(albumId: string): Promise<Track[]>;
 }

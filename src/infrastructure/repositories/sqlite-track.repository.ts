@@ -21,19 +21,40 @@ export class SqliteTrackRepository implements TrackRepository {
           ) 
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            p.id, p.url, p.title, p.artistId, p.albumId, p.artistName, p.albumName,
-            p.duration, p.format, p.bitrate, p.size, p.genre, p.year, p.trackNumber,
-            p.diskNumber, p.artworkUri, p.lyricsContent, p.lyricsType, p.lyricsSource,
-            p.isFavorite, p.isProcessed, p.dateAdded, p.playCount,
-          ] as any[]
+            p.id,
+            p.url,
+            p.title,
+            p.artistId,
+            p.albumId,
+            p.artistName,
+            p.albumName,
+            p.duration,
+            p.format,
+            p.bitrate,
+            p.size,
+            p.genre,
+            p.year,
+            p.trackNumber,
+            p.diskNumber,
+            p.artworkUri,
+            p.lyricsContent,
+            p.lyricsType,
+            p.lyricsSource,
+            p.isFavorite,
+            p.isProcessed,
+            p.dateAdded,
+            p.playCount,
+          ] as any[],
         );
 
-        await this.db.runAsync("DELETE FROM track_artists WHERE trackId = ?", [p.id]);
-        
+        await this.db.runAsync("DELETE FROM track_artists WHERE trackId = ?", [
+          p.id,
+        ]);
+
         for (const aId of track.artistIds) {
           await this.db.runAsync(
             "INSERT INTO track_artists (trackId, artistId) VALUES (?, ?)",
-            [p.id, aId]
+            [p.id, aId],
           );
         }
       }
@@ -48,7 +69,7 @@ export class SqliteTrackRepository implements TrackRepository {
 
   async getPendingTracks(): Promise<Track[]> {
     const results = await this.db.getAllAsync<any>(
-      `${this.BASE_SELECT} WHERE t.isProcessed = 0`
+      `${this.BASE_SELECT} WHERE t.isProcessed = 0`,
     );
     return results.map((row) => TrackMapper.toDomain(row));
   }
@@ -70,13 +91,21 @@ export class SqliteTrackRepository implements TrackRepository {
         const values = Object.values(updateData).map((v) =>
           typeof v === "boolean" ? (v ? 1 : 0) : v,
         );
-        await this.db.runAsync(`UPDATE tracks SET ${fields} WHERE id = ?`, [...values, id] as any[]);
+        await this.db.runAsync(`UPDATE tracks SET ${fields} WHERE id = ?`, [
+          ...values,
+          id,
+        ] as any[]);
       }
 
       if (artistIds) {
-        await this.db.runAsync("DELETE FROM track_artists WHERE trackId = ?", [id]);
+        await this.db.runAsync("DELETE FROM track_artists WHERE trackId = ?", [
+          id,
+        ]);
         for (const aId of artistIds) {
-          await this.db.runAsync("INSERT INTO track_artists (trackId, artistId) VALUES (?, ?)", [id, aId]);
+          await this.db.runAsync(
+            "INSERT INTO track_artists (trackId, artistId) VALUES (?, ?)",
+            [id, aId],
+          );
         }
       }
     });
@@ -84,7 +113,7 @@ export class SqliteTrackRepository implements TrackRepository {
 
   async findAll(): Promise<Track[]> {
     const results = await this.db.getAllAsync<any>(
-      `${this.BASE_SELECT} ORDER BY t.title ASC`
+      `${this.BASE_SELECT} ORDER BY t.title ASC`,
     );
     return results.map((row) => TrackMapper.toDomain(row));
   }
@@ -92,9 +121,17 @@ export class SqliteTrackRepository implements TrackRepository {
   async findById(id: string): Promise<Track | null> {
     const row = await this.db.getFirstAsync<any>(
       `${this.BASE_SELECT} WHERE t.id = ?`,
-      [id]
+      [id],
     );
     return row ? TrackMapper.toDomain(row) : null;
+  }
+
+  async getTracksByAlbumId(albumId: string): Promise<Track[]> {
+    const results = await this.db.getAllAsync<any>(
+      `${this.BASE_SELECT} WHERE t.albumId = ? ORDER BY t.trackNumber ASC`,
+      [albumId],
+    );
+    return results.map((row) => TrackMapper.toDomain(row));
   }
 
   async deleteAll(): Promise<void> {
