@@ -12,4 +12,5 @@ export interface TrackRepository {
   search(query: string): Promise<Track[]>;
   getLeastPlayedTracks(limit: number): Promise<Track[]>;
   getNeverPlayedTracks(limit: number): Promise<Track[]>;
+  getLongestTracks(limit: number): Promise<Track[]>;
 }

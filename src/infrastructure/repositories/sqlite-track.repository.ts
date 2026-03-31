@@ -198,4 +198,16 @@ export class SqliteTrackRepository implements TrackRepository {
     const results = await this.db.getAllAsync<any>(query, [limit]);
     return results.map((row) => TrackMapper.toDomain(row));
   }
+
+  async getLongestTracks(limit: number): Promise<Track[]> {
+    const query = `
+    ${this.BASE_SELECT}
+    WHERE t.isProcessed = 1
+    ORDER BY t.duration DESC
+    LIMIT ?
+  `;
+
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
 }
