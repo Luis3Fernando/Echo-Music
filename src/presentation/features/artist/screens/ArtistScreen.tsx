@@ -25,6 +25,7 @@ import ArtistInfoSection from "../components/ArtistInfoSection";
 import ArtistSongsSection from "../components/ArtistSongsSection";
 import ArtistAlbumsSection from "../components/ArtistAlbumsSection";
 import ArtistCollaborationsSection from "../components/ArtistCollaborationsSection";
+import { useArtist } from "@hooks/use-artist.hook";
 
 const ArtistScreen = () => {
   const route = useRoute<any>();
@@ -36,6 +37,7 @@ const ArtistScreen = () => {
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
   const { toggleFavorite } = useTrack();
+  const { updateImage } = useArtist();
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
@@ -83,6 +85,13 @@ const ArtistScreen = () => {
     if (newState !== null) {
       refresh();
       refreshPlaylists();
+    }
+  };
+
+  const handleImageChange = async (uri: string) => {
+    if (artist?.id) {
+      await updateImage(artist.id, uri);
+      refresh();
     }
   };
 
@@ -150,6 +159,12 @@ const ArtistScreen = () => {
         <ArtistHeaderSection
           pictureUrl={artist?.pictureUrl}
           onBackPress={() => navigation.goBack()}
+          onImageChange={handleImageChange}
+          onResetImage={() => {
+            if (artist?.id) {
+              handleImageChange("");
+            }
+          }}
         />
         <View style={styles.contentCard}>
           <ArtistInfoSection
