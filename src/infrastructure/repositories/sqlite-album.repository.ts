@@ -130,4 +130,43 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     );
     return results.map((row) => AlbumMapper.toDomain(row));
   }
+
+  async getRecentAlbums(limit: number): Promise<Album[]> {
+    const query = `
+    SELECT a.*, MAX(t.dateAdded) as lastAdded,
+    (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+    FROM albums a
+    INNER JOIN tracks t ON a.id = t.albumId
+    GROUP BY a.id
+    ORDER BY lastAdded DESC
+    LIMIT ?
+  `;
+    const rows = await this.db.getAllAsync<any>(query, [limit]);
+    return rows.map(AlbumMapper.toDomain);
+  }
+
+  async getTopTrackCountAlbums(limit: number): Promise<Album[]> {
+    const query = `
+    ${this.BASE_SELECT}
+    ORDER BY a.trackCount DESC
+    LIMIT ?
+  `;
+    const rows = await this.db.getAllAsync<any>(query, [limit]);
+    return rows.map(AlbumMapper.toDomain);
+  }
+
+  async getMostLikedAlbums(limit: number): Promise<Album[]> {
+    const query = `
+    SELECT a.*,
+    (SELECT json_group_array(artistId) FROM album_artists WHERE albumId = a.id) as artistIds
+    FROM albums a
+    INNER JOIN tracks t ON a.id = t.albumId
+    WHERE t.isFavorite = 1
+    GROUP BY a.id
+    ORDER BY COUNT(t.id) DESC
+    LIMIT ?
+  `;
+    const rows = await this.db.getAllAsync<any>(query, [limit]);
+    return rows.map(AlbumMapper.toDomain);
+  }
 }
