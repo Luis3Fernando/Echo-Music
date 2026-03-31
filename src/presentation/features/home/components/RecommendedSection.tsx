@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
-  Text,
   FlatList,
   Dimensions,
   StyleSheet,
@@ -36,6 +35,7 @@ const RecommendedSection = ({ data }: { data: any[] }) => {
         onScroll={onScroll}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
+        scrollEventThrottle={16}
         renderItem={({ item }) => (
           <View style={{ width: ITEM_WIDTH, marginRight: 10 }}>
             <Banner
@@ -80,10 +80,12 @@ const styles = StyleSheet.create({
   activeDot: {
     width: 15,
     backgroundColor: Colors.primary,
+    borderRadius: 2,
   },
   inactiveDot: {
     width: 4,
-    backgroundColor: Colors.darkGrey,
+    backgroundColor: Colors.gray_light,
+    borderRadius: 2,
   },
 });
 
