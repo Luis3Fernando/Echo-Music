@@ -4,51 +4,89 @@ import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
 import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
 import { SearchUseCase } from "@use-cases/search/search.use-case";
+import { GetLeastPlayedTracksUseCase } from "@use-cases/search/get-least-played-tracks.use-case";
+import { GetNeverPlayedTracksUseCase } from "@use-cases/search/get-never-played-tracks.use-case";
+import { GetLongestTracksUseCase } from "@use-cases/search/get-longest-tracks.use-case";
+import { GetForgottenFavoritesUseCase } from "@use-cases/search/get-forgotten-favorites-tracks.use-case";
 import { SearchResults } from "@dtos/search-results.dto";
 import { SMART_FILTERS } from "@constants/smart-filter.constants";
+import { Track } from "@entities/track.entity";
 
 export const useDiscovery = () => {
   const db = useSQLiteContext();
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const executeSearch = useCallback(async (query: string) => {
-    // 1. Identificar si el query es un filtro inteligente
-    const smartFilter = SMART_FILTERS.find(f => f.title === query || f.key === query);
-    
-    setIsLoading(true);
-    try {
-      const trackRepo = new SqliteTrackRepository(db);
-      const artistRepo = new SqliteArtistRepository(db);
-      const albumRepo = new SQLiteAlbumRepository(db);
+  const executeSearch = useCallback(
+    async (query: string) => {
+      const cleanQuery = query.trim();
+      if (!cleanQuery) return;
 
-      if (smartFilter) {
-        // --- LOGICA DE FILTROS INTELIGENTES ---
-        console.log("LOG: Ejecutando Filtro Inteligente:", smartFilter.key);
-        
-        // Aquí llamarás a otro Use Case en el futuro, ej:
-        // const smartUseCase = new SmartFilterUseCase(trackRepo);
-        // const data = await smartUseCase.execute(smartFilter.key);
-        // setResults({ tracks: data, artists: [], albums: [] });
-        
-      } else {
-        // --- LOGICA DE BUSQUEDA NORMAL ---
-        const searchUseCase = new SearchUseCase(trackRepo, artistRepo, albumRepo);
-        const data = await searchUseCase.execute(query);
-        setResults(data);
+      const smartFilter = SMART_FILTERS.find(
+        (f) => f.title === cleanQuery || f.key === cleanQuery,
+      );
+
+      setIsLoading(true);
+      try {
+        const trackRepo = new SqliteTrackRepository(db);
+        const artistRepo = new SqliteArtistRepository(db);
+        const albumRepo = new SQLiteAlbumRepository(db);
+
+        if (smartFilter) {
+          let smartTracks: Track[] = [];
+          switch (smartFilter.key) {
+            case "SMART_LESS_PLAYED":
+              smartTracks = await new GetLeastPlayedTracksUseCase(
+                trackRepo,
+              ).execute(50);
+              break;
+            case "SMART_NEVER_PLAYED":
+              smartTracks = await new GetNeverPlayedTracksUseCase(
+                trackRepo,
+              ).execute(50);
+              break;
+            case "SMART_LONGEST":
+              smartTracks = await new GetLongestTracksUseCase(
+                trackRepo,
+              ).execute(50);
+              break;
+            case "SMART_FORGOTTEN_FAVS":
+              smartTracks = await new GetForgottenFavoritesUseCase(
+                trackRepo,
+              ).execute();
+              break;
+          }
+
+          setResults({
+            tracks: smartTracks,
+            artists: [],
+            albums: [],
+          });
+        } else {
+          const searchUseCase = new SearchUseCase(
+            trackRepo,
+            artistRepo,
+            albumRepo,
+          );
+          const data = await searchUseCase.execute(cleanQuery);
+          setResults(data);
+        }
+      } catch (error) {
+        console.error("[useDiscovery] Error fatal en búsqueda:", error);
+        setResults({ tracks: [], artists: [], albums: [] });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("[useDiscovery] Error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [db]);
+    },
+    [db],
+  );
+
+  const clearResults = useCallback(() => setResults(null), []);
 
   return {
     results,
     isLoading,
     executeSearch,
-    // Podrías devolver también una función para limpiar resultados
-    clearResults: () => setResults(null)
+    clearResults,
   };
 };
