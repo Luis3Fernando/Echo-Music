@@ -6,4 +6,5 @@ export interface ArtistRepository {
   findByName(name: string): Promise<Artist | null>;
   findByIds(ids: string[]): Promise<Artist[]>;
   findAll(): Promise<Artist[]>;
+  search(query: string): Promise<Artist[]>;
 }

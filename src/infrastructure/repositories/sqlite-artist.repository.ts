@@ -63,4 +63,13 @@ export class SqliteArtistRepository implements ArtistRepository {
     );
     return results.map((row) => ArtistMapper.toDomain(row));
   }
+
+  async search(query: string): Promise<Artist[]> {
+    const pattern = `%${query.toLowerCase()}%`;
+    const results = await this.db.getAllAsync<any>(
+      "SELECT * FROM artists WHERE LOWER(name) LIKE ? LIMIT 20",
+      [pattern],
+    );
+    return results.map((row) => ArtistMapper.toDomain(row));
+  }
 }

@@ -13,4 +13,5 @@ export interface AlbumRepository {
     excludeAlbumId: string,
     limit?: number,
   ): Promise<Album[]>;
+  search(query: string): Promise<Album[]>;
 }

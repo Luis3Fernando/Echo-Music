@@ -9,4 +9,5 @@ export interface TrackRepository {
   deleteAll(): Promise<void>;
   getTracksByAlbumId(albumId: string): Promise<Track[]>;
   findByArtistId(artistId: string, artistName?: string): Promise<Track[]>;
+  search(query: string): Promise<Track[]>;
 }

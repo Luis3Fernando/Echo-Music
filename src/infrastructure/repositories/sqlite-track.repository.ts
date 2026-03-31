@@ -161,4 +161,17 @@ export class SqliteTrackRepository implements TrackRepository {
     const results = await this.db.getAllAsync<any>(query, params);
     return results.map((row) => TrackMapper.toDomain(row));
   }
+
+  async search(query: string): Promise<Track[]> {
+    const pattern = `%${query.toLowerCase()}%`;
+    const results = await this.db.getAllAsync<any>(
+      `${this.BASE_SELECT} 
+       WHERE LOWER(t.title) LIKE ? 
+          OR LOWER(t.artistName) LIKE ? 
+       ORDER BY t.title ASC 
+       LIMIT 50`,
+      [pattern, pattern],
+    );
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
 }

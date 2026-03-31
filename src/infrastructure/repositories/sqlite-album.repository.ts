@@ -118,4 +118,16 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     ]);
     return rows.map((row) => AlbumMapper.toDomain(row));
   }
+
+  async search(query: string): Promise<Album[]> {
+    const pattern = `%${query.toLowerCase()}%`;
+    const results = await this.db.getAllAsync<any>(
+      `${this.BASE_SELECT} 
+       WHERE LOWER(a.title) LIKE ? 
+          OR LOWER(a.artistName) LIKE ? 
+       LIMIT 20`,
+      [pattern, pattern],
+    );
+    return results.map((row) => AlbumMapper.toDomain(row));
+  }
 }
