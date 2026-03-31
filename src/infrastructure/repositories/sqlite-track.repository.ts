@@ -229,4 +229,16 @@ export class SqliteTrackRepository implements TrackRepository {
     const results = await this.db.getAllAsync<any>(query, [limit]);
     return results.map((row) => TrackMapper.toDomain(row));
   }
+
+  async getMostPlayedTracks(limit: number): Promise<Track[]> {
+  const query = `
+    ${this.BASE_SELECT}
+    WHERE t.isProcessed = 1
+    ORDER BY t.playCount DESC, t.title ASC
+    LIMIT ?
+  `;
+
+  const results = await this.db.getAllAsync<any>(query, [limit]);
+  return results.map((row) => TrackMapper.toDomain(row));
+}
 }

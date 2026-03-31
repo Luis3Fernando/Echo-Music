@@ -15,4 +15,5 @@ export interface TrackRepository {
   getLongestTracks(limit: number): Promise<Track[]>;
   getFavoriteTracksCount(): Promise<number>;
   getForgottenFavorites(limit: number): Promise<Track[]>;
+  getMostPlayedTracks(limit: number): Promise<Track[]>;
 }
