@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -38,17 +38,11 @@ const ResultsSection = ({
   onAlbumPress,
 }: ResultsSectionProps) => {
   const [showAllTracks, setShowAllTracks] = useState(false);
-
-  const safeTracks = tracks ?? [];
-  const safeArtists = artists ?? [];
-  const safeAlbums = albums ?? [];
-
-  const displayedTracks = showAllTracks ? safeTracks : safeTracks.slice(0, 5);
-  const hasMoreTracks = safeTracks.length > 5;
+  const displayedTracks = showAllTracks ? tracks : tracks.slice(0, 5);
 
   return (
     <View style={styles.container}>
-      {safeTracks.length > 0 && (
+      {tracks.length > 0 && (
         <View style={styles.section}>
           <SectionTitle title="Canciones" />
           {displayedTracks.map((item) => (
@@ -61,13 +55,13 @@ const ResultsSection = ({
               onFavoritePress={() => onFavoritePress(item)}
             />
           ))}
-          {hasMoreTracks && (
+          {tracks.length > 5 && (
             <TouchableOpacity
               style={styles.viewMoreButton}
               onPress={() => setShowAllTracks(!showAllTracks)}
             >
               <Text style={styles.viewMoreText}>
-                {showAllTracks ? "Ver menos" : `Ver todas (${safeTracks.length})`}
+                {showAllTracks ? "Ver menos" : `Ver todas (${tracks.length})`}
               </Text>
               <Ionicons
                 name={showAllTracks ? "chevron-up" : "chevron-down"}
@@ -78,7 +72,7 @@ const ResultsSection = ({
           )}
         </View>
       )}
-      {safeArtists.length > 0 && (
+      {artists.length > 0 && (
         <View style={styles.section}>
           <SectionTitle title="Artistas" />
           <ScrollView
@@ -86,19 +80,17 @@ const ResultsSection = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalPadding}
           >
-            {safeArtists.map((item) => (
+            {artists.map((item) => (
               <ArtistCircle
                 key={item.id}
-                data={{ 
-                  name: item.name,
-                }}
+                data={{ name: item.name }}
                 onPress={() => onArtistPress(item)}
               />
             ))}
           </ScrollView>
         </View>
       )}
-      {safeAlbums.length > 0 && (
+      {albums.length > 0 && (
         <View style={styles.section}>
           <SectionTitle title="Álbumes" />
           <ScrollView
@@ -106,7 +98,7 @@ const ResultsSection = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalPadding}
           >
-            {safeAlbums.map((item) => (
+            {albums.map((item) => (
               <AlbumCard
                 key={item.id}
                 type="album"
@@ -136,11 +128,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 5,
   },
-  viewMoreText: {
-    color: Colors.primary,
-    fontWeight: "700",
-    fontSize: 14,
-  },
+  viewMoreText: { color: Colors.primary, fontWeight: "700", fontSize: 14 },
 });
 
 export default ResultsSection;

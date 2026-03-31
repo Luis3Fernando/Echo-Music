@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, SafeAreaView, Platform } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  Platform,
+  ActivityIndicator,
+  View,
+} from "react-native";
 import { Colors } from "@theme/colors";
 import { Track } from "@entities/track.entity";
 import { SearchInput } from "@components/molecules/SearchInput";
@@ -9,50 +16,40 @@ import LoadingSection from "../components/LoadingSection";
 import ResultsSection from "../components/ResultsSection";
 import EmptySection from "../components/EmptySection";
 import { MenuItem, MenuPopover } from "@components/atoms/MenuPopover";
-import { useDiscovery } from "@/presentation/shared/hooks/use-search.hook";
-import { useNavigation } from "@react-navigation/native";
+import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
+import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
+import { useDiscovery } from "@hooks/use-search.hook";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useTrack } from "@hooks/use-track.hook";
 import {
   useAddTracksToPlaylist,
   usePlaylists,
-} from "@/presentation/shared/hooks/use-playlists.hook";
+} from "@hooks/use-playlists.hook";
 
 const SearchScreen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { results, isLoading, executeSearch, clearResults } = useDiscovery();
   const navigation = useNavigation<any>();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { results, isLoading, executeSearch, clearResults, setResults } =
+    useDiscovery();
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
-
+  const { toggleFavorite } = useTrack();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [confirmData, setConfirmData] = useState({
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
 
-  const trackMenuItems: MenuItem[] = [
-    {
-      label: "Reproducir",
-      icon: "play-outline",
-      onPress: () =>
-        console.log("[Acción] Reproduciendo:", selectedTrack?.title),
-    },
-    {
-      label: "Añadir a la cola",
-      icon: "list-outline",
-      onPress: () =>
-        console.log("[Acción] Añadido a la cola:", selectedTrack?.title),
-    },
-    {
-      label: "Añadir a playlist",
-      icon: "add-circle-outline",
-      onPress: () => console.log("[Acción] Abriendo selector de playlist"),
-    },
-    {
-      label: "Eliminar",
-      icon: "trash-outline",
-      variant: "danger",
-      onPress: () =>
-        console.log("[Acción] Solicitando eliminación de:", selectedTrack?.id),
-    },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -63,31 +60,89 @@ const SearchScreen = () => {
     }
   };
 
-  const renderContent = () => {
-    if (searchQuery.length === 0) {
-      return <DiscoverySection onSearchQuery={handleSearch} />;
+  const handleToggleFavorite = async (track: Track) => {
+    const newFavoriteStatus = !track.isFavorite;
+    if (results) {
+      const updatedTracks = results.tracks.map((t) =>
+        t.id === track.id ? { ...t, isFavorite: newFavoriteStatus } : t,
+      );
+      setResults({
+        ...results,
+        tracks: updatedTracks,
+      });
     }
 
-    if (isLoading) {
-      return <LoadingSection />;
+    try {
+      await toggleFavorite(track.id);
+    } catch (error) {
+      console.error("Error al guardar favorito", error);
     }
+  };
+
+  const handleSelectPlaylist = async (playlist: any) => {
+    if (!selectedTrack) return;
+    setIsAddModalVisible(false);
+    await addTracks(playlist.id, [selectedTrack.id]);
+    refreshPlaylists();
+  };
+
+  const trackMenuItems: MenuItem[] = [
+    {
+      label: "Reproducir",
+      icon: "play-outline",
+      onPress: () => console.log("Play", selectedTrack?.title),
+    },
+    {
+      label: "Añadir a la cola",
+      icon: "list-outline",
+      onPress: () => console.log("A cola"),
+    },
+    {
+      label: "Añadir a playlist",
+      icon: "add-circle-outline",
+      onPress: () => {
+        setIsMenuVisible(false);
+        setIsAddModalVisible(true);
+      },
+    },
+    {
+      label: "Eliminar",
+      icon: "trash-outline",
+      variant: "danger",
+      onPress: () => {
+        setIsMenuVisible(false);
+        setConfirmData({
+          title: "Eliminar canción",
+          description:
+            "¿Deseas eliminar permanentemente de tu memoria interna?",
+          onConfirm: () => {
+            console.log("Eliminando:", selectedTrack?.id);
+            setIsConfirmVisible(false);
+          },
+        });
+        setIsConfirmVisible(true);
+      },
+    },
+  ];
+
+  const renderContent = () => {
+    if (searchQuery.length === 0)
+      return <DiscoverySection onSearchQuery={handleSearch} />;
+    if (isLoading) return <LoadingSection />;
 
     const hasResults =
       (results?.tracks?.length || 0) > 0 ||
       (results?.artists?.length || 0) > 0 ||
       (results?.albums?.length || 0) > 0;
-
-    if (!hasResults) {
-      return <EmptySection query={searchQuery} />;
-    }
+    if (!hasResults) return <EmptySection query={searchQuery} />;
 
     return (
       <ResultsSection
         tracks={results!.tracks}
         artists={results!.artists}
         albums={results!.albums}
-        onTrackPress={(t) => console.log("Play Directo:", t.title)}
-        onFavoritePress={(t) => console.log("[LOG] Toggle Favorite:", t.title)}
+        onTrackPress={(t) => console.log("Reproduciendo:", t.title)}
+        onFavoritePress={handleToggleFavorite}
         onArtistPress={(artist) =>
           navigation.navigate("Artist", {
             artistId: artist.id,
@@ -106,6 +161,7 @@ const SearchScreen = () => {
           const { pageX, pageY } = event.nativeEvent;
           setMenuAnchor({ x: pageX, y: pageY });
           setSelectedTrack(track);
+          setIsMenuVisible(true);
         }}
       />
     );
@@ -122,7 +178,6 @@ const SearchScreen = () => {
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {renderContent()}
@@ -132,6 +187,24 @@ const SearchScreen = () => {
         onClose={() => setIsMenuVisible(false)}
         anchorPosition={menuAnchor}
         items={trackMenuItems}
+      />
+      <ConfirmDialog
+        isVisible={isConfirmVisible}
+        title={confirmData.title}
+        description={confirmData.description}
+        onConfirm={confirmData.onConfirm}
+        onCancel={() => setIsConfirmVisible(false)}
+        isDestructive={true}
+      />
+      <AddToPlaylistModal
+        isVisible={isAddModalVisible}
+        playlists={userPlaylists}
+        onClose={() => setIsAddModalVisible(false)}
+        onSelect={handleSelectPlaylist}
+        onCreateNew={() => {
+          setIsAddModalVisible(false);
+          navigation.navigate("PlaylistForm");
+        }}
       />
     </SafeAreaView>
   );
@@ -143,10 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     paddingTop: Platform.OS === "ios" ? 60 : 40,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 120,
-  },
+  scrollContent: { flexGrow: 1, paddingBottom: 120 },
 });
 
 export default SearchScreen;

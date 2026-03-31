@@ -85,6 +85,7 @@ export const useDiscovery = () => {
 
   return {
     results,
+    setResults,
     isLoading,
     executeSearch,
     clearResults,
