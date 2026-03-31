@@ -1,35 +1,21 @@
-import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
-import { styles } from "../../library/styles/ExploreStyles";
+import { ScrollView, View, StyleSheet } from "react-native";
+import { styles } from "../styles/ExploreStyles";
 import { useRecommendations } from "@hooks/use-recommendations.hook";
-import RecommendedSection from "../components/RecommendedSection";
+import { useNavigation } from "@react-navigation/native";
+import { useHomeAlbums } from "@hooks/use-album.hook";
 import ScreenHeader from "@components/organisms/ScreenHeader";
-import RecentAlbumsSection from "../components/RecentAlbumsSection";
+import RecommendedSection from "../components/RecommendedSection";
+import QuickActionsSection from "../components/QuickActionsSection";
+import AlbumSection from "../components/AlbumSection";
 import MostPlayedSection from "../components/MostPlayedSection";
 import TopArtistsSection from "../components/TopArtistsSection";
 import LibraryStatsSection from "../components/LibraryStatsSection";
-import { useNavigation } from "@react-navigation/native";
-import QuickActionsSection from "../components/QuickActionsSection";
 
 const ExploreScreen = () => {
-  const { recommendedTracks, loading } = useRecommendations();
-  const [isScanning, setIsScanning] = useState(true);
-  const [progress, setProgress] = useState(0);
   const navigation = useNavigation<any>();
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsScanning(false), 500);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, []);
+  const { recommendedTracks } = useRecommendations();
+  const { recentAlbums, topCountAlbums, mostLikedAlbums, isLoading } =
+    useHomeAlbums();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -37,15 +23,17 @@ const ExploreScreen = () => {
         title="Explorar"
         onActionPress={() => navigation.navigate("Settings")}
       />
-      <RecommendedSection data={recommendedTracks}></RecommendedSection>
+      <RecommendedSection data={recommendedTracks} />
       <QuickActionsSection
         onShuffle={() => console.log("[Action] Shuffle All")}
         onPlayFavorites={() => console.log("[Action] Play Favorites")}
         onPlayRecent={() => console.log("[Action] Play Recent")}
         onPlayTop={() => console.log("[Action] Play Most Played")}
       />
-      <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
+      <AlbumSection title="Álbumes recientes" data={recentAlbums} />
       <MostPlayedSection />
+      <AlbumSection title="Discos completos" data={topCountAlbums} />
+      <AlbumSection title="Tus favoritos" data={mostLikedAlbums} />
       <TopArtistsSection />
       <LibraryStatsSection />
       <View style={{ height: 40 }} />
