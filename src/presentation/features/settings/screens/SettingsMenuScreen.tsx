@@ -2,29 +2,23 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   TouchableOpacity,
   ScrollView,
   Linking,
+  Image,
   BackHandler,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import SettingOption from "@components/molecules/SettingOption";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { useAppSettings } from "@hooks/use-app-settings.hook";
 
 const SettingsMenuScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const currentYear = new Date().getFullYear();
-  const [shuffleAlways, setShuffleAlways] = useState(true);
-  const [crossfade, setCrossfade] = useState(false);
-
-  const openURL = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      console.error("Error al abrir URL:", err),
-    );
-  };
+  const { config, updateSetting, isLoading } = useAppSettings();
 
   useFocusEffect(
     useCallback(() => {
@@ -39,6 +33,14 @@ const SettingsMenuScreen = () => {
       return () => subscription.remove();
     }, [navigation]),
   );
+
+  const openURL = (url: string) => {
+    Linking.openURL(url).catch((err) =>
+      console.error("Error al abrir URL:", err),
+    );
+  };
+
+  if (isLoading) return null;
 
   return (
     <View style={styles.container}>
@@ -58,6 +60,7 @@ const SettingsMenuScreen = () => {
           <Text style={styles.appName}>Echo Music</Text>
           <Text style={styles.appVersion}>Seed 1.0.0</Text>
         </View>
+
         <Text style={styles.sectionLabel}>Reproductor</Text>
         <View style={styles.card}>
           <SettingOption
@@ -65,8 +68,8 @@ const SettingsMenuScreen = () => {
             iconBgColor="#5856D6"
             title="Aleatorio siempre"
             description="El modo aleatorio no se desactivará al reproducir una lista nueva."
-            value={shuffleAlways}
-            onValueChange={setShuffleAlways}
+            value={config.shuffleAlways}
+            onValueChange={(val) => updateSetting("shuffleAlways", val)}
           />
           <View style={styles.separator} />
           <SettingOption
@@ -74,8 +77,10 @@ const SettingsMenuScreen = () => {
             iconBgColor="#FF9500"
             title="Crossfade"
             description="Permite una transición suave entre canciones sin silencios."
-            value={crossfade}
-            onValueChange={setCrossfade}
+            value={config.crossfadeDuration > 0}
+            onValueChange={(val) =>
+              updateSetting("crossfadeDuration", val ? 5 : 0)
+            }
           />
         </View>
         <Text style={styles.sectionLabel}>Sobre la app</Text>

@@ -98,5 +98,10 @@ export const createTables = async (db: any) => {
       FOREIGN KEY (albumId) REFERENCES albums (id) ON DELETE CASCADE,
       FOREIGN KEY (artistId) REFERENCES artists (id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY NOT NULL,
+      value TEXT NOT NULL
+    );
   `);
 };
