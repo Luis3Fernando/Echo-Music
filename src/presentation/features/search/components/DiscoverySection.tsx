@@ -3,17 +3,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import SectionTitle from "@components/atoms/SectionTitle";
 import { SMART_FILTERS } from "@constants/smart-filter.constants";
+
 interface DiscoverySectionProps {
   onSearchQuery: (query: string) => void;
 }
 
-const RECENT_HISTORY = ["Rock", "Jazz", "80s", "Rock", "Jazz", "80s", "Rock"];
+const RECENT_HISTORY = ["Rock", "Jazz", "80s"];
 
 export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
-        <SectionTitle title="Búsqueda reciente"></SectionTitle>
+        <SectionTitle title="Búsqueda reciente" />
         <View style={styles.tagContainer}>
           {RECENT_HISTORY.map((item, index) => (
             <TouchableOpacity
@@ -28,7 +29,7 @@ export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
         </View>
       </View>
       <View style={styles.section}>
-        <SectionTitle title="Búsqueda avanzada"></SectionTitle>
+        <SectionTitle title="Búsqueda avanzada" />
         <View style={styles.grid}>
           {SMART_FILTERS.map((item) => (
             <TouchableOpacity
@@ -37,8 +38,17 @@ export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
               onPress={() => onSearchQuery(item.title)}
               activeOpacity={0.7}
             >
-              <View style={[styles.iconCircle, { backgroundColor: item.color + "15" }]}>
-                <Ionicons name={item.icon as any} size={24} color={item.color} />
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: item.color + "15" },
+                ]}
+              >
+                <Ionicons
+                  name={item.icon as any}
+                  size={24}
+                  color={item.color}
+                />
               </View>
               <Text style={styles.actionTitle}>{item.title}</Text>
             </TouchableOpacity>
@@ -50,25 +60,16 @@ export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.white,
-  },
+  container: { backgroundColor: Colors.white },
   section: {
     marginBottom: 30,
     paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "500",
-    color: Colors.black,
-    marginBottom: 15,
-    letterSpacing: -0.6,
   },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 10
+    marginTop: 10,
   },
   tag: {
     flexDirection: "row",
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 10,
-    marginTop: 10
+    marginTop: 10,
   },
   actionCard: {
     width: "47%",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -14,26 +14,17 @@ import AlbumCard from "@components/atoms/AlbumCard";
 import SectionTitle from "@components/atoms/SectionTitle";
 import { Track } from "@entities/track.entity";
 import { Artist } from "@entities/artist.entity";
+import { Album } from "@entities/album.entity";
 
 interface ResultsSectionProps {
   tracks?: Track[];
   artists?: Artist[];
-  albums?: { title: string; artist: string; artwork?: string }[];
-  onTrackPress: (track: Track) => void;
-  onTrackOptionsPress: (event: any, track: Track) => void;
-  onArtistPress: (artist: Artist) => void;
-  onAlbumPress: (albumName: string, artistName: string) => void;
-}
-
-interface ResultsSectionProps {
-  tracks?: Track[];
-  artists?: Artist[];
-  albums?: { title: string; artist: string; artwork?: string }[];
+  albums?: Album[];
   onTrackPress: (track: Track) => void;
   onTrackOptionsPress: (event: any, track: Track) => void;
   onFavoritePress: (track: Track) => void;
   onArtistPress: (artist: Artist) => void;
-  onAlbumPress: (albumName: string, artistName: string) => void;
+  onAlbumPress: (album: Album) => void;
 }
 
 const ResultsSection = ({
@@ -42,12 +33,15 @@ const ResultsSection = ({
   albums = [],
   onTrackPress,
   onTrackOptionsPress,
-  onFavoritePress,
   onArtistPress,
   onAlbumPress,
 }: ResultsSectionProps) => {
   const [showAllTracks, setShowAllTracks] = useState(false);
+
   const safeTracks = tracks ?? [];
+  const safeArtists = artists ?? [];
+  const safeAlbums = albums ?? [];
+
   const displayedTracks = showAllTracks ? safeTracks : safeTracks.slice(0, 5);
   const hasMoreTracks = safeTracks.length > 5;
 
@@ -55,24 +49,24 @@ const ResultsSection = ({
     <View style={styles.container}>
       {safeTracks.length > 0 && (
         <View style={styles.section}>
-          <SectionTitle title="Resultados" />
+          <SectionTitle title="Canciones" />
           {displayedTracks.map((item) => (
             <SongItem
               key={item.id}
               track={item}
-              showFavorite={true}
+              showFavorite={false}
               onPress={onTrackPress}
               onOptionsPress={onTrackOptionsPress}
-              onFavoritePress={() => onFavoritePress(item)}
             />
           ))}
+          
           {hasMoreTracks && (
             <TouchableOpacity
               style={styles.viewMoreButton}
               onPress={() => setShowAllTracks(!showAllTracks)}
             >
               <Text style={styles.viewMoreText}>
-                {showAllTracks ? "Ver menos" : "Ver todo"}
+                {showAllTracks ? "Ver menos" : `Ver todas (${safeTracks.length})`}
               </Text>
               <Ionicons
                 name={showAllTracks ? "chevron-up" : "chevron-down"}
@@ -83,7 +77,7 @@ const ResultsSection = ({
           )}
         </View>
       )}
-      {(artists ?? []).length > 0 && (
+      {safeArtists.length > 0 && (
         <View style={styles.section}>
           <SectionTitle title="Artistas" />
           <ScrollView
@@ -91,17 +85,19 @@ const ResultsSection = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalPadding}
           >
-            {artists.map((item) => (
+            {safeArtists.map((item) => (
               <ArtistCircle
                 key={item.id}
-                data={{ name: item.name }}
+                data={{ 
+                  name: item.name,
+                }}
                 onPress={() => onArtistPress(item)}
               />
             ))}
           </ScrollView>
         </View>
       )}
-      {(albums ?? []).length > 0 && (
+      {safeAlbums.length > 0 && (
         <View style={styles.section}>
           <SectionTitle title="Álbumes" />
           <ScrollView
@@ -109,16 +105,16 @@ const ResultsSection = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalPadding}
           >
-            {albums.map((item, index) => (
+            {safeAlbums.map((item) => (
               <AlbumCard
-                key={index}
+                key={item.id}
                 type="album"
                 data={{
                   title: item.title,
-                  artist: item.artist,
-                  cover: item.artwork ? { uri: item.artwork } : null,
+                  artist: item.artistName,
+                  cover: item.artworkUri ? { uri: item.artworkUri } : null,
                 }}
-                onPress={() => onAlbumPress(item.title, item.artist)}
+                onPress={() => onAlbumPress(item)}
               />
             ))}
           </ScrollView>
@@ -130,14 +126,13 @@ const ResultsSection = ({
 
 const styles = StyleSheet.create({
   container: { paddingVertical: 10 },
-  section: { marginBottom: 0 },
-  horizontalPadding: { paddingHorizontal: 15, gap: 10, marginTop: 10 },
+  section: { marginBottom: 20 },
+  horizontalPadding: { paddingHorizontal: 15, gap: 15, marginTop: 10 },
   viewMoreButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
-    marginTop: 0,
     gap: 5,
   },
   viewMoreText: {

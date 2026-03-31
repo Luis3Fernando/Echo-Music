@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, ScrollView, SafeAreaView, Platform } from "react-native";
 import { Colors } from "@theme/colors";
-import { MOCK_SONGS } from "@mocks/mock-songs";
 import { Track } from "@entities/track.entity";
 import { SearchInput } from "@components/molecules/SearchInput";
 import ScreenHeader from "@components/organisms/ScreenHeader";
@@ -9,28 +8,16 @@ import DiscoverySection from "../components/DiscoverySection";
 import LoadingSection from "../components/LoadingSection";
 import ResultsSection from "../components/ResultsSection";
 import EmptySection from "../components/EmptySection";
-import { Artist } from "@entities/artist.entity";
 import { MenuItem, MenuPopover } from "@components/atoms/MenuPopover";
-
-interface SearchResults {
-  tracks: Track[];
-  artists: Artist[];
-  albums: { title: string; artist: string; artwork?: string }[];
-}
+import { useDiscovery } from "@/presentation/shared/hooks/use-search.hook";
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const [results, setResults] = useState<SearchResults>({
-    tracks: [],
-    artists: [],
-    albums: []
-  });
+  const { results, isLoading, executeSearch, clearResults } = useDiscovery();
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
-  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
   const trackMenuItems: MenuItem[] = [
     {
@@ -46,7 +33,7 @@ const SearchScreen = () => {
     {
       label: "Añadir a playlist",
       icon: "add-circle-outline",
-      onPress: () => console.log("[Acción] Abriendo selector de playlist para:", selectedTrack?.title),
+      onPress: () => console.log("[Acción] Abriendo selector de playlist"),
     },
     {
       label: "Eliminar",
@@ -56,55 +43,41 @@ const SearchScreen = () => {
     },
   ];
 
-  const handleTextChange = (text: string) => {
+  const handleSearch = (text: string) => {
     setSearchQuery(text);
-
-    if (text.length > 0) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        const tracks = MOCK_SONGS;
-
-        const uniqueArtistNames = Array.from(new Set(MOCK_SONGS.map(s => s.artistName)));
-        const artists: Artist[] = uniqueArtistNames.map((name, index) => ({
-          id: `artist-${index}`,
-          name: name,
-          pictureUrl: "", 
-          isProcessed: true,
-          description: null,
-          socialLinks: [],
-          reels: []
-        }));
-
-        const uniqueAlbums = Array.from(new Set(MOCK_SONGS.map(s => s.albumName)));
-        const albums = uniqueAlbums.map(name => {
-          const song = MOCK_SONGS.find(s => s.albumName === name);
-          return {
-            title: name,
-            artist: song?.artistName || "Varios Artistas",
-            artwork: song?.artworkUri || undefined
-          };
-        });
-        setResults({ tracks, artists, albums });
-      }, 400);
+    if (text.trim().length > 0) {
+      executeSearch(text);
     } else {
-      setIsLoading(false);
-      setResults({ tracks: [], artists: [], albums: [] });
+      clearResults();
     }
   };
 
- const renderContent = () => {
-    if (searchQuery.length === 0) return <DiscoverySection onSearchQuery={handleTextChange} />;
-    if (isLoading) return <LoadingSection />;
-    if (results.tracks.length === 0 && results.artists.length === 0) return <EmptySection query={searchQuery} />;
-    
+  const renderContent = () => {
+    if (searchQuery.length === 0) {
+      return <DiscoverySection onSearchQuery={handleSearch} />;
+    }
+
+    // 2. Cargando
+    if (isLoading) {
+      return <LoadingSection />;
+    }
+
+    const hasResults = 
+      (results?.tracks?.length || 0) > 0 || 
+      (results?.artists?.length || 0) > 0 || 
+      (results?.albums?.length || 0) > 0;
+
+    if (!hasResults) {
+      return <EmptySection query={searchQuery} />;
+    }
+
     return (
       <ResultsSection
-        tracks={results.tracks}
-        artists={results.artists}
-        albums={results.albums}
+        tracks={results!.tracks}
+        artists={results!.artists}
+        albums={results!.albums}
         onTrackPress={(t) => console.log("Play Directo:", t.title)}
-        onFavoritePress={(t) => console.log("[LOG] Me gusta presionado para:", t.title)}
+        onFavoritePress={(t) => console.log("[LOG] Toggle Favorite:", t.title)}
         onTrackOptionsPress={(event, track) => {
           const { pageX, pageY } = event.nativeEvent;
           setMenuAnchor({ x: pageX, y: pageY });
@@ -112,7 +85,7 @@ const SearchScreen = () => {
           setIsMenuVisible(true);
         }}
         onArtistPress={(a) => console.log("Ver artista:", a.name)}
-        onAlbumPress={(album) => console.log("Ver álbum:", album)}
+        onAlbumPress={(album) => console.log("Ver álbum:", album.title)}
       />
     );
   };
@@ -120,11 +93,13 @@ const SearchScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScreenHeader title="Descubrir" showAction={false} />
+      
       <SearchInput
         value={searchQuery}
-        onChangeText={handleTextChange}
-        onClear={() => handleTextChange("")}
+        onChangeText={handleSearch}
+        onClear={() => handleSearch("")}
       />
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
@@ -133,6 +108,7 @@ const SearchScreen = () => {
       >
         {renderContent()}
       </ScrollView>
+
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}

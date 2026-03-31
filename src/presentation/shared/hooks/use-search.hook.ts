@@ -23,7 +23,7 @@ export const useDiscovery = () => {
       if (!cleanQuery) return;
 
       const smartFilter = SMART_FILTERS.find(
-        (f) => f.title === cleanQuery || f.key === cleanQuery,
+        (f) => f.title === query || f.key === query,
       );
 
       setIsLoading(true);
