@@ -72,4 +72,44 @@ export class SqliteArtistRepository implements ArtistRepository {
     );
     return results.map((row) => ArtistMapper.toDomain(row));
   }
+
+  async getTopTrackCountArtists(limit: number): Promise<Artist[]> {
+    const query = `
+    SELECT ar.*, COUNT(t.id) as totalTracks
+    FROM artists ar
+    INNER JOIN tracks t ON ar.id = t.artistId
+    GROUP BY ar.id
+    ORDER BY totalTracks DESC
+    LIMIT ?
+  `;
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map(ArtistMapper.toDomain);
+  }
+
+  async getMostLikedArtists(limit: number): Promise<Artist[]> {
+    const query = `
+    SELECT ar.*, COUNT(t.id) as totalFavorites
+    FROM artists ar
+    INNER JOIN tracks t ON ar.id = t.artistId
+    WHERE t.isFavorite = 1
+    GROUP BY ar.id
+    ORDER BY totalFavorites DESC
+    LIMIT ?
+  `;
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map(ArtistMapper.toDomain);
+  }
+
+  async getTopPlayedArtists(limit: number): Promise<Artist[]> {
+    const query = `
+    SELECT ar.*, SUM(t.playCount) as totalPlays
+    FROM artists ar
+    INNER JOIN tracks t ON ar.id = t.artistId
+    GROUP BY ar.id
+    ORDER BY totalPlays DESC
+    LIMIT ?
+  `;
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map(ArtistMapper.toDomain);
+  }
 }

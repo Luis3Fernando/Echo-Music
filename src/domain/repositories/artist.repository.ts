@@ -7,4 +7,7 @@ export interface ArtistRepository {
   findByIds(ids: string[]): Promise<Artist[]>;
   findAll(): Promise<Artist[]>;
   search(query: string): Promise<Artist[]>;
+  getTopTrackCountArtists(limit: number): Promise<Artist[]>;
+  getMostLikedArtists(limit: number): Promise<Artist[]>;
+  getTopPlayedArtists(limit: number): Promise<Artist[]>;
 }
