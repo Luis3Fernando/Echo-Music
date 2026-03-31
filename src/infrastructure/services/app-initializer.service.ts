@@ -5,7 +5,7 @@ import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
 import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
 import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
-import { SyncLibraryUseCase } from "@use-cases/sync-library.use-case";
+import { SyncLibraryUseCase } from "@/application/use-cases/init-app/sync-library.use-case";
 import { CreateInitialPlaylistsUseCase } from "@use-cases/init-app/create-initial-playlists.use-case";
 
 export const appInitializerService = {
