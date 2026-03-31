@@ -6,6 +6,9 @@ import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { GetAlbumDetailsUseCase } from "@use-cases/albums/get-album-details.use-case";
 import { GetRelatedAlbumsUseCase } from "@use-cases/albums/get-related-albums.use-case";
+import { GetRecentAlbumsUseCase } from "@use-cases/albums/get-recent-albums.use-case";
+import { GetTopTrackCountAlbumsUseCase } from "@use-cases/albums/get-top-track-count-albums.use-case";
+import { GetMostLikedAlbumsUseCase } from "@use-cases/albums/get-most-liked-albums.use-case";
 
 export const useAlbumDetail = (albumId: string) => {
   const db = useSQLiteContext();
@@ -69,4 +72,51 @@ export const useRelatedAlbums = (artistId?: string, currentAlbumId?: string) => 
   }, [loadRelated]);
 
   return { relatedAlbums, isLoading };
+};
+
+export const useHomeAlbums = () => {
+  const db = useSQLiteContext();
+  
+  const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
+  const [topCountAlbums, setTopCountAlbums] = useState<Album[]>([]);
+  const [mostLikedAlbums, setMostLikedAlbums] = useState<Album[]>([]);
+  
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchHomeAlbums = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const repo = new SQLiteAlbumRepository(db);
+      
+      const recentUseCase = new GetRecentAlbumsUseCase(repo);
+      const topCountUseCase = new GetTopTrackCountAlbumsUseCase(repo);
+      const mostLikedUseCase = new GetMostLikedAlbumsUseCase(repo);
+
+      const [recent, top, liked] = await Promise.all([
+        recentUseCase.execute(10),
+        topCountUseCase.execute(10),
+        mostLikedUseCase.execute(10)
+      ]);
+
+      setRecentAlbums(recent);
+      setTopCountAlbums(top);
+      setMostLikedAlbums(liked);
+    } catch (error) {
+      console.error("[useHomeAlbums] Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [db]);
+
+  useEffect(() => {
+    fetchHomeAlbums();
+  }, [fetchHomeAlbums]);
+
+  return { 
+    recentAlbums, 
+    topCountAlbums, 
+    mostLikedAlbums, 
+    isLoading, 
+    refresh: fetchHomeAlbums 
+  };
 };
