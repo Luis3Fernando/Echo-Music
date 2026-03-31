@@ -157,7 +157,6 @@ const AlbumScreen = () => {
             })
           }
         />
-        <View style={styles.divider} />
         <AlbumSongsSection
           tracks={tracks}
           onTrackPress={(t) => console.log("Playing:", t.title)}
@@ -171,7 +170,6 @@ const AlbumScreen = () => {
         />
         {relatedAlbums.length > 0 && (
           <>
-            <View style={styles.divider} />
             <RelatedAlbumsSection
               albums={relatedAlbums}
               onAlbumPress={handleAlbumPress}
@@ -204,12 +202,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
     paddingBottom: 120,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#F2F2F2",
-    marginHorizontal: 16,
-    marginVertical: 5,
   },
 });
 
