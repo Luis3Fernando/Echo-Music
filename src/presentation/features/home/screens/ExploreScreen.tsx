@@ -3,12 +3,13 @@ import { ScrollView, View } from "react-native";
 import { styles } from "../../library/styles/ExploreStyles";
 import { useRecommendations } from "@hooks/use-recommendations.hook";
 import RecommendedSection from "../components/RecommendedSection";
-import ScreenHeader from "@/presentation/shared/components/organisms/ScreenHeader";
+import ScreenHeader from "@components/organisms/ScreenHeader";
 import RecentAlbumsSection from "../components/RecentAlbumsSection";
 import MostPlayedSection from "../components/MostPlayedSection";
 import TopArtistsSection from "../components/TopArtistsSection";
 import LibraryStatsSection from "../components/LibraryStatsSection";
 import { useNavigation } from "@react-navigation/native";
+import QuickActionsSection from "../components/QuickActionsSection";
 
 const ExploreScreen = () => {
   const { recommendedTracks, loading } = useRecommendations();
@@ -34,9 +35,15 @@ const ExploreScreen = () => {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <ScreenHeader
         title="Explorar"
-        onActionPress={() => navigation.navigate('Settings')}
+        onActionPress={() => navigation.navigate("Settings")}
       />
       <RecommendedSection data={recommendedTracks}></RecommendedSection>
+      <QuickActionsSection
+        onShuffle={() => console.log("[Action] Shuffle All")}
+        onPlayFavorites={() => console.log("[Action] Play Favorites")}
+        onPlayRecent={() => console.log("[Action] Play Recent")}
+        onPlayTop={() => console.log("[Action] Play Most Played")}
+      />
       <RecentAlbumsSection isScanning={isScanning} scanProgress={progress} />
       <MostPlayedSection />
       <TopArtistsSection />

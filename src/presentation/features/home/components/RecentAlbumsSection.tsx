@@ -96,7 +96,7 @@ const RecentAlbumsSection = ({
 };
 
 const styles = StyleSheet.create({
-  section: { marginTop: 20 },
+  section: { marginTop: 10 },
   listContent: { paddingHorizontal: 10, marginTop: 5 },
 });
 
