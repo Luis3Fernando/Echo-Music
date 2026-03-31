@@ -1,4 +1,4 @@
-import { Track } from '@entities/track.entity';
+import { Track } from "@entities/track.entity";
 
 export interface TrackRepository {
   saveAll(tracks: Track[]): Promise<void>;
@@ -13,4 +13,6 @@ export interface TrackRepository {
   getLeastPlayedTracks(limit: number): Promise<Track[]>;
   getNeverPlayedTracks(limit: number): Promise<Track[]>;
   getLongestTracks(limit: number): Promise<Track[]>;
+  getFavoriteTracksCount(): Promise<number>;
+  getForgottenFavorites(limit: number): Promise<Track[]>;
 }

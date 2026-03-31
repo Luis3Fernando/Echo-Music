@@ -210,4 +210,23 @@ export class SqliteTrackRepository implements TrackRepository {
     const results = await this.db.getAllAsync<any>(query, [limit]);
     return results.map((row) => TrackMapper.toDomain(row));
   }
+
+  async getFavoriteTracksCount(): Promise<number> {
+    const result = await this.db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM tracks WHERE isFavorite = 1 AND isProcessed = 1",
+    );
+    return result?.count || 0;
+  }
+
+  async getForgottenFavorites(limit: number): Promise<Track[]> {
+    const query = `
+    ${this.BASE_SELECT}
+    WHERE t.isFavorite = 1 AND t.isProcessed = 1
+    ORDER BY t.playCount ASC, t.dateAdded DESC
+    LIMIT ?
+  `;
+
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
 }
