@@ -1,5 +1,8 @@
 import { PlaylistRepository } from "@interfaces/playlist.repository";
 import { Playlist } from "@entities/playlist.entity";
+import * as FileSystem from "expo-file-system/legacy";
+
+const PLAYLIST_IMAGES_DIR = `${FileSystem.documentDirectory || FileSystem.cacheDirectory}custom_playlists/`;
 
 export interface UpdatePlaylistDTO {
   id: string;
@@ -32,13 +35,46 @@ export class UpdatePlaylistUseCase {
       }
     }
 
+    let finalArtworkUri = existingPlaylist.artworkUri;
+
+    if (data.artworkUri === "" || data.artworkUri === null) {
+      finalArtworkUri = null;
+    } else if (data.artworkUri && data.artworkUri !== existingPlaylist.artworkUri) {
+      const dirInfo = await FileSystem.getInfoAsync(PLAYLIST_IMAGES_DIR);
+      if (!dirInfo.exists) {
+        await FileSystem.makeDirectoryAsync(PLAYLIST_IMAGES_DIR, {
+          intermediates: true,
+        });
+      }
+
+      const fileName = `playlist_${existingPlaylist.id}_${Date.now()}.jpg`;
+      const permanentUri = `${PLAYLIST_IMAGES_DIR}${fileName}`;
+
+      await FileSystem.copyAsync({
+        from: data.artworkUri,
+        to: permanentUri,
+      });
+
+      finalArtworkUri = permanentUri;
+    }
+
+    if (
+      data.artworkUri !== undefined &&
+      existingPlaylist.artworkUri !== finalArtworkUri &&
+      existingPlaylist.artworkUri?.startsWith("file://")
+    ) {
+      try {
+        const oldFileInfo = await FileSystem.getInfoAsync(existingPlaylist.artworkUri);
+        if (oldFileInfo.exists) {
+          await FileSystem.deleteAsync(existingPlaylist.artworkUri, { idempotent: true });
+        }
+      } catch (e) {}
+    }
+
     const updatedPlaylist: Playlist = {
       ...existingPlaylist,
       name: trimmedName,
-      artworkUri:
-        data.artworkUri !== undefined
-          ? data.artworkUri
-          : existingPlaylist.artworkUri,
+      artworkUri: finalArtworkUri,
       updatedAt: Date.now(),
     };
 
