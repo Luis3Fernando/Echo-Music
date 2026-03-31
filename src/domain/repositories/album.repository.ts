@@ -17,4 +17,5 @@ export interface AlbumRepository {
   getRecentAlbums(limit: number): Promise<Album[]>;
   getTopTrackCountAlbums(limit: number): Promise<Album[]>;
   getMostLikedAlbums(limit: number): Promise<Album[]>;
+  getTotalAlbumsCount(): Promise<number>;
 }

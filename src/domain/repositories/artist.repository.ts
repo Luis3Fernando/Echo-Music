@@ -10,4 +10,5 @@ export interface ArtistRepository {
   getTopTrackCountArtists(limit: number): Promise<Artist[]>;
   getMostLikedArtists(limit: number): Promise<Artist[]>;
   getTopPlayedArtists(limit: number): Promise<Artist[]>;
+  getTotalArtistsCount(): Promise<number>;
 }

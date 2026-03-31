@@ -1,29 +1,60 @@
+import React, { useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
+import { useFocusEffect } from "@react-navigation/native";
 import SectionTitle from "@/presentation/shared/components/atoms/SectionTitle";
+import { useLibraryStats } from "@hooks/use-library-stats.hook";
 
 const LibraryStatsSection = () => {
-  const stats = [
-    { label: "Canciones", value: "1,240", icon: "musical-notes-outline", target: "Songs" },
-    { label: "Artistas", value: "148", icon: "people-outline", target: "Artists" },
-    { label: "Álbumes", value: "82", icon: "albums-outline", target: "Albums" },
-    { label: "Sin escuchar", value: "34", icon: "library-outline", target: "NotPlayed" },
-  ];
+  const { stats, refresh } = useLibraryStats();
 
-  const handlePress = (target: string) => {
-    console.log(`Navegando a: ${target}`);
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat("es-PE").format(num);
   };
+
+  const statItems = [
+    { 
+      label: "Canciones", 
+      value: formatNumber(stats.totalTracks), 
+      icon: "musical-notes-outline", 
+      target: "Songs" 
+    },
+    { 
+      label: "Artistas", 
+      value: formatNumber(stats.totalArtists), 
+      icon: "people-outline", 
+      target: "Artists" 
+    },
+    { 
+      label: "Álbumes", 
+      value: formatNumber(stats.totalAlbums), 
+      icon: "albums-outline", 
+      target: "Albums" 
+    },
+    { 
+      label: "Sin escuchar", 
+      value: formatNumber(stats.neverPlayedCount), 
+      icon: "library-outline", 
+      target: "NotPlayed" 
+    },
+  ];
 
   return (
     <View style={styles.container}>
       <SectionTitle title="Tu Resumen" />
       <View style={styles.grid}>
-        {stats.map((item, index) => (
+        {statItems.map((item, index) => (
           <TouchableOpacity 
             key={index} 
             style={styles.statCard}
-            onPress={() => handlePress(item.target)}
+            onPress={() => console.log(`Navegando a: ${item.target}`)}
             activeOpacity={0.7}
           >
             <View style={styles.iconWrapper}>

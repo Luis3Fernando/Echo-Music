@@ -112,4 +112,11 @@ export class SqliteArtistRepository implements ArtistRepository {
     const results = await this.db.getAllAsync<any>(query, [limit]);
     return results.map(ArtistMapper.toDomain);
   }
+
+  async getTotalArtistsCount(): Promise<number> {
+    const result = await this.db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM artists",
+    );
+    return result?.count || 0;
+  }
 }

@@ -231,14 +231,28 @@ export class SqliteTrackRepository implements TrackRepository {
   }
 
   async getMostPlayedTracks(limit: number): Promise<Track[]> {
-  const query = `
+    const query = `
     ${this.BASE_SELECT}
     WHERE t.isProcessed = 1
     ORDER BY t.playCount DESC, t.title ASC
     LIMIT ?
   `;
 
-  const results = await this.db.getAllAsync<any>(query, [limit]);
-  return results.map((row) => TrackMapper.toDomain(row));
-}
+    const results = await this.db.getAllAsync<any>(query, [limit]);
+    return results.map((row) => TrackMapper.toDomain(row));
+  }
+
+  async getTotalTracksCount(): Promise<number> {
+    const result = await this.db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM tracks",
+    );
+    return result?.count || 0;
+  }
+
+  async getNeverPlayedCount(): Promise<number> {
+    const result = await this.db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM tracks WHERE playCount = 0",
+    );
+    return result?.count || 0;
+  }
 }

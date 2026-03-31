@@ -16,4 +16,6 @@ export interface TrackRepository {
   getFavoriteTracksCount(): Promise<number>;
   getForgottenFavorites(limit: number): Promise<Track[]>;
   getMostPlayedTracks(limit: number): Promise<Track[]>;
+  getTotalTracksCount(): Promise<number>;
+  getNeverPlayedCount(): Promise<number>;
 }

@@ -169,4 +169,11 @@ export class SQLiteAlbumRepository implements AlbumRepository {
     const rows = await this.db.getAllAsync<any>(query, [limit]);
     return rows.map(AlbumMapper.toDomain);
   }
+
+  async getTotalAlbumsCount(): Promise<number> {
+    const result = await this.db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM albums",
+    );
+    return result?.count || 0;
+  }
 }
