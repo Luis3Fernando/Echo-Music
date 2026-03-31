@@ -12,7 +12,7 @@ export type SearchStackParamList = {
     artistName: string;
     artwork?: string;
   };
-  Artist: { artist: Artist };
+  Artist: { artistId: string; name: string };
 };
 
 const Stack = createNativeStackNavigator<SearchStackParamList>();

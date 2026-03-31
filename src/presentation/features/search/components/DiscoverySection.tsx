@@ -8,12 +8,10 @@ interface DiscoverySectionProps {
   onSearchQuery: (query: string) => void;
 }
 
-const RECENT_HISTORY = ["Rock", "Jazz", "80s"];
-
 export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
   return (
     <View style={styles.container}>
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <SectionTitle title="Búsqueda reciente" />
         <View style={styles.tagContainer}>
           {RECENT_HISTORY.map((item, index) => (
@@ -27,7 +25,7 @@ export const DiscoverySection = ({ onSearchQuery }: DiscoverySectionProps) => {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </View> */}
       <View style={styles.section}>
         <SectionTitle title="Búsqueda avanzada" />
         <View style={styles.grid}>

@@ -14,7 +14,7 @@ export type SongsStackParamList = {
     artwork?: string;
   };
   Artist: { artistId: string; name: string };
-    PlaylistForm: { playlist?: Playlist };
+  PlaylistForm: { playlist?: Playlist };
 };
 
 const Stack = createNativeStackNavigator<SongsStackParamList>();

@@ -10,10 +10,18 @@ import ResultsSection from "../components/ResultsSection";
 import EmptySection from "../components/EmptySection";
 import { MenuItem, MenuPopover } from "@components/atoms/MenuPopover";
 import { useDiscovery } from "@/presentation/shared/hooks/use-search.hook";
+import { useNavigation } from "@react-navigation/native";
+import {
+  useAddTracksToPlaylist,
+  usePlaylists,
+} from "@/presentation/shared/hooks/use-playlists.hook";
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { results, isLoading, executeSearch, clearResults } = useDiscovery();
+  const navigation = useNavigation<any>();
+  const { userPlaylists, refreshPlaylists } = usePlaylists();
+  const { addTracks } = useAddTracksToPlaylist();
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
@@ -23,12 +31,14 @@ const SearchScreen = () => {
     {
       label: "Reproducir",
       icon: "play-outline",
-      onPress: () => console.log("[Acción] Reproduciendo:", selectedTrack?.title),
+      onPress: () =>
+        console.log("[Acción] Reproduciendo:", selectedTrack?.title),
     },
     {
       label: "Añadir a la cola",
       icon: "list-outline",
-      onPress: () => console.log("[Acción] Añadido a la cola:", selectedTrack?.title),
+      onPress: () =>
+        console.log("[Acción] Añadido a la cola:", selectedTrack?.title),
     },
     {
       label: "Añadir a playlist",
@@ -39,7 +49,8 @@ const SearchScreen = () => {
       label: "Eliminar",
       icon: "trash-outline",
       variant: "danger",
-      onPress: () => console.log("[Acción] Solicitando eliminación de:", selectedTrack?.id),
+      onPress: () =>
+        console.log("[Acción] Solicitando eliminación de:", selectedTrack?.id),
     },
   ];
 
@@ -57,14 +68,13 @@ const SearchScreen = () => {
       return <DiscoverySection onSearchQuery={handleSearch} />;
     }
 
-    // 2. Cargando
     if (isLoading) {
       return <LoadingSection />;
     }
 
-    const hasResults = 
-      (results?.tracks?.length || 0) > 0 || 
-      (results?.artists?.length || 0) > 0 || 
+    const hasResults =
+      (results?.tracks?.length || 0) > 0 ||
+      (results?.artists?.length || 0) > 0 ||
       (results?.albums?.length || 0) > 0;
 
     if (!hasResults) {
@@ -78,14 +88,25 @@ const SearchScreen = () => {
         albums={results!.albums}
         onTrackPress={(t) => console.log("Play Directo:", t.title)}
         onFavoritePress={(t) => console.log("[LOG] Toggle Favorite:", t.title)}
+        onArtistPress={(artist) =>
+          navigation.navigate("Artist", {
+            artistId: artist.id,
+            name: artist.name,
+          })
+        }
+        onAlbumPress={(album) =>
+          navigation.navigate("Album", {
+            id: album.id,
+            albumName: album.title,
+            artistName: album.artistName,
+            artwork: album.artworkUri || undefined,
+          })
+        }
         onTrackOptionsPress={(event, track) => {
           const { pageX, pageY } = event.nativeEvent;
           setMenuAnchor({ x: pageX, y: pageY });
           setSelectedTrack(track);
-          setIsMenuVisible(true);
         }}
-        onArtistPress={(a) => console.log("Ver artista:", a.name)}
-        onAlbumPress={(album) => console.log("Ver álbum:", album.title)}
       />
     );
   };
@@ -93,13 +114,11 @@ const SearchScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScreenHeader title="Descubrir" showAction={false} />
-      
       <SearchInput
         value={searchQuery}
         onChangeText={handleSearch}
         onClear={() => handleSearch("")}
       />
-
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
@@ -108,7 +127,6 @@ const SearchScreen = () => {
       >
         {renderContent()}
       </ScrollView>
-
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -33,6 +33,7 @@ const ResultsSection = ({
   albums = [],
   onTrackPress,
   onTrackOptionsPress,
+  onFavoritePress,
   onArtistPress,
   onAlbumPress,
 }: ResultsSectionProps) => {
@@ -54,12 +55,12 @@ const ResultsSection = ({
             <SongItem
               key={item.id}
               track={item}
-              showFavorite={false}
+              showFavorite={true}
               onPress={onTrackPress}
               onOptionsPress={onTrackOptionsPress}
+              onFavoritePress={() => onFavoritePress(item)}
             />
           ))}
-          
           {hasMoreTracks && (
             <TouchableOpacity
               style={styles.viewMoreButton}
