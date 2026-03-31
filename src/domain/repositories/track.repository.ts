@@ -10,4 +10,5 @@ export interface TrackRepository {
   getTracksByAlbumId(albumId: string): Promise<Track[]>;
   findByArtistId(artistId: string, artistName?: string): Promise<Track[]>;
   search(query: string): Promise<Track[]>;
+  getLeastPlayedTracks(limit: number): Promise<Track[]>;
 }
