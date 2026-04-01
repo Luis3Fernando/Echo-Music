@@ -26,7 +26,7 @@ const TrackItem = ({ variant, data, onPress }: TrackItemProps) => {
       />
       <View style={styles.textContainer}>
         <Text style={styles.artist} numberOfLines={1}>{data.artist}</Text>
-        <Text style={styles.title} numberOfLines={1}>{data.title}</Text>
+        <Text style={[styles.title, isShort ? styles.shortTitle : styles.standardTitle]} numberOfLines={1}>{data.title}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -63,15 +63,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   artist: {
-    fontSize: 10,
-    color: 'gray',
-    fontWeight: '500',
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '400',
   },
   title: {
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.black,
     fontWeight: '600',
     marginTop: 1,
+  },
+  shortTitle: {
+    fontWeight: '500',
+  },
+  standardTitle: {
+    fontWeight: '600',
   },
 });
 
