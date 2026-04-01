@@ -43,7 +43,7 @@ export const MenuPopover = ({
     if (isVisible) {
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 150,
+        duration: 10,
         useNativeDriver: true,
       }).start();
     } else {
