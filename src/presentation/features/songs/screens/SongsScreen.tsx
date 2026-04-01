@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import {
   View,
   FlatList,
@@ -16,46 +16,38 @@ import { MenuPopover, MenuItem } from "@components/atoms/MenuPopover";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
 import SongListControls from "../../library/components/SongListControls";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import {
-  usePlaylists,
-  useAddTracksToPlaylist,
-} from "@hooks/use-playlists.hook";
+import { usePlaylists, useAddTracksToPlaylist } from "@hooks/use-playlists.hook";
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
+import { useAppSettings } from "@hooks/use-app-settings.hook";
+import { TRACK_SORT_OPTIONS, SortOptionType } from "@constants/sort-options.constants";
 
 export const SongsScreen = () => {
-  const { songs, isScanning } = useLibrary();
+  const { songs } = useLibrary();
+  const { config, updateSetting } = useAppSettings();
+  const navigation = useNavigation<any>();
+
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
-  const [currentSort, setCurrentSort] = useState("Por nombre");
 
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
-  const navigation = useNavigation<any>();
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
 
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-
-  const sortOptions: MenuItem[] = [
-    {
-      label: "Por nombre (A-Z)",
-      icon: "text-outline",
-      onPress: () => setCurrentSort("Por nombre"),
-    },
-    {
-      label: "Por artista",
-      icon: "person-outline",
-      onPress: () => setCurrentSort("Por artista"),
-    },
-    {
-      label: "Añadidas recientemente",
-      icon: "time-outline",
-      onPress: () => setCurrentSort("Recientes"),
-    },
-  ];
+  const sortOptions: MenuItem[] = useMemo(() => 
+    TRACK_SORT_OPTIONS.map((option) => ({
+      label: option.label,
+      icon: option.icon,
+      onPress: () => {
+        updateSetting("trackSortOrder", option.label);
+        setIsSortMenuVisible(false);
+      },
+    })), [updateSetting]
+  );
 
   const trackOptions: MenuItem[] = [
     {
@@ -117,14 +109,7 @@ export const SongsScreen = () => {
     if (!selectedTrack) return;
     setIsAddModalVisible(false);
     const success = await addTracks(playlist.id, [selectedTrack.id]);
-    if (success) {
-      refreshPlaylists();
-    }
-  };
-
-  const handleCreateNewPlaylist = () => {
-    setIsAddModalVisible(false);
-    navigation.navigate("PlaylistForm");
+    if (success) refreshPlaylists();
   };
 
   useFocusEffect(
@@ -144,7 +129,7 @@ export const SongsScreen = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <SongListControls
-            orderLabel={currentSort}
+            orderLabel={config.trackSortOrder}
             onOrderPress={(event: any) => {
               const { pageX, pageY } = event.nativeEvent;
               setSortMenuAnchor({ x: pageX, y: pageY });
@@ -185,13 +170,10 @@ export const SongsScreen = () => {
       <ConfirmDialog
         isVisible={isConfirmVisible}
         title="Eliminar canción"
-        description="¿Deseas eliminar permanentemente de tu memoria interna?"
+        description="¿Deseas eliminar permanentemente?"
         confirmLabel="Eliminar"
         isDestructive={true}
-        onConfirm={() => {
-          console.log("Eliminando track...");
-          setIsConfirmVisible(false);
-        }}
+        onConfirm={() => setIsConfirmVisible(false)}
         onCancel={() => setIsConfirmVisible(false)}
       />
       <AddToPlaylistModal
@@ -199,7 +181,10 @@ export const SongsScreen = () => {
         playlists={userPlaylists}
         onClose={() => setIsAddModalVisible(false)}
         onSelect={handleSelectPlaylist}
-        onCreateNew={handleCreateNewPlaylist}
+        onCreateNew={() => {
+          setIsAddModalVisible(false);
+          navigation.navigate("PlaylistForm");
+        }}
       />
     </SafeAreaView>
   );

@@ -1,78 +1,38 @@
-import { useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSQLiteContext } from "expo-sqlite";
-import { useLibraryStore } from "@store/use-library.store";
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
-import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
-import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
-import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
-import { SyncLibraryUseCase } from "@/application/use-cases/init-app/sync-library.use-case";
-import { CreateInitialPlaylistsUseCase } from "@/application/use-cases/init-app/create-initial-playlists.use-case";
+import { GetAllTracksUseCase } from "@use-cases/tracks/get-all-tracks.use-case";
+import { Track } from "@entities/track.entity";
+import { useAppConfigStore } from "@store/use-config.store";
 
 export const useLibrary = () => {
   const db = useSQLiteContext();
+  const [songs, setSongs] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const sortOrder = useAppConfigStore((state) => state.config.trackSortOrder);
 
-  const {
-    tracks,
-    isScanning,
-    scanProgress,
-    totalTracks,
-    setTracks,
-    setScanning,
-    setScanProgress,
-  } = useLibraryStore();
-
-  const loadSongs = useCallback(async () => {
-    const repository = new SqliteTrackRepository(db);
-    const allTracks = await repository.findAll();
-    setTracks(allTracks);
-  }, [db, setTracks]);
-
-  const startScan = async () => {
-    if (isScanning) return;
-
-    const trackRepo = new SqliteTrackRepository(db);
-    const artistRepo = new SqliteArtistRepository(db);
-    const albumRepo = new SQLiteAlbumRepository(db);
-    const playlistRepo = new SqlitePlaylistRepository(db);
-
-    const syncUseCase = new SyncLibraryUseCase(
-      trackRepo, 
-      artistRepo, 
-      albumRepo
-    );
-
-    const initialPlaylistsUseCase = new CreateInitialPlaylistsUseCase(
-      playlistRepo, 
-      trackRepo
-    );
-
+  const fetchSongs = useCallback(async () => {
+    setIsLoading(true);
     try {
-      setScanning(true);
-      await syncUseCase.execute((percent) => {
-        setScanProgress(percent);
-      });
+      const repository = new SqliteTrackRepository(db);
+      const useCase = new GetAllTracksUseCase(repository);
 
-      await loadSongs();
-      await initialPlaylistsUseCase.execute();
-
+      const result = await useCase.execute(sortOrder);
+      setSongs(result);
     } catch (error) {
-      console.error("[useLibrary] Error crítico en el escaneo:", error);
+      console.error("[useLibrary] Error al cargar canciones:", error);
     } finally {
-      setScanning(false);
-      setScanProgress(0);
+      setIsLoading(false);
     }
-  };
+  }, [db, sortOrder]);
 
   useEffect(() => {
-    loadSongs();
-  }, [loadSongs]);
+    fetchSongs();
+  }, [fetchSongs]);
 
   return {
-    songs: tracks,
-    isScanning,
-    scanProgress,
-    totalTracks,
-    refreshSongs: loadSongs,
-    startScan,
+    songs,
+    isLoading,
+    refreshSongs: fetchSongs,
   };
 };

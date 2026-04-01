@@ -2,7 +2,7 @@ import { Track } from "@entities/track.entity";
 
 export interface TrackRepository {
   saveAll(tracks: Track[]): Promise<void>;
-  findAll(): Promise<Track[]>;
+  findAll(sort?: string): Promise<Track[]>;
   findById(id: string): Promise<Track | null>;
   getPendingTracks(): Promise<Track[]>;
   updateMetadata(id: string, metadata: Partial<Track>): Promise<void>;

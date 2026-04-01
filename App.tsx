@@ -10,26 +10,38 @@ import { PlayerController } from "@features/player/screens";
 import LoadingScreen from "@features/onboarding/screens/LoadingScreen";
 import { ToastProvider } from "react-native-toast-notifications";
 import { Colors } from "@theme/colors";
+import { useAppConfigStore } from "@/presentation/store/use-config.store";
+import { SqliteAppSettingsRepository } from "@/infrastructure/repositories/sqlite-app-settings.repository";
+import { InitializeAppSettingsUseCase } from "@/application/use-cases/settings/initialize-app-settings.use-case";
 
 const AppContent = () => {
   const db = useSQLiteContext();
   const [isReady, setIsReady] = useState(false);
+  const setFullConfig = useAppConfigStore((state) => state.setFullConfig);
 
   useEffect(() => {
     let mounted = true;
     const initialize = async () => {
       try {
         await appInitializerService.init(db);
-        if (mounted) setIsReady(true);
+        const repo = new SqliteAppSettingsRepository(db);
+        const useCase = new InitializeAppSettingsUseCase(repo);
+        const savedConfig = await useCase.execute();
+
+        if (mounted) {
+          setFullConfig(savedConfig);
+          setIsReady(true);
+        }
       } catch (e) {
-        console.error("Fallo al iniciar DB", e);
+        console.error("Fallo al iniciar AppContent", e);
       }
     };
+
     initialize();
     return () => {
       mounted = false;
     };
-  }, [db]);
+  }, [db, setFullConfig]);
 
   if (!isReady) return <LoadingScreen />;
 

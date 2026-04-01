@@ -111,11 +111,31 @@ export class SqliteTrackRepository implements TrackRepository {
     });
   }
 
-  async findAll(): Promise<Track[]> {
+  async findAll(sort?: string): Promise<Track[]> {
+    let orderBy = "t.title ASC";
+
+    switch (sort) {
+      case "Por nombre (A-Z)":
+        orderBy = "t.title ASC";
+        break;
+      case "Por nombre (Z-A)":
+        orderBy = "t.title DESC";
+        break;
+      case "Más recientes":
+        orderBy = "t.dateAdded DESC";
+        break;
+      case "Por artista":
+        orderBy = "t.artistName ASC, t.title ASC";
+        break;
+      case "Por duración":
+        orderBy = "t.duration DESC";
+        break;
+    }
+
     const results = await this.db.getAllAsync<any>(
-      `${this.BASE_SELECT} ORDER BY t.title ASC`,
+      `${this.BASE_SELECT} ORDER BY ${orderBy}`,
     );
-    return results.map((row) => TrackMapper.toDomain(row));
+    return results.map(TrackMapper.toDomain);
   }
 
   async findById(id: string): Promise<Track | null> {

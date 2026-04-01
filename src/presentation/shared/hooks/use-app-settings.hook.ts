@@ -1,43 +1,26 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import { SqliteAppSettingsRepository } from "@repositories/sqlite-app-settings.repository";
-import { InitializeAppSettingsUseCase } from "@use-cases/settings/initialize-app-settings.use-case";
 import { UpdateAppSettingUseCase } from "@use-cases/settings/update-app-setting.use-case";
-import { AppConfig, DEFAULT_APP_CONFIG } from "@entities/app-config.entity";
+import { AppConfig } from "@entities/app-config.entity";
+import { useAppConfigStore } from "@/presentation/store/use-config.store";
 
 export const useAppSettings = () => {
   const db = useSQLiteContext();
-  const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG);
-  const [isLoading, setIsLoading] = useState(true);
+  const config = useAppConfigStore((state) => state.config);
+  const isLoading = useAppConfigStore((state) => state.isLoading);
+  const updateConfigKey = useAppConfigStore((state) => state.updateConfigKey);
 
-  const loadConfig = useCallback(async () => {
+  const updateSetting = useCallback(async (key: keyof AppConfig, value: any) => {
     try {
-      const repo = new SqliteAppSettingsRepository(db);
-      const useCase = new InitializeAppSettingsUseCase(repo);
-      const data = await useCase.execute();
-      setConfig(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [db]);
-
-  const updateSetting = async (key: keyof AppConfig, value: any) => {
-    try {
+      updateConfigKey(key, value);
       const repo = new SqliteAppSettingsRepository(db);
       const useCase = new UpdateAppSettingUseCase(repo);
       await useCase.execute(key, value);
-      
-      setConfig(prev => ({ ...prev, [key]: value }));
     } catch (error) {
-      console.error(error);
+      console.error("[useAppSettings] Error al persistir:", error);
     }
-  };
-
-  useEffect(() => {
-    loadConfig();
-  }, [loadConfig]);
+  }, [db, updateConfigKey]);
 
   return { config, updateSetting, isLoading };
 };
