@@ -14,6 +14,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import SettingOption from "@components/molecules/SettingOption";
 import { useCallback } from "react";
 import { useAppSettings } from "@hooks/use-app-settings.hook";
+import { APP_INFO, SYSARI_LINKS } from "@constants/app.constants";
 
 const SettingsMenuScreen = () => {
   const navigation = useNavigation<any>();
@@ -57,8 +58,8 @@ const SettingsMenuScreen = () => {
       >
         <View style={styles.profileSection}>
           <View style={styles.logoContainer}></View>
-          <Text style={styles.appName}>Echo Music</Text>
-          <Text style={styles.appVersion}>Seed 1.0.0</Text>
+          <Text style={styles.appName}>{APP_INFO.NAME}</Text>
+          <Text style={styles.appVersion}>{APP_INFO.VERSION}</Text>
         </View>
 
         <Text style={styles.sectionLabel}>Reproductor</Text>
@@ -83,6 +84,7 @@ const SettingsMenuScreen = () => {
             }
           />
         </View>
+
         <Text style={styles.sectionLabel}>Sobre la app</Text>
         <View style={styles.card}>
           <View style={styles.sysariSection}>
@@ -94,13 +96,11 @@ const SettingsMenuScreen = () => {
                   style={styles.logoSysari}
                   resizeMode="contain"
                 />
-                <Text style={styles.sysariName}>Sysari</Text>
+                <Text style={styles.sysariName}>{APP_INFO.DEVELOPER}</Text>
               </View>
               <View style={styles.socialRow}>
                 <TouchableOpacity
-                  onPress={() =>
-                    openURL("https://www.linkedin.com/company/sysari")
-                  }
+                  onPress={() => openURL(SYSARI_LINKS.LINKEDIN)}
                 >
                   <Ionicons
                     name="logo-linkedin"
@@ -108,9 +108,8 @@ const SettingsMenuScreen = () => {
                     color={Colors.gray}
                   />
                 </TouchableOpacity>
-
                 <TouchableOpacity
-                  onPress={() => openURL("https://www.instagram.com/sysari__/")}
+                  onPress={() => openURL(SYSARI_LINKS.INSTAGRAM)}
                 >
                   <Ionicons
                     name="logo-instagram"
@@ -118,9 +117,7 @@ const SettingsMenuScreen = () => {
                     color={Colors.gray}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openURL("https://www.sysari.net/")}
-                >
+                <TouchableOpacity onPress={() => openURL(SYSARI_LINKS.WEBSITE)}>
                   <Ionicons
                     name="globe-outline"
                     size={28}
@@ -131,7 +128,9 @@ const SettingsMenuScreen = () => {
             </View>
           </View>
         </View>
-        <Text style={styles.footerText}>© {currentYear} Echo Music</Text>
+        <Text style={styles.footerText}>
+          © {currentYear} {APP_INFO.NAME}
+        </Text>
       </ScrollView>
     </View>
   );
