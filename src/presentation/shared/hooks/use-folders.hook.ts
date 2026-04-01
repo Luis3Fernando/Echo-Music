@@ -5,6 +5,7 @@ import { SqliteFolderRepository } from "@repositories/sqlite-folder.repository";
 import { GetAllFoldersUseCase } from "@use-cases/folders/get-all-folders.use-case";
 import { GetTracksByFolderUseCase } from "@use-cases/folders/get-tracks-by-folder.use-case";
 import { Track } from "@entities/track.entity";
+import { useAppConfigStore } from "@/presentation/store/use-config.store";
 
 export const useFolders = () => {
   const db = useSQLiteContext();
@@ -36,6 +37,8 @@ export const useFolderDetail = (folderPath: string) => {
   const db = useSQLiteContext();
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const sortOrder = useAppConfigStore((state) => state.config.playlistSortOrder);
 
   const loadTracks = useCallback(async () => {
     if (!folderPath) return;
@@ -43,14 +46,15 @@ export const useFolderDetail = (folderPath: string) => {
     try {
       const repo = new SqliteFolderRepository(db);
       const useCase = new GetTracksByFolderUseCase(repo);
-      const data = await useCase.execute(folderPath);
+      
+      const data = await useCase.execute(folderPath, sortOrder);
       setTracks(data);
     } catch (error) {
       console.error("[useFolderDetail] Error:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [db, folderPath]);
+  }, [db, folderPath, sortOrder]);
 
   useEffect(() => {
     loadTracks();

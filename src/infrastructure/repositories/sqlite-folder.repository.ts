@@ -9,7 +9,7 @@ export class SqliteFolderRepository implements FolderRepository {
 
   async findAll(): Promise<Folder[]> {
     const rows = await this.db.getAllAsync<{ url: string }>(
-      "SELECT DISTINCT url FROM tracks"
+      "SELECT DISTINCT url FROM tracks",
     );
 
     const folderMap = new Map<string, Folder>();
@@ -32,19 +32,41 @@ export class SqliteFolderRepository implements FolderRepository {
       }
     });
 
-    return Array.from(folderMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(folderMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   }
 
-  async getTracksByFolder(folderPath: string): Promise<Track[]> {
+  async getTracksByFolder(folderPath: string, sort?: string): Promise<Track[]> {
+    let orderBy = "t.title ASC";
+
+    switch (sort) {
+      case "Por nombre (A-Z)":
+        orderBy = "t.title ASC";
+        break;
+      case "Por nombre (Z-A)":
+        orderBy = "t.title DESC";
+        break;
+      case "Más recientes":
+        orderBy = "t.dateAdded DESC";
+        break;
+      case "Por artista":
+        orderBy = "t.artistName ASC, t.title ASC";
+        break;
+      case "Por duración":
+        orderBy = "t.duration DESC";
+        break;
+    }
+
     const queryPath = `file://${folderPath}/%`;
-    
+
     const rows = await this.db.getAllAsync<any>(
       `SELECT t.*, 
-       (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds 
-       FROM tracks t 
-       WHERE t.url LIKE ? 
-       ORDER BY t.title ASC`,
-      [queryPath]
+      (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds 
+      FROM tracks t 
+      WHERE t.url LIKE ? 
+      ORDER BY ${orderBy}`,
+      [queryPath],
     );
 
     return rows.map(TrackMapper.toDomain);

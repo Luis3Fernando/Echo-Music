@@ -3,5 +3,5 @@ import { Track } from "@entities/track.entity";
 
 export interface FolderRepository {
   findAll(): Promise<Folder[]>;
-  getTracksByFolder(folderPath: string): Promise<Track[]>;
+  getTracksByFolder(folderPath: string, sort?: string): Promise<Track[]>;
 }

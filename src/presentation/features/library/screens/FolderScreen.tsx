@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -28,12 +28,15 @@ import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { useFolderDetail } from "@hooks/use-folders.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 import { useTrack } from "@hooks/use-track.hook";
+import { TRACK_SORT_OPTIONS } from "@constants/sort-options.constants";
+import { useAppSettings } from "@hooks/use-app-settings.hook";
 
 const FolderScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { folderId, folderName } = route.params || {};
 
+  const { config, updateSetting } = useAppSettings();
   const { tracks, isLoading, refresh } = useFolderDetail(folderId);
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
@@ -41,7 +44,6 @@ const FolderScreen = () => {
 
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
-  const [currentSort, setCurrentSort] = useState("Por nombre");
 
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [isTrackMenuVisible, setIsTrackMenuVisible] = useState(false);
@@ -55,13 +57,23 @@ const FolderScreen = () => {
     onConfirm: () => {},
   });
 
+  const sortOptions: MenuItem[] = useMemo(() =>
+    TRACK_SORT_OPTIONS.map((option) => ({
+      label: option.label,
+      icon: option.icon,
+      onPress: () => {
+        updateSetting("playlistSortOrder", option.label);
+        setIsSortMenuVisible(false);
+      },
+    })), [updateSetting]
+  );
+
   useHardwareBack(() => {
     if (isTrackMenuVisible || isSortMenuVisible) {
       setIsTrackMenuVisible(false);
       setIsSortMenuVisible(false);
       return true;
     }
-
     return false;
   });
 
@@ -69,24 +81,6 @@ const FolderScreen = () => {
     const totalMs = tracks.reduce((acc, track) => acc + track.duration, 0);
     return formatPlaylistDuration(totalMs);
   }, [tracks]);
-
-  const sortOptions: MenuItem[] = [
-    {
-      label: "Por nombre (A-Z)",
-      icon: "text-outline",
-      onPress: () => setCurrentSort("Por nombre"),
-    },
-    {
-      label: "Por artista",
-      icon: "person-outline",
-      onPress: () => setCurrentSort("Por artista"),
-    },
-    {
-      label: "Más recientes",
-      icon: "time-outline",
-      onPress: () => setCurrentSort("Recientes"),
-    },
-  ];
 
   const trackOptions: MenuItem[] = useMemo(
     () => [
@@ -117,7 +111,7 @@ const FolderScreen = () => {
             title: "Eliminar canción",
             description: `¿Deseas eliminar permanentemente de tu memoria interna?`,
             onConfirm: () => {
-              console.log("LOG: Eliminación física pendiente");
+              console.log("Eliminación física");
               setIsConfirmVisible(false);
             },
           });
@@ -126,22 +120,14 @@ const FolderScreen = () => {
         },
       },
     ],
-    [selectedTrack],
+    [selectedTrack]
   );
 
   useFocusEffect(
     useCallback(() => {
       refreshPlaylists();
-    }, [refreshPlaylists]),
+    }, [refreshPlaylists])
   );
-
-  if (isLoading && tracks.length === 0) {
-    return (
-      <View style={[styles.container, { justifyContent: "center" }]}>
-        <ActivityIndicator color={Colors.primary} size="large" />
-      </View>
-    );
-  }
 
   const handleSelectPlaylist = async (playlist: any) => {
     if (!selectedTrack) return;
@@ -154,12 +140,20 @@ const FolderScreen = () => {
 
   const handleToggleFavorite = async (track: Track) => {
     const newState = await toggleFavorite(track.id);
-
     if (newState !== null) {
       refresh();
       refreshPlaylists();
     }
   };
+
+  if (isLoading && tracks.length === 0) {
+    return (
+      <View style={[styles.container, { justifyContent: "center" }]}>
+        <ActivityIndicator color={Colors.primary} size="large" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScreenHeaderBasic
@@ -180,7 +174,7 @@ const FolderScreen = () => {
               duration={totalDuration}
             />
             <SongListControls
-              orderLabel={currentSort}
+              orderLabel={config.playlistSortOrder}
               onOrderPress={(event) => {
                 const { pageX, pageY } = event.nativeEvent;
                 setSortMenuAnchor({ x: pageX, y: pageY });

@@ -4,11 +4,11 @@ import { Track } from "@entities/track.entity";
 export class GetTracksByFolderUseCase {
   constructor(private folderRepo: FolderRepository) {}
 
-  async execute(folderPath: string): Promise<Track[]> {
+  async execute(folderPath: string, sortOrder: string): Promise<Track[]> {
     if (!folderPath) {
       throw new Error("La ruta de la carpeta es obligatoria");
     }
-    
-    return await this.folderRepo.getTracksByFolder(folderPath);
+
+    return await this.folderRepo.getTracksByFolder(folderPath, sortOrder);
   }
 }
