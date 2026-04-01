@@ -33,6 +33,8 @@ import {
   useRemoveTrackFromPlaylist,
 } from "@hooks/use-playlists.hook";
 import { useTrack } from "@hooks/use-track.hook";
+import { useAppSettings } from "@hooks/use-app-settings.hook";
+import { TRACK_SORT_OPTIONS } from "@constants/sort-options.constants";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -48,7 +50,7 @@ const PlaylistScreen = () => {
   const [trackMenuAnchor, setTrackMenuAnchor] = useState({ x: 0, y: 0 });
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
-  const [currentSort, setCurrentSort] = useState("Por nombre");
+  const { config, updateSetting } = useAppSettings();
   const { deletePlaylist } = useDeletePlaylist();
   const { removeTrack } = useRemoveTrackFromPlaylist();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
@@ -159,33 +161,18 @@ const PlaylistScreen = () => {
     return options;
   }, [playlist, selectedTrack]);
 
-  const sortOptions: MenuItem[] = [
-    {
-      label: "Por nombre (A-Z)",
-      icon: "text-outline",
-      onPress: () => setCurrentSort("Por nombre (A-Z)"),
-    },
-    {
-      label: "Por nombre (Z-A)",
-      icon: "text-outline",
-      onPress: () => setCurrentSort("Por nombre (Z-A)"),
-    },
-    {
-      label: "Más recientes",
-      icon: "time-outline",
-      onPress: () => setCurrentSort("Más recientes"),
-    },
-    {
-      label: "Por artista",
-      icon: "person-outline",
-      onPress: () => setCurrentSort("Por artista"),
-    },
-    {
-      label: "Por duración",
-      icon: "hourglass-outline",
-      onPress: () => setCurrentSort("Por duración"),
-    },
-  ];
+  const sortOptions: MenuItem[] = useMemo(
+    () =>
+      TRACK_SORT_OPTIONS.map((option) => ({
+        label: option.label,
+        icon: option.icon,
+        onPress: () => {
+          updateSetting("playlistSortOrder", option.label);
+          setIsSortMenuVisible(false);
+        },
+      })),
+    [updateSetting],
+  );
 
   const totalDuration = tracks.reduce((acc, track) => acc + track.duration, 0);
 
@@ -199,7 +186,7 @@ const PlaylistScreen = () => {
   if (!playlist) return null;
 
   const handleToggleFavorite = async (track: Track) => {
-    if (playlist.id === 'playlist-favorites' && track.isFavorite) {
+    if (playlist.id === "playlist-favorites" && track.isFavorite) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
     const newState = await toggleFavorite(track.id);
@@ -262,7 +249,7 @@ const PlaylistScreen = () => {
             ListHeaderComponent={
               tracks.length > 0 ? (
                 <SongListControls
-                  orderLabel={currentSort}
+                  orderLabel={config.playlistSortOrder}
                   onOrderPress={(event) => {
                     const { pageX, pageY } = event.nativeEvent;
                     setSortMenuAnchor({ x: pageX, y: pageY });

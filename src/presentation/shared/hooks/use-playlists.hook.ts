@@ -12,6 +12,7 @@ import { UpdatePlaylistUseCase } from "@use-cases/playlists/update-playlist.use-
 import { DeletePlaylistUseCase } from "@use-cases/playlists/delete-playlist.use-case";
 import { RemoveTrackFromPlaylistUseCase } from "@use-cases/playlists/remove-track-from-playlist.use-case";
 import { AddTracksToPlaylistUseCase } from "@use-cases/playlists/add-tracks-to-playlist.use-case";
+import { useAppConfigStore } from "@store/use-config.store";
 
 export const usePlaylists = () => {
   const db = useSQLiteContext();
@@ -52,29 +53,31 @@ export const usePlaylistDetail = (playlistId: string) => {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const sortOrder = useAppConfigStore(
+    (state) => state.config.playlistSortOrder,
+  );
 
   const loadDetail = useCallback(async () => {
     if (!playlistId) return;
-
-    if (!playlist) {
-      setIsLoading(true);
-    }
+    if (!playlist) setIsLoading(true);
 
     try {
       const repo = new SqlitePlaylistRepository(db);
       const useCase = new GetPlaylistByIdUseCase(repo);
-
       const data = await useCase.execute(playlistId);
       setPlaylist(data);
 
-      const playlistTracks = await repo.getTracksByPlaylistId(playlistId);
+      const playlistTracks = await repo.getTracksByPlaylistId(
+        playlistId,
+        sortOrder,
+      );
       setTracks(playlistTracks);
     } catch (error) {
       console.error("[usePlaylistDetail] Error:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [db, playlistId, playlist]);
+  }, [db, playlistId, sortOrder]);
 
   useEffect(() => {
     loadDetail();

@@ -72,15 +72,38 @@ export class SqlitePlaylistRepository implements PlaylistRepository {
     return row ? PlaylistMapper.toDomain(row) : null;
   }
 
-  async getTracksByPlaylistId(playlistId: string): Promise<Track[]> {
+  async getTracksByPlaylistId(
+    playlistId: string,
+    sort?: string,
+  ): Promise<Track[]> {
+    let orderBy = "pt.orderIndex ASC";
+
+    switch (sort) {
+      case "Por nombre (A-Z)":
+        orderBy = "t.title ASC";
+        break;
+      case "Por nombre (Z-A)":
+        orderBy = "t.title DESC";
+        break;
+      case "Más recientes":
+        orderBy = "t.dateAdded DESC";
+        break;
+      case "Por artista":
+        orderBy = "t.artistName ASC, t.title ASC";
+        break;
+      case "Por duración":
+        orderBy = "t.duration DESC";
+        break;
+    }
+
     const rows = await this.db.getAllAsync<any>(
       `
-      SELECT t.*, 
-      (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds
-      FROM tracks t
-      JOIN playlist_tracks pt ON t.id = pt.trackId
-      WHERE pt.playlistId = ?
-      ORDER BY pt.orderIndex ASC
+    SELECT t.*, 
+    (SELECT json_group_array(artistId) FROM track_artists WHERE trackId = t.id) as artistIds
+    FROM tracks t
+    JOIN playlist_tracks pt ON t.id = pt.trackId
+    WHERE pt.playlistId = ?
+    ORDER BY ${orderBy}
     `,
       [playlistId],
     );
