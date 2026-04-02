@@ -9,6 +9,7 @@ import {
   GetArtistProfileUseCase,
   ArtistProfile,
 } from "@use-cases/artists/get-artist-profile.use-case";
+import { Track } from "@entities/track.entity";
 
 export const useArtistProfile = (artistName: string) => {
   const db = useSQLiteContext();
@@ -49,6 +50,10 @@ export const useArtistProfile = (artistName: string) => {
     }
   }, [db, artistName]);
 
+  const setTracks = useCallback((newTracks: Track[]) => {
+    setProfile((prev) => (prev ? { ...prev, tracks: newTracks } : null));
+  }, []);
+
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
@@ -56,6 +61,7 @@ export const useArtistProfile = (artistName: string) => {
   return {
     artist: profile?.artist,
     tracks: profile?.tracks || [],
+    setTracks,
     albums: profile?.albums || [],
     collaborators: profile?.collaborators || [],
     isLoading,

@@ -19,25 +19,35 @@ import { useTrack } from "@hooks/use-track.hook";
 import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { ConfirmDialog } from "@components/organisms/ConfirmDialog";
-
 import ArtistHeaderSection from "../components/ArtistHeaderSection";
 import ArtistInfoSection from "../components/ArtistInfoSection";
 import ArtistSongsSection from "../components/ArtistSongsSection";
 import ArtistAlbumsSection from "../components/ArtistAlbumsSection";
 import ArtistCollaborationsSection from "../components/ArtistCollaborationsSection";
 import { useArtist } from "@hooks/use-artist.hook";
+import { usePlayerActions } from "@hooks/use-player-actions.hook";
+import { usePlayerStore } from "@store/use-player.store";
 
 const ArtistScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { name } = route.params;
+  const {
+    artist,
+    tracks,
+    setTracks,
+    albums,
+    collaborators,
+    isLoading,
+    refresh,
+  } = useArtistProfile(name);
 
-  const { artist, tracks, albums, collaborators, isLoading, refresh } =
-    useArtistProfile(name);
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
   const { toggleFavorite } = useTrack();
   const { updateImage } = useArtist();
+  const { playList } = usePlayerActions();
+  const updateTrackInStore = usePlayerStore((s) => s.updateTrackInStore);
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
@@ -51,40 +61,37 @@ const ArtistScreen = () => {
     onConfirm: () => {},
   });
 
-  useHardwareBack(() => {
-    if (isMenuVisible) {
-      setIsMenuVisible(false);
-      return true;
-    }
-    return false;
-  });
+  const handlePlayArtist = (shuffle: boolean) => {
+    if (!tracks || tracks.length === 0) return;
+    const ids = tracks.map((t) => t.id);
+    playList(ids, 0, shuffle);
+  };
 
-  useFocusEffect(
-    useCallback(() => {
-      refreshPlaylists();
-    }, [refreshPlaylists]),
-  );
-
-  const totalDuration = useMemo(() => {
-    if (!tracks || tracks.length === 0) return "0 min";
-    const totalMs = tracks.reduce((acc, t) => acc + t.duration, 0);
-    return formatPlaylistDuration(totalMs);
-  }, [tracks]);
-
-  const handleSelectPlaylist = async (playlist: any) => {
-    if (!selectedTrack) return;
-    setIsAddModalVisible(false);
-    const success = await addTracks(playlist.id, [selectedTrack.id]);
-    if (success) {
-      refreshPlaylists();
-    }
+  const handleTrackPress = (track: Track) => {
+    if (!tracks) return;
+    const ids = tracks.map((t) => t.id);
+    const index = tracks.findIndex((t) => t.id === track.id);
+    const isCurrentlyShuffling =
+      usePlayerStore.getState().queue?.isShuffle ?? false;
+    playList(ids, index, isCurrentlyShuffling);
   };
 
   const handleToggleFavorite = async (track: Track) => {
-    const newState = await toggleFavorite(track.id);
-    if (newState !== null) {
+    const newStatus = !track.isFavorite;
+    if (setTracks) {
+      setTracks(
+        tracks.map((t) =>
+          t.id === track.id ? { ...t, isFavorite: newStatus } : t,
+        ),
+      );
+    }
+    updateTrackInStore(track.id, { isFavorite: newStatus });
+
+    try {
+      const result = await toggleFavorite(track.id);
+      if (result !== null) refreshPlaylists();
+    } catch (e) {
       refresh();
-      refreshPlaylists();
     }
   };
 
@@ -95,14 +102,21 @@ const ArtistScreen = () => {
     }
   };
 
+  const handleSelectPlaylist = async (playlist: any) => {
+    if (!selectedTrack) return;
+    setIsAddModalVisible(false);
+    const success = await addTracks(playlist.id, [selectedTrack.id]);
+    if (success) refreshPlaylists();
+  };
+
   const trackMenuItems: MenuItem[] = useMemo(
     () => [
       {
         label: "Reproducir",
         icon: "play-outline",
         onPress: () => {
-          console.log("Play", selectedTrack?.title);
           setIsMenuVisible(false);
+          if (selectedTrack) handleTrackPress(selectedTrack);
         },
       },
       {
@@ -130,10 +144,7 @@ const ArtistScreen = () => {
             title: "Eliminar canción",
             description: `¿Deseas eliminar permanentemente de tu memoria interna?`,
             onConfirm: () => {
-              console.log(
-                "LOG: Eliminación física pendiente para",
-                selectedTrack?.id,
-              );
+              console.log("Eliminación física:", selectedTrack?.id);
               setIsConfirmVisible(false);
             },
           });
@@ -142,8 +153,30 @@ const ArtistScreen = () => {
         },
       },
     ],
-    [selectedTrack],
+    [selectedTrack, tracks],
   );
+
+  useHardwareBack(() => {
+    if (isMenuVisible || isAddModalVisible || isConfirmVisible) {
+      setIsMenuVisible(false);
+      setIsAddModalVisible(false);
+      setIsConfirmVisible(false);
+      return true;
+    }
+    return false;
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPlaylists();
+    }, [refreshPlaylists]),
+  );
+
+  const totalDuration = useMemo(() => {
+    if (!tracks || tracks.length === 0) return "0 min";
+    const totalMs = tracks.reduce((acc, t) => acc + t.duration, 0);
+    return formatPlaylistDuration(totalMs);
+  }, [tracks]);
 
   if (isLoading && !artist) {
     return (
@@ -160,23 +193,19 @@ const ArtistScreen = () => {
           pictureUrl={artist?.pictureUrl}
           onBackPress={() => navigation.goBack()}
           onImageChange={handleImageChange}
-          onResetImage={() => {
-            if (artist?.id) {
-              handleImageChange("");
-            }
-          }}
+          onResetImage={() => artist?.id && handleImageChange("")}
         />
         <View style={styles.contentCard}>
           <ArtistInfoSection
             name={artist?.name || name}
             songCount={tracks.length}
             duration={totalDuration}
-            onPlayPress={() => console.log("Shuffle total")}
-            onShufflePress={() => console.log("Shuffle")}
+            onPlayPress={() => handlePlayArtist(false)}
+            onShufflePress={() => handlePlayArtist(true)}
           />
           <ArtistSongsSection
             tracks={tracks}
-            onTrackPress={(t) => console.log("Play", t.title)}
+            onTrackPress={handleTrackPress}
             onFavoritePress={handleToggleFavorite}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
@@ -204,12 +233,14 @@ const ArtistScreen = () => {
           />
         </View>
       </ScrollView>
+
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setIsMenuVisible(false)}
         anchorPosition={menuAnchor}
         items={trackMenuItems}
       />
+
       <ConfirmDialog
         isVisible={isConfirmVisible}
         title={confirmData.title}
@@ -219,6 +250,7 @@ const ArtistScreen = () => {
         onCancel={() => setIsConfirmVisible(false)}
         isDestructive={true}
       />
+
       <AddToPlaylistModal
         isVisible={isAddModalVisible}
         playlists={userPlaylists}
