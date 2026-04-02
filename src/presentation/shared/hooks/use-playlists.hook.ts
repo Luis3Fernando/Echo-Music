@@ -83,7 +83,7 @@ export const usePlaylistDetail = (playlistId: string) => {
     loadDetail();
   }, [loadDetail]);
 
-  return { playlist, tracks, isLoading, refresh: loadDetail };
+  return { playlist, tracks, setTracks, isLoading, refresh: loadDetail };
 };
 
 export const useCreatePlaylist = () => {

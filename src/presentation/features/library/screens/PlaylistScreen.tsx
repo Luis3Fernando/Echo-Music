@@ -35,6 +35,8 @@ import {
 import { useTrack } from "@hooks/use-track.hook";
 import { useAppSettings } from "@hooks/use-app-settings.hook";
 import { TRACK_SORT_OPTIONS } from "@constants/sort-options.constants";
+import { usePlayerActions } from "@hooks/use-player-actions.hook";
+import { usePlayerStore } from "@store/use-player.store";
 
 type PlaylistScreenRouteProp = RouteProp<LibraryStackParamList, "Playlist">;
 
@@ -42,7 +44,9 @@ const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
-  const { playlist, tracks, isLoading, refresh } = usePlaylistDetail(id);
+  const { playlist, tracks, setTracks, isLoading, refresh } = usePlaylistDetail(id);
+  const { playList } = usePlayerActions();
+  const updateTrackInStore = usePlayerStore((s) => s.updateTrackInStore);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -183,16 +187,40 @@ const PlaylistScreen = () => {
       </View>
     );
   }
+
   if (!playlist) return null;
 
   const handleToggleFavorite = async (track: Track) => {
+    const newStatus = !track.isFavorite;
     if (playlist.id === "playlist-favorites" && track.isFavorite) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    const newState = await toggleFavorite(track.id);
-    if (newState !== null) {
-      refresh();
+
+    if (setTracks) {
+      setTracks(tracks.map(t => t.id === track.id ? { ...t, isFavorite: newStatus } : t));
     }
+
+    updateTrackInStore(track.id, { isFavorite: newStatus });
+
+    try {
+      await toggleFavorite(track.id);
+    } catch (e) {
+      refresh(); 
+    }
+  };
+
+  const handlePlayPlaylist = (shuffle: boolean) => {
+    if (tracks.length === 0) return;
+    const ids = tracks.map((t) => t.id);
+    playList(ids, 0, shuffle);
+  };
+
+  const handleTrackPress = (track: Track) => {
+    const ids = tracks.map((t) => t.id);
+    const index = tracks.findIndex((t) => t.id === track.id);
+    const isCurrentlyShuffling =
+      usePlayerStore.getState().queue?.isShuffle ?? false;
+    playList(ids, index, isCurrentlyShuffling);
   };
 
   return (
@@ -255,8 +283,8 @@ const PlaylistScreen = () => {
                     setSortMenuAnchor({ x: pageX, y: pageY });
                     setIsSortMenuVisible(true);
                   }}
-                  onShufflePress={() => console.log("Shuffle canciones")}
-                  onPlayAllPress={() => console.log("Reproducir todo")}
+                  onShufflePress={() => handlePlayPlaylist(true)}
+                  onPlayAllPress={() => handlePlayPlaylist(false)}
                 />
               ) : null
             }
@@ -266,6 +294,7 @@ const PlaylistScreen = () => {
                 track={item as any}
                 showIndex={false}
                 showFavorite={true}
+                onPress={handleTrackPress}
                 onFavoritePress={() => handleToggleFavorite(item as any)}
                 onOptionsPress={(event, track) => {
                   const { pageX, pageY } = event.nativeEvent;
