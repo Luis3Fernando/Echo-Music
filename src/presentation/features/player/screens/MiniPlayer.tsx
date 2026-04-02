@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Animated from "react-native-reanimated";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
-import { MOCK_TRACK } from "@mocks/mock-track";
+import { usePlayerStore } from "@store/use-player.store";
+import { usePlayerActions } from "@/presentation/shared/hooks/use-player-actions.hook";
 
 interface MiniPlayerProps {
   animatedStyle: any;
@@ -11,37 +11,38 @@ interface MiniPlayerProps {
 }
 
 const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
-  const track = MOCK_TRACK;
-  const [isPlaying, setIsPlaying] = useState(false);
+  const currentTrack = usePlayerStore((s) => s.currentTrack);
+  const isPlaying = usePlayerStore((s) => s.isPlaying);
+  const setIsPlaying = usePlayerStore((s) => s.setIsPlaying);
+  const { skipToNext, skipToPrevious } = usePlayerActions();
 
-  const handlePrevious = () => console.log("Evento: Canción Anterior");
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    console.log("Evento: Play/Pause");
-  };
-  const handleNext = () => console.log("Evento: Siguiente Canción");
+  if (!currentTrack) return null;
 
   return (
     <TouchableOpacity onPress={onExpand} activeOpacity={1}>
       <Animated.View style={[styles.cardContainer, animatedStyle]}>
         <Image
-          source={{ uri: track.artworkUri || undefined }}
+          source={
+            currentTrack.artworkUri 
+              ? { uri: currentTrack.artworkUri } 
+              : require("@assets/img/song_default.png")
+          }
           style={styles.artwork}
         />
         <View style={styles.textContainer}>
           <Text style={styles.title} numberOfLines={1}>
-            {track.title}
+            {currentTrack.title}
           </Text>
           <Text style={styles.artist} numberOfLines={1}>
-            {track.artistName}
+            {currentTrack.artistName}
           </Text>
         </View>
         <View style={styles.controls}>
-          <TouchableOpacity onPress={handlePrevious} activeOpacity={0.6}>
+          <TouchableOpacity onPress={skipToPrevious} activeOpacity={0.6}>
             <FontAwesome6 name="backward" size={18} color={Colors.black} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handlePlayPause}
+            onPress={() => setIsPlaying(!isPlaying)}
             style={styles.playBtnPrimary}
             activeOpacity={0.8}
           >
@@ -51,7 +52,7 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
               color={Colors.white} 
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNext} activeOpacity={0.6}>
+          <TouchableOpacity onPress={skipToNext} activeOpacity={0.6}>
             <FontAwesome6 name="forward" size={18} color={Colors.black} />
           </TouchableOpacity>
         </View>

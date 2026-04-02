@@ -17,11 +17,20 @@ interface FullPlayerProps {
 
 const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
   const currentTrack = usePlayerStore((s) => s.currentTrack);
+  const updateTrackInStore = usePlayerStore((s) => s.updateTrackInStore);
   const { toggleFavorite } = useTrack();
 
   const handleToggleFavorite = async () => {
-    if (currentTrack) {
+    if (!currentTrack) return;
+
+    const newFavoriteStatus = !currentTrack.isFavorite;
+    updateTrackInStore(currentTrack.id, { isFavorite: newFavoriteStatus });
+
+    try {
       await toggleFavorite(currentTrack.id);
+    } catch (error) {
+      updateTrackInStore(currentTrack.id, { isFavorite: !newFavoriteStatus });
+      console.error("Error al guardar favorito en FullPlayer", error);
     }
   };
 

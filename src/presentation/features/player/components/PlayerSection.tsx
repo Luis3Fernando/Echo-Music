@@ -18,33 +18,36 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const PlayerSection = () => {
   const flatListRef = useRef<FlatList>(null);
+  const isInitialMount = useRef(true);
   
-  // Selectores atómicos para evitar re-renders innecesarios
   const queue = usePlayerStore((s) => s.queue);
   const currentIndex = usePlayerStore((s) => s.queue?.currentIndex ?? 0);
-  const queueArtworks = usePlayerStore((s) => s.queueArtworks); // ¡Importante para las portadas!
-  
+  const queueArtworks = usePlayerStore((s) => s.queueArtworks);
   const { skipToNext, skipToPrevious, jumpToIndex } = usePlayerActions();
-
+  
   const activeIds = queue?.isShuffle ? queue.shuffledTracks : queue?.tracks || [];
 
-  // Sincroniza el carrusel cuando el índice cambia por BOTONES (Next/Prev)
   useEffect(() => {
     if (activeIds.length > 0) {
-      // Validamos si el scroll ya está en la posición correcta para no forzarlo
-      flatListRef.current?.scrollToIndex({
-        index: currentIndex,
-        animated: true,
-      });
+      if (isInitialMount.current) {
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex,
+          animated: false,
+        });
+        isInitialMount.current = false;
+      } else {
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex,
+          animated: true,
+        });
+      }
     }
-  }, [currentIndex]);
+  }, [currentIndex, activeIds.length]);
 
   const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // Calculamos el índice basado en la posición final del scroll
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / SCREEN_WIDTH);
     
-    // Solo actualizamos si el índice realmente cambió para evitar bucles
     if (index !== currentIndex && index >= 0 && index < activeIds.length) {
       jumpToIndex(index);
     }
@@ -59,10 +62,10 @@ const PlayerSection = () => {
           keyExtractor={(id) => id}
           horizontal
           pagingEnabled
+          initialScrollIndex={currentIndex > 0 ? currentIndex : undefined} 
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={onScrollEnd}
-          // Optimizaciones de rendimiento
-          removeClippedSubviews={false} // Mantener vecinos para swipe fluido
+          removeClippedSubviews={false}
           initialNumToRender={3}
           windowSize={5}
           scrollEventThrottle={16}
@@ -76,12 +79,8 @@ const PlayerSection = () => {
           )}
         />
       </View>
-
       <PlayerInfo onArtistPress={() => console.log("Ir al artista")} />
-      
-      {/* Estos valores vendrán del motor de audio en el siguiente paso */}
       <PlayerProgressBar currentTime="0:00" duration="0:00" />
-      
       <PlayerControls 
         onNext={skipToNext} 
         onPrev={skipToPrevious} 
