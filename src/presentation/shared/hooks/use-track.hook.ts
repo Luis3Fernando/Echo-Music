@@ -4,6 +4,7 @@ import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
 import { ToggleFavoriteUseCase } from "@use-cases/tracks/toggle-favorite.use-case";
 import { GetMostPlayedTracksUseCase } from "@use-cases/tracks/get-most-played-tracks.use-case";
+import { GetAllTracksUseCase } from "@use-cases/tracks/get-all-tracks.use-case";
 import { Track } from "@entities/track.entity";
 
 export const useTrack = () => {
@@ -40,9 +41,21 @@ export const useTrack = () => {
     }
   }, [db]);
 
+  const findAll = useCallback(async (sort?: string): Promise<Track[]> => {
+    try {
+      const trackRepo = new SqliteTrackRepository(db);
+      const useCase = new GetAllTracksUseCase(trackRepo);
+      return await useCase.execute(sort);
+    } catch (error) {
+      console.error("[useTrack] Error fetching all tracks:", error);
+      return [];
+    }
+  }, [db]);
+
   return {
     toggleFavorite,
     getMostPlayedTracks,
+    findAll,
     isProcessing
   };
 };

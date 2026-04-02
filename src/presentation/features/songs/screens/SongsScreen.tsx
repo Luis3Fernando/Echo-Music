@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo } from "react";
 import {
   View,
   FlatList,
@@ -19,12 +19,15 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { usePlaylists, useAddTracksToPlaylist } from "@hooks/use-playlists.hook";
 import { AddToPlaylistModal } from "@components/organisms/AddToPlaylistModal";
 import { useAppSettings } from "@hooks/use-app-settings.hook";
-import { TRACK_SORT_OPTIONS, SortOptionType } from "@constants/sort-options.constants";
+import { TRACK_SORT_OPTIONS } from "@constants/sort-options.constants";
+import { usePlayerActions } from "@/presentation/shared/hooks/use-player-actions.hook";
+import { usePlayerStore } from "@store/use-player.store";
 
 export const SongsScreen = () => {
   const { songs } = useLibrary();
   const { config, updateSetting } = useAppSettings();
   const navigation = useNavigation<any>();
+  const { playList } = usePlayerActions();
 
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
@@ -38,6 +41,20 @@ export const SongsScreen = () => {
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
 
+  const handlePlaySongs = (shuffle: boolean) => {
+    if (songs.length === 0) return;
+    const ids = songs.map(s => s.id);
+    playList(ids, 0, shuffle);
+  };
+
+  const handleTrackPress = (track: Track) => {
+    if (songs.length === 0) return;
+    const ids = songs.map(s => s.id);
+    const index = songs.findIndex(s => s.id === track.id);
+    const isShuffleActive = usePlayerStore.getState().queue?.isShuffle ?? false;
+    playList(ids, index, isShuffleActive);
+  };
+
   const sortOptions: MenuItem[] = useMemo(() => 
     TRACK_SORT_OPTIONS.map((option) => ({
       label: option.label,
@@ -49,11 +66,14 @@ export const SongsScreen = () => {
     })), [updateSetting]
   );
 
-  const trackOptions: MenuItem[] = [
+  const trackOptions: MenuItem[] = useMemo(() => [
     {
       label: "Reproducir",
       icon: "play-outline",
-      onPress: () => console.log("Play", selectedTrack?.title),
+      onPress: () => {
+        setIsTrackMenuVisible(false);
+        if (selectedTrack) handleTrackPress(selectedTrack);
+      },
     },
     {
       label: "Añadir a la cola",
@@ -103,7 +123,7 @@ export const SongsScreen = () => {
         setIsConfirmVisible(true);
       },
     },
-  ];
+  ], [selectedTrack, songs]);
 
   const handleSelectPlaylist = async (playlist: any) => {
     if (!selectedTrack) return;
@@ -135,8 +155,8 @@ export const SongsScreen = () => {
               setSortMenuAnchor({ x: pageX, y: pageY });
               setIsSortMenuVisible(true);
             }}
-            onShufflePress={() => console.log("Shuffle total")}
-            onPlayAllPress={() => console.log("Reproducir todas")}
+            onShufflePress={() => handlePlaySongs(true)}
+            onPlayAllPress={() => handlePlaySongs(false)}
           />
         }
         renderItem={({ item, index }) => (
@@ -145,7 +165,7 @@ export const SongsScreen = () => {
             index={index}
             showIndex={false}
             showFavorite={false}
-            onPress={(t) => console.log("Play", t.title)}
+            onPress={handleTrackPress}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
               setTrackMenuAnchor({ x: pageX, y: pageY });
