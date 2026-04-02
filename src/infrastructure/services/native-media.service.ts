@@ -9,7 +9,7 @@ export const nativeMediaService = {
 
     const media = await MediaLibrary.getAssetsAsync({
       mediaType: "audio",
-      first: 20,
+      first: 30,
     });
 
     const filteredAssets = media.assets.filter((asset) => {

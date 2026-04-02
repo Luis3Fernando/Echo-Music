@@ -5,7 +5,7 @@ export const ArtistSplitter = {
     }
 
     const cleaned = rawName
-      .replace(/\s+(feat\.?|ft\.?|&|and|y|with|arr\.)\s+/gi, '|')
+      .replace(/\s+(feat\.?|ft\.?|with|arr\.)\s+/gi, '|')
       .replace(/[;/]/g, '|')
       .replace(/,/g, '|');
 
