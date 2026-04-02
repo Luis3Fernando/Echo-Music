@@ -5,7 +5,7 @@ import { SqliteFolderRepository } from "@repositories/sqlite-folder.repository";
 import { GetAllFoldersUseCase } from "@use-cases/folders/get-all-folders.use-case";
 import { GetTracksByFolderUseCase } from "@use-cases/folders/get-tracks-by-folder.use-case";
 import { Track } from "@entities/track.entity";
-import { useAppConfigStore } from "@/presentation/store/use-config.store";
+import { useAppConfigStore } from "@store/use-config.store";
 
 export const useFolders = () => {
   const db = useSQLiteContext();
@@ -59,6 +59,5 @@ export const useFolderDetail = (folderPath: string) => {
   useEffect(() => {
     loadTracks();
   }, [loadTracks]);
-
-  return { tracks, isLoading, refresh: loadTracks };
+  return { tracks, setTracks, isLoading, refresh: loadTracks };
 };

@@ -30,6 +30,8 @@ import { useHardwareBack } from "@hooks/use-hardware-back.hook";
 import { useTrack } from "@hooks/use-track.hook";
 import { TRACK_SORT_OPTIONS } from "@constants/sort-options.constants";
 import { useAppSettings } from "@hooks/use-app-settings.hook";
+import { usePlayerActions } from "@/presentation/shared/hooks/use-player-actions.hook";
+import { usePlayerStore } from "@store/use-player.store";
 
 const FolderScreen = () => {
   const route = useRoute<any>();
@@ -37,10 +39,12 @@ const FolderScreen = () => {
   const { folderId, folderName } = route.params || {};
 
   const { config, updateSetting } = useAppSettings();
-  const { tracks, isLoading, refresh } = useFolderDetail(folderId);
+  const { tracks, setTracks, isLoading, refresh } = useFolderDetail(folderId);
   const { userPlaylists, refreshPlaylists } = usePlaylists();
   const { addTracks } = useAddTracksToPlaylist();
   const { toggleFavorite } = useTrack();
+  const { playList } = usePlayerActions();
+  const updateTrackInStore = usePlayerStore(s => s.updateTrackInStore);
 
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
   const [sortMenuAnchor, setSortMenuAnchor] = useState({ x: 0, y: 0 });
@@ -56,6 +60,33 @@ const FolderScreen = () => {
     description: "",
     onConfirm: () => {},
   });
+
+  const handlePlayFolder = (shuffle: boolean) => {
+    if (tracks.length === 0) return;
+    const ids = tracks.map(t => t.id);
+    playList(ids, 0, shuffle);
+  };
+
+  const handleTrackPress = (track: Track) => {
+    const ids = tracks.map(t => t.id);
+    const index = tracks.findIndex(t => t.id === track.id);
+    const isCurrentlyShuffling = usePlayerStore.getState().queue?.isShuffle ?? false;
+    playList(ids, index, isCurrentlyShuffling);
+  };
+
+  const handleToggleFavorite = async (track: Track) => {
+    const newStatus = !track.isFavorite;
+    if (setTracks) {
+      setTracks(tracks.map(t => t.id === track.id ? { ...t, isFavorite: newStatus } : t));
+    }
+    updateTrackInStore(track.id, { isFavorite: newStatus });
+
+    try {
+      await toggleFavorite(track.id);
+    } catch (e) {
+      refresh();
+    }
+  };
 
   const sortOptions: MenuItem[] = useMemo(() =>
     TRACK_SORT_OPTIONS.map((option) => ({
@@ -87,7 +118,10 @@ const FolderScreen = () => {
       {
         label: "Reproducir",
         icon: "play-outline",
-        onPress: () => console.log("Play", selectedTrack?.title),
+        onPress: () => {
+          setIsTrackMenuVisible(false);
+          if (selectedTrack) handleTrackPress(selectedTrack);
+        },
       },
       {
         label: "Añadir a la cola",
@@ -120,7 +154,7 @@ const FolderScreen = () => {
         },
       },
     ],
-    [selectedTrack]
+    [selectedTrack, tracks]
   );
 
   useFocusEffect(
@@ -134,14 +168,6 @@ const FolderScreen = () => {
     setIsAddModalVisible(false);
     const success = await addTracks(playlist.id, [selectedTrack.id]);
     if (success) {
-      refreshPlaylists();
-    }
-  };
-
-  const handleToggleFavorite = async (track: Track) => {
-    const newState = await toggleFavorite(track.id);
-    if (newState !== null) {
-      refresh();
       refreshPlaylists();
     }
   };
@@ -180,8 +206,8 @@ const FolderScreen = () => {
                 setSortMenuAnchor({ x: pageX, y: pageY });
                 setIsSortMenuVisible(true);
               }}
-              onShufflePress={() => console.log("Shuffle folder")}
-              onPlayAllPress={() => console.log("Play folder")}
+              onShufflePress={() => handlePlayFolder(true)}
+              onPlayAllPress={() => handlePlayFolder(false)}
             />
           </>
         }
@@ -192,7 +218,7 @@ const FolderScreen = () => {
             showFavorite={true}
             showArtist={true}
             showOptions={true}
-            onPress={(t) => console.log("Reproduciendo:", t.title)}
+            onPress={handleTrackPress}
             onFavoritePress={() => handleToggleFavorite(item)}
             onOptionsPress={(event, track) => {
               const { pageX, pageY } = event.nativeEvent;
