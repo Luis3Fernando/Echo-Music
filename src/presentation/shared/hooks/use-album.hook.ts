@@ -44,7 +44,7 @@ export const useAlbumDetail = (albumId: string) => {
     fetchAlbumDetails();
   }, [albumId]);
 
-  return { album, tracks, isLoading, error, refresh: fetchAlbumDetails };
+  return { album, tracks, setTracks, isLoading, error, refresh: fetchAlbumDetails };
 };
 
 export const useRelatedAlbums = (artistId?: string, currentAlbumId?: string) => {
