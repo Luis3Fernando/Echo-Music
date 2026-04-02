@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet, View, Image, Dimensions } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -6,17 +5,25 @@ interface PlayerArtworkProps {
   artworkUri?: string | null; 
 }
 
-const PlayerArtwork = ({ artworkUri }: PlayerArtworkProps) => (
-  <View style={styles.container}>
-    <View style={styles.artworkContainer}>
-      <Image 
-        source={{ uri: artworkUri || "" }} 
-        style={styles.bigArt} 
-        resizeMode="cover"
-      />
+const PlayerArtwork = ({ artworkUri }: PlayerArtworkProps) => {
+  const imageSource = artworkUri 
+    ? { uri: artworkUri } 
+    : require("@assets/img/song_default.png");
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.artworkContainer}>
+        <Image 
+          source={imageSource} 
+          style={styles.bigArt} 
+          resizeMode="cover"
+          fadeDuration={0} 
+        />
+      </View>
     </View>
-  </View>
-);
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,

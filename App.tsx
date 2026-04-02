@@ -10,26 +10,50 @@ import { PlayerController } from "@features/player/screens";
 import LoadingScreen from "@features/onboarding/screens/LoadingScreen";
 import { ToastProvider } from "react-native-toast-notifications";
 import { Colors } from "@theme/colors";
-import { useAppConfigStore } from "@/presentation/store/use-config.store";
-import { SqliteAppSettingsRepository } from "@/infrastructure/repositories/sqlite-app-settings.repository";
-import { InitializeAppSettingsUseCase } from "@/application/use-cases/settings/initialize-app-settings.use-case";
+import { useAppConfigStore } from "@store/use-config.store";
+import { usePlayerStore } from "@store/use-player.store";
+import { SqliteAppSettingsRepository } from "@repositories/sqlite-app-settings.repository";
+import { SqlitePlaybackQueueRepository } from "@repositories/sqlite-playback-queue.repository";
+import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
+import { InitializeAppSettingsUseCase } from "@use-cases/settings/initialize-app-settings.use-case";
+import { GetQueueArtworksUseCase } from "@/application/use-cases/player/get-queue-artworks.use-case";
 
 const AppContent = () => {
   const db = useSQLiteContext();
   const [isReady, setIsReady] = useState(false);
   const setFullConfig = useAppConfigStore((state) => state.setFullConfig);
+  const { setQueue, setCurrentTrack, setQueueArtworks } = usePlayerStore();
 
   useEffect(() => {
     let mounted = true;
     const initialize = async () => {
       try {
         await appInitializerService.init(db);
-        const repo = new SqliteAppSettingsRepository(db);
-        const useCase = new InitializeAppSettingsUseCase(repo);
-        const savedConfig = await useCase.execute();
+
+        const settingsRepo = new SqliteAppSettingsRepository(db);
+        const settingsUseCase = new InitializeAppSettingsUseCase(settingsRepo);
+        const savedConfig = await settingsUseCase.execute();
+
+        const queueRepo = new SqlitePlaybackQueueRepository(db);
+        const trackRepo = new SqliteTrackRepository(db);
+        const savedQueue = await queueRepo.get();
 
         if (mounted) {
           setFullConfig(savedConfig);
+
+          if (savedQueue) {
+            setQueue(savedQueue);
+
+            const artworksUseCase = new GetQueueArtworksUseCase(trackRepo);
+            const artworksMap = await artworksUseCase.execute(savedQueue.tracks);
+            setQueueArtworks(artworksMap);
+
+            if (savedQueue.currentTrackId) {
+              const trackData = await trackRepo.findById(savedQueue.currentTrackId);
+              setCurrentTrack(trackData);
+            }
+          }
+
           setIsReady(true);
         }
       } catch (e) {
@@ -41,7 +65,7 @@ const AppContent = () => {
     return () => {
       mounted = false;
     };
-  }, [db, setFullConfig]);
+  }, [db, setFullConfig, setQueue, setCurrentTrack, setQueueArtworks]);
 
   if (!isReady) return <LoadingScreen />;
 

@@ -4,6 +4,7 @@ export interface TrackRepository {
   saveAll(tracks: Track[]): Promise<void>;
   findAll(sort?: string): Promise<Track[]>;
   findById(id: string): Promise<Track | null>;
+  findArtworksByIds(ids: string[]): Promise<{id: string, artworkUri: string | null}[]>;
   getPendingTracks(): Promise<Track[]>;
   updateMetadata(id: string, metadata: Partial<Track>): Promise<void>;
   deleteAll(): Promise<void>;

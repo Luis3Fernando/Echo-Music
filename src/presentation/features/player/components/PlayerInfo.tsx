@@ -1,13 +1,11 @@
 import { Colors } from '@/core/theme/colors';
+import { usePlayerStore } from '@/presentation/store/use-player.store';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
-interface PlayerInfoProps {
-  title: string;
-  artistName: string;
-  onArtistPress?: () => void;
-}
+const PlayerInfo = ({ onArtistPress }: { onArtistPress?: () => void }) => {
+  const title = usePlayerStore(s => s.currentTrack?.title ?? "Sin título");
+  const artistName = usePlayerStore(s => s.currentTrack?.artistName ?? "Artista desconocido");
 
-const PlayerInfo = ({ title, artistName, onArtistPress }: PlayerInfoProps) => {
   return (
     <View style={styles.infoContainer}>
       <Text style={styles.fullTitle} numberOfLines={1}>

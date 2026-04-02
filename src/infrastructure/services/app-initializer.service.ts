@@ -33,33 +33,28 @@ export const appInitializerService = {
 
       const settingsRepo = new SqliteAppSettingsRepository(db);
       const initSettingsUseCase = new InitializeAppSettingsUseCase(settingsRepo);
-      const appConfig = await initSettingsUseCase.execute();
-
-      const trackRepo = new SqliteTrackRepository(db);
-      const queueRepo = new SqlitePlaybackQueueRepository(db);
-      const initQueueUseCase = new InitializeQueueUseCase(queueRepo, trackRepo);
-      
-      await initQueueUseCase.execute();
+      await initSettingsUseCase.execute();
 
       const { status } = await MediaLibrary.getPermissionsAsync();
 
       if (status === "granted") {
+        const trackRepo = new SqliteTrackRepository(db);
         const artistRepo = new SqliteArtistRepository(db);
         const albumRepo = new SQLiteAlbumRepository(db);
         const playlistRepo = new SqlitePlaylistRepository(db);
+        const queueRepo = new SqlitePlaybackQueueRepository(db);
 
         const syncUseCase = new SyncLibraryUseCase(trackRepo, artistRepo, albumRepo);
         const playlistUseCase = new CreateInitialPlaylistsUseCase(playlistRepo, trackRepo);
+        const initQueueUseCase = new InitializeQueueUseCase(queueRepo, trackRepo);
 
-        syncUseCase.execute((percent) => {
-          if (percent % 10 === 0) console.log(`[Sync] ${percent}%`);
-        })
-        .then(async () => {
-          await playlistUseCase.execute();
-          await initQueueUseCase.execute();
-          await settingsRepo.set("isFirstLaunch", "false");
-        })
-        .catch((err) => console.error(err));
+        await syncUseCase.execute((percent) => {
+          if (percent % 20 === 0) console.log(`[Sync] ${percent}%`);
+        });
+
+        await playlistUseCase.execute();
+        await initQueueUseCase.execute();
+        await settingsRepo.set("isFirstLaunch", "false");
       }
 
       return true;

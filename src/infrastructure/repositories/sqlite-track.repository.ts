@@ -275,4 +275,13 @@ export class SqliteTrackRepository implements TrackRepository {
     );
     return result?.count || 0;
   }
+
+  async findArtworksByIds(
+    ids: string[],
+  ): Promise<{ id: string; artworkUri: string | null }[]> {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => "?").join(",");
+    const query = `SELECT id, artworkUri FROM tracks WHERE id IN (${placeholders})`;
+    return await this.db.getAllAsync<any>(query, ids);
+  }
 }

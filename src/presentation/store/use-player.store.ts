@@ -6,8 +6,10 @@ import { RepeatMode, getNextRepeatMode } from '@value-objects/repeat-mode.object
 interface PlayerState {
   queue: PlaybackQueue | null;
   currentTrack: Track | null;
+  queueArtworks: Record<string, string | null>;
   isPlaying: boolean;
   setQueue: (queue: PlaybackQueue) => void;
+  setQueueArtworks: (artworks: Record<string, string | null>) => void;
   setCurrentTrack: (track: Track | null) => void;
   setIsPlaying: (playing: boolean) => void;
   toggleShuffle: () => void;
@@ -18,9 +20,12 @@ interface PlayerState {
 export const usePlayerStore = create<PlayerState>((set) => ({
   queue: null,
   currentTrack: null,
+  queueArtworks: {},
   isPlaying: false,
 
   setQueue: (queue) => set({ queue }),
+
+  setQueueArtworks: (artworks) => set({ queueArtworks: artworks }),
   
   setCurrentTrack: (track) => set({ currentTrack: track }),
   

@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { View, StyleSheet, Dimensions, BackHandler } from "react-native";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
 import DetailsSection from "../components/DetailsSection";
-import { Colors } from "@/core/theme/colors";
+import { Colors } from "@theme/colors";
+import { useTrack } from "@hooks/use-track.hook";
+import { usePlayerStore } from "@store/use-player.store";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -15,7 +16,14 @@ interface FullPlayerProps {
 }
 
 const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const currentTrack = usePlayerStore((s) => s.currentTrack);
+  const { toggleFavorite } = useTrack();
+
+  const handleToggleFavorite = async () => {
+    if (currentTrack) {
+      await toggleFavorite(currentTrack.id);
+    }
+  };
 
   useEffect(() => {
     const backAction = () => {
@@ -25,7 +33,7 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove();
@@ -41,8 +49,8 @@ const FullPlayer = ({ animatedStyle, onClose }: FullPlayerProps) => {
         <View style={styles.staticBackground}>
           <FullPlayerHeader
             onClose={onClose}
-            isFavorite={isFavorite}
-            onToggleFavorite={() => setIsFavorite(!isFavorite)}
+            isFavorite={currentTrack?.isFavorite || false}
+            onToggleFavorite={handleToggleFavorite}
           />
           <View style={styles.mainPlayerWrapper}>
             <PlayerSection />
