@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import { usePlayerStore } from "@store/use-player.store";
 import { SqlitePlaybackQueueRepository } from "@repositories/sqlite-playback-queue.repository";
@@ -8,20 +9,20 @@ import { GetQueueArtworksUseCase } from "@use-cases/player/get-queue-artworks.us
 
 export const usePlayerActions = () => {
   const db = useSQLiteContext();
-  const { 
-    queue, 
-    updateIndex, 
-    setCurrentTrack, 
-    setQueue, 
-    setQueueArtworks 
+  const {
+    queue,
+    updateIndex,
+    setCurrentTrack,
+    setQueue,
+    setQueueArtworks
   } = usePlayerStore();
+  const isProcessing = useRef(false);
 
   const loadTrackMetadata = async (index: number, currentQueue = queue) => {
     if (!currentQueue) return;
-    
     const trackRepo = new SqliteTrackRepository(db);
-    const targetId = currentQueue.isShuffle 
-      ? currentQueue.shuffledTracks[index] 
+    const targetId = currentQueue.isShuffle
+      ? currentQueue.shuffledTracks[index]
       : currentQueue.tracks[index];
 
     const trackData = await trackRepo.findById(targetId);
@@ -29,16 +30,25 @@ export const usePlayerActions = () => {
   };
 
   const jumpToIndex = async (index: number) => {
-    if (!queue || index === queue.currentIndex) return;
+    if (!queue || isProcessing.current) return;
 
-    updateIndex(index);
-    const queueRepo = new SqlitePlaybackQueueRepository(db);
-    queueRepo.updateCurrentIndex(index).catch(console.error);
-    await loadTrackMetadata(index);
+    try {
+      isProcessing.current = true;
+      updateIndex(index);
+
+      const queueRepo = new SqlitePlaybackQueueRepository(db);
+      await queueRepo.updateCurrentIndex(index);
+      await loadTrackMetadata(index);
+    } catch (error) {
+    } finally {
+      setTimeout(() => {
+        isProcessing.current = false;
+      }, 150);
+    }
   };
 
   const handleSkip = async (direction: 'next' | 'prev') => {
-    if (!queue || queue.tracks.length === 0) return;
+    if (!queue || queue.tracks.length === 0 || isProcessing.current) return;
 
     const skipUseCase = new SkipTrackUseCase();
     const newIndex = skipUseCase.execute(
@@ -54,28 +64,36 @@ export const usePlayerActions = () => {
   };
 
   const playList = async (trackIds: string[], startIndex: number = 0, shuffle: boolean = false) => {
-    const setQueueUseCase = new SetPlaybackQueueUseCase();
-    const trackRepo = new SqliteTrackRepository(db);
-    const queueRepo = new SqlitePlaybackQueueRepository(db);
-    const artworksUseCase = new GetQueueArtworksUseCase(trackRepo);
+    if (isProcessing.current) return;
 
-    const newQueue = setQueueUseCase.execute({ 
-      tracks: trackIds, 
-      startIndex, 
-      startWithShuffle: shuffle 
-    });
+    isProcessing.current = true;
 
-    setQueue(newQueue);
+    try {
+      const setQueueUseCase = new SetPlaybackQueueUseCase();
+      const trackRepo = new SqliteTrackRepository(db);
+      const queueRepo = new SqlitePlaybackQueueRepository(db);
+      const artworksUseCase = new GetQueueArtworksUseCase(trackRepo);
 
-    const [trackData, artworksMap] = await Promise.all([
-      trackRepo.findById(newQueue.currentTrackId!),
-      artworksUseCase.execute(newQueue.tracks)
-    ]);
+      const newQueue = setQueueUseCase.execute({
+        tracks: trackIds,
+        startIndex,
+        startWithShuffle: shuffle
+      });
 
-    setCurrentTrack(trackData);
-    setQueueArtworks(artworksMap);
+      setQueue(newQueue);
 
-    await queueRepo.save(newQueue);
+      const [trackData, artworksMap] = await Promise.all([
+        trackRepo.findById(newQueue.currentTrackId!),
+        artworksUseCase.execute(newQueue.tracks)
+      ]);
+
+      setCurrentTrack(trackData);
+      setQueueArtworks(artworksMap);
+      await queueRepo.save(newQueue);
+    } catch (error) {
+    } finally {
+      isProcessing.current = false;
+    }
   };
 
   const skipToNext = () => handleSkip('next');

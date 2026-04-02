@@ -1,12 +1,5 @@
 import { useRef, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { StyleSheet, View, Dimensions, FlatList } from "react-native";
 import PlayerArtwork from "./PlayerArtwork";
 import PlayerInfo from "./PlayerInfo";
 import PlayerProgressBar from "./PlayerProgressBar";
@@ -19,12 +12,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PlayerSection = () => {
   const flatListRef = useRef<FlatList>(null);
   const isInitialMount = useRef(true);
-  
+
   const queue = usePlayerStore((s) => s.queue);
   const currentIndex = usePlayerStore((s) => s.queue?.currentIndex ?? 0);
   const queueArtworks = usePlayerStore((s) => s.queueArtworks);
-  const { skipToNext, skipToPrevious, jumpToIndex } = usePlayerActions();
-  
+  const { skipToNext, skipToPrevious } = usePlayerActions();
+
   const activeIds = queue?.isShuffle ? queue.shuffledTracks : queue?.tracks || [];
 
   useEffect(() => {
@@ -44,15 +37,6 @@ const PlayerSection = () => {
     }
   }, [currentIndex, activeIds.length]);
 
-  const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const index = Math.round(offsetX / SCREEN_WIDTH);
-    
-    if (index !== currentIndex && index >= 0 && index < activeIds.length) {
-      jumpToIndex(index);
-    }
-  };
-
   return (
     <View style={styles.section}>
       <View style={styles.carouselContainer}>
@@ -62,13 +46,11 @@ const PlayerSection = () => {
           keyExtractor={(id) => id}
           horizontal
           pagingEnabled
-          initialScrollIndex={currentIndex > 0 ? currentIndex : undefined} 
+          scrollEnabled={false}
           showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={onScrollEnd}
           removeClippedSubviews={false}
           initialNumToRender={3}
           windowSize={5}
-          scrollEventThrottle={16}
           getItemLayout={(_, index) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
