@@ -1,3 +1,4 @@
+import { Colors } from '@/core/theme/colors';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    backgroundColor: '#121212', 
+    backgroundColor: Colors.background_dark_light, 
     borderRadius: 15,
     padding: 24,
     height: 320, 

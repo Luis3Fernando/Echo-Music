@@ -5,6 +5,7 @@ import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import FullPlayerHeader from "../components/FullPlayerHeader";
 import PlayerSection from "../components/PlayerSection";
 import DetailsSection from "../components/DetailsSection";
+import { Colors } from "@/core/theme/colors";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   },
   staticBackground: {
     flex: 1,
-    backgroundColor: "#181818",
+    backgroundColor: Colors.background_dark,
     paddingTop: 10,
     paddingBottom: 60,
   },

@@ -6,9 +6,11 @@ import { SqliteArtistRepository } from "@repositories/sqlite-artist.repository";
 import { SQLiteAlbumRepository } from "@repositories/sqlite-album.repository";
 import { SqlitePlaylistRepository } from "@repositories/sqlite-playlist.repository";
 import { SqliteAppSettingsRepository } from "@repositories/sqlite-app-settings.repository";
+import { SqlitePlaybackQueueRepository } from "@repositories/sqlite-playback-queue.repository";
 import { SyncLibraryUseCase } from "@/application/use-cases/init-app/sync-library.use-case";
 import { CreateInitialPlaylistsUseCase } from "@use-cases/init-app/create-initial-playlists.use-case";
 import { InitializeAppSettingsUseCase } from "@use-cases/settings/initialize-app-settings.use-case";
+import { InitializeQueueUseCase } from "@use-cases/player/initialize-queue.use-case";
 
 export const appInitializerService = {
   async init(db: SQLiteDatabase) {
@@ -33,10 +35,15 @@ export const appInitializerService = {
       const initSettingsUseCase = new InitializeAppSettingsUseCase(settingsRepo);
       const appConfig = await initSettingsUseCase.execute();
 
+      const trackRepo = new SqliteTrackRepository(db);
+      const queueRepo = new SqlitePlaybackQueueRepository(db);
+      const initQueueUseCase = new InitializeQueueUseCase(queueRepo, trackRepo);
+      
+      await initQueueUseCase.execute();
+
       const { status } = await MediaLibrary.getPermissionsAsync();
 
       if (status === "granted") {
-        const trackRepo = new SqliteTrackRepository(db);
         const artistRepo = new SqliteArtistRepository(db);
         const albumRepo = new SQLiteAlbumRepository(db);
         const playlistRepo = new SqlitePlaylistRepository(db);
@@ -49,6 +56,7 @@ export const appInitializerService = {
         })
         .then(async () => {
           await playlistUseCase.execute();
+          await initQueueUseCase.execute();
           await settingsRepo.set("isFirstLaunch", "false");
         })
         .catch((err) => console.error(err));

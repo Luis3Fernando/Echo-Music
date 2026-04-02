@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/core/theme/colors';
 
 const ArtistCard = () => {
   const artistData = {
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   card: {
-    backgroundColor: '#161616',
+    backgroundColor: Colors.background_dark_light,
     borderRadius: 15,
     overflow: 'hidden',
   },
