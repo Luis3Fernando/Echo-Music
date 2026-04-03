@@ -284,4 +284,18 @@ export class SqliteTrackRepository implements TrackRepository {
     const query = `SELECT id, artworkUri FROM tracks WHERE id IN (${placeholders})`;
     return await this.db.getAllAsync<any>(query, ids);
   }
+
+  async incrementPlayCount(id: string): Promise<void> {
+    try {
+      await this.db.runAsync(
+        "UPDATE tracks SET playCount = playCount + 1 WHERE id = ?",
+        [id],
+      );
+    } catch (error) {
+      console.error(
+        `[SqliteTrackRepository] Error incrementando playCount para ${id}:`,
+        error,
+      );
+    }
+  }
 }

@@ -16,6 +16,7 @@ import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
 import { usePlayerStore } from "@/presentation/store/use-player.store";
+import { TrackProgressTracker } from "../components/TrackProgressTracker";
 
 const MINI_PLAYER_HEIGHT = 70;
 
@@ -94,6 +95,7 @@ export const PlayerController = () => {
       enablePanDownToClose={false}
     >
       <View style={{ flex: 1 }}>
+        <TrackProgressTracker />
         <Animated.View style={miniPlayerStyle}>
           <MiniPlayer onExpand={expandPlayer} animatedStyle={{ opacity: 1 }} />
         </Animated.View>

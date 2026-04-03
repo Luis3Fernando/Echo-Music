@@ -22,11 +22,11 @@ const ExploreScreen = () => {
   const db = useSQLiteContext();
   const navigation = useNavigation<any>();
   const [mostPlayed, setMostPlayed] = useState<Track[]>([]);
-  
+
   const { recommendedTracks } = useRecommendations();
   const { recentAlbums, topCountAlbums, mostLikedAlbums } = useHomeAlbums();
   const { topTrackArtists, likedArtists, topPlayedArtists } = useHomeArtists();
-  
+
   const { getMostPlayedTracks, findAll } = useTrack();
   const { playList } = usePlayerActions();
 
@@ -41,16 +41,19 @@ const ExploreScreen = () => {
   const handleShuffleAll = async () => {
     const allTracks = await findAll();
     if (allTracks.length > 0) {
-      const ids = allTracks.map(t => t.id);
+      const ids = allTracks.map((t) => t.id);
       playList(ids, 0, true);
     }
   };
 
   const handlePlayFavorites = async () => {
     const playlistRepo = new SqlitePlaylistRepository(db);
-    const favTracks = await playlistRepo.getTracksByPlaylistId("playlist-favorites", "date_added_desc");
+    const favTracks = await playlistRepo.getTracksByPlaylistId(
+      "playlist-favorites",
+      "date_added_desc",
+    );
     if (favTracks.length > 0) {
-      const ids = favTracks.map(t => t.id);
+      const ids = favTracks.map((t) => t.id);
       playList(ids, 0, false);
     }
   };
@@ -58,7 +61,7 @@ const ExploreScreen = () => {
   const handlePlayRecent = async () => {
     const recentTracks = await findAll("date_added_desc");
     if (recentTracks.length > 0) {
-      const ids = recentTracks.map(t => t.id);
+      const ids = recentTracks.map((t) => t.id);
       playList(ids, 0, false);
     }
   };
@@ -66,7 +69,7 @@ const ExploreScreen = () => {
   const handlePlayTop = async () => {
     const topTracks = await getMostPlayedTracks(50);
     if (topTracks.length > 0) {
-      const ids = topTracks.map(t => t.id);
+      const ids = topTracks.map((t) => t.id);
       playList(ids, 0, false);
     }
   };
@@ -91,7 +94,7 @@ const ExploreScreen = () => {
       <ArtistSection title="Tus artistas favoritos" data={likedArtists} />
       <AlbumSection title="Álbumes que te encantan" data={mostLikedAlbums} />
       <ArtistSection title="Los más escuchados" data={topPlayedArtists} />
-      <LibraryStatsSection /> 
+      <LibraryStatsSection />
       <View style={{ height: 40 }} />
     </ScrollView>
   );

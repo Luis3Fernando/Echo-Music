@@ -44,7 +44,8 @@ const PlaylistScreen = () => {
   const route = useRoute<PlaylistScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
-  const { playlist, tracks, setTracks, isLoading, refresh } = usePlaylistDetail(id);
+  const { playlist, tracks, setTracks, isLoading, refresh } =
+    usePlaylistDetail(id);
   const { playList } = usePlayerActions();
   const updateTrackInStore = usePlayerStore((s) => s.updateTrackInStore);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -197,7 +198,11 @@ const PlaylistScreen = () => {
     }
 
     if (setTracks) {
-      setTracks(tracks.map(t => t.id === track.id ? { ...t, isFavorite: newStatus } : t));
+      setTracks(
+        tracks.map((t) =>
+          t.id === track.id ? { ...t, isFavorite: newStatus } : t,
+        ),
+      );
     }
 
     updateTrackInStore(track.id, { isFavorite: newStatus });
@@ -205,7 +210,7 @@ const PlaylistScreen = () => {
     try {
       await toggleFavorite(track.id);
     } catch (e) {
-      refresh(); 
+      refresh();
     }
   };
 

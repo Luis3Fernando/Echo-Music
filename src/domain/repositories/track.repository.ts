@@ -19,4 +19,5 @@ export interface TrackRepository {
   getMostPlayedTracks(limit: number): Promise<Track[]>;
   getTotalTracksCount(): Promise<number>;
   getNeverPlayedCount(): Promise<number>;
+  incrementPlayCount(id: string): Promise<void>;
 }
