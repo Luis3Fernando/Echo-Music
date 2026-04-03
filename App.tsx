@@ -3,12 +3,13 @@ import { View, StyleSheet, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { RootNavigator } from "@navigation/RootNavigator";
 import { navigationRef } from "@navigation/navigation-ref";
+import TrackPlayer from "react-native-track-player";
+import { ToastProvider } from "react-native-toast-notifications";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { appInitializerService } from "@services/app-initializer.service";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PlayerController } from "@features/player/screens";
 import LoadingScreen from "@features/onboarding/screens/LoadingScreen";
-import { ToastProvider } from "react-native-toast-notifications";
 import { Colors } from "@theme/colors";
 import { useAppConfigStore } from "@store/use-config.store";
 import { usePlayerStore } from "@store/use-player.store";
@@ -16,7 +17,9 @@ import { SqliteAppSettingsRepository } from "@repositories/sqlite-app-settings.r
 import { SqlitePlaybackQueueRepository } from "@repositories/sqlite-playback-queue.repository";
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { InitializeAppSettingsUseCase } from "@use-cases/settings/initialize-app-settings.use-case";
-import { GetQueueArtworksUseCase } from "@/application/use-cases/player/get-queue-artworks.use-case";
+import { GetQueueArtworksUseCase } from "@use-cases/player/get-queue-artworks.use-case";
+import { PlaybackService } from "@services/playback.service";
+import { TrackPlayerService } from "@services/track-player.service";
 
 const AppContent = () => {
   const db = useSQLiteContext();
@@ -29,6 +32,9 @@ const AppContent = () => {
     const initialize = async () => {
       try {
         await appInitializerService.init(db);
+
+        const playerService = new TrackPlayerService();
+        await playerService.setup();
 
         const settingsRepo = new SqliteAppSettingsRepository(db);
         const settingsUseCase = new InitializeAppSettingsUseCase(settingsRepo);
@@ -45,11 +51,15 @@ const AppContent = () => {
             setQueue(savedQueue);
 
             const artworksUseCase = new GetQueueArtworksUseCase(trackRepo);
-            const artworksMap = await artworksUseCase.execute(savedQueue.tracks);
+            const artworksMap = await artworksUseCase.execute(
+              savedQueue.tracks,
+            );
             setQueueArtworks(artworksMap);
 
             if (savedQueue.currentTrackId) {
-              const trackData = await trackRepo.findById(savedQueue.currentTrackId);
+              const trackData = await trackRepo.findById(
+                savedQueue.currentTrackId,
+              );
               setCurrentTrack(trackData);
             }
           }
@@ -78,6 +88,8 @@ const AppContent = () => {
     </View>
   );
 };
+
+TrackPlayer.registerPlaybackService(() => PlaybackService);
 
 export default function App() {
   return (
