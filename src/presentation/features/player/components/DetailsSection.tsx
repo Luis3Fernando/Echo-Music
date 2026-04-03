@@ -5,9 +5,9 @@ import AlbumCard from "./AlbumCard";
 
 const DetailsSection = () => (
   <View style={styles.detailsContainer}>
-    <LyricsCard />
+    {/* <LyricsCard />
     <ArtistCard />
-    <AlbumCard /> 
+    <AlbumCard />  */}
   </View>
 );
 

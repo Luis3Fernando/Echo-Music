@@ -61,7 +61,7 @@ export const usePlayerActions = () => {
 
       await TrackPlayer.skip(index);
       await playerService.resume();
-      setIsPlaying(true); // Sincronizamos estado al saltar
+      setIsPlaying(true);
     } catch (error) {
       console.error(error);
     } finally {
