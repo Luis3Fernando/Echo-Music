@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import Animated from "react-native-reanimated";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { usePlayerStore } from "@store/use-player.store";
 import { usePlayerActions } from "@/presentation/shared/hooks/use-player-actions.hook";
+import { usePlaybackState, State } from "react-native-track-player";
 
 interface MiniPlayerProps {
   animatedStyle: any;
@@ -12,9 +13,11 @@ interface MiniPlayerProps {
 
 const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
   const currentTrack = usePlayerStore((s) => s.currentTrack);
-  const isPlaying = usePlayerStore((s) => s.isPlaying);
-  const setIsPlaying = usePlayerStore((s) => s.setIsPlaying);
-  const { skipToNext, skipToPrevious } = usePlayerActions();
+  const { skipToNext, skipToPrevious, togglePlayPause } = usePlayerActions();
+  const playbackState = usePlaybackState();
+
+  const isPlaying = playbackState.state === State.Playing;
+  const isBuffering = playbackState.state === State.Buffering || playbackState.state === State.Loading;
 
   if (!currentTrack) return null;
 
@@ -42,15 +45,21 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
             <FontAwesome6 name="backward" size={18} color={Colors.black} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setIsPlaying(!isPlaying)}
+            onPress={togglePlayPause}
             style={styles.playBtnPrimary}
             activeOpacity={0.8}
+            disabled={isBuffering}
           >
-            <Ionicons 
-              name={isPlaying ? "pause-outline" : "play-outline"} 
-              size={22} 
-              color={Colors.white} 
-            />
+            {isBuffering ? (
+              <ActivityIndicator size="small" color={Colors.white} />
+            ) : (
+              <Ionicons 
+                name={isPlaying ? "pause-outline" : "play-outline"} 
+                size={22} 
+                color={Colors.white} 
+                style={{ marginLeft: isPlaying ? 0 : 2 }}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity onPress={skipToNext} activeOpacity={0.6}>
             <FontAwesome6 name="forward" size={18} color={Colors.black} />

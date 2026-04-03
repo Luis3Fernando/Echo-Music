@@ -6,6 +6,8 @@ import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { SkipTrackUseCase } from "@use-cases/player/skip-track.use-case";
 import { SetPlaybackQueueUseCase } from "@use-cases/player/set-playback-queue.use-case";
 import { GetQueueArtworksUseCase } from "@use-cases/player/get-queue-artworks.use-case";
+import { TrackPlayerService } from "@services/track-player.service";
+import TrackPlayer, { State } from "react-native-track-player";
 
 export const usePlayerActions = () => {
   const db = useSQLiteContext();
@@ -17,6 +19,20 @@ export const usePlayerActions = () => {
     setQueueArtworks
   } = usePlayerStore();
   const isProcessing = useRef(false);
+  const playerService = new TrackPlayerService();
+
+  const togglePlayPause = async () => {
+    try {
+      const state = await TrackPlayer.getPlaybackState();
+      if (state.state === State.Playing) {
+        await playerService.pause();
+      } else {
+        await playerService.resume();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const loadTrackMetadata = async (index: number, currentQueue = queue) => {
     if (!currentQueue) return;
@@ -26,7 +42,7 @@ export const usePlayerActions = () => {
       : currentQueue.tracks[index];
 
     const trackData = await trackRepo.findById(targetId);
-    setCurrentTrack(trackData);
+    if (trackData) setCurrentTrack(trackData);
   };
 
   const jumpToIndex = async (index: number) => {
@@ -39,7 +55,11 @@ export const usePlayerActions = () => {
       const queueRepo = new SqlitePlaybackQueueRepository(db);
       await queueRepo.updateCurrentIndex(index);
       await loadTrackMetadata(index);
+
+      await TrackPlayer.skip(index);
+      await playerService.resume();
     } catch (error) {
+      console.error(error);
     } finally {
       setTimeout(() => {
         isProcessing.current = false;
@@ -64,7 +84,7 @@ export const usePlayerActions = () => {
   };
 
   const playList = async (trackIds: string[], startIndex: number = 0, shuffle: boolean = false) => {
-    if (isProcessing.current) return;
+    if (isProcessing.current || trackIds.length === 0) return;
 
     isProcessing.current = true;
 
@@ -82,15 +102,25 @@ export const usePlayerActions = () => {
 
       setQueue(newQueue);
 
-      const [trackData, artworksMap] = await Promise.all([
-        trackRepo.findById(newQueue.currentTrackId!),
+      const actualTrackIds = newQueue.isShuffle ? newQueue.shuffledTracks : newQueue.tracks;
+      const fullTracksData = await Promise.all(
+        actualTrackIds.map(id => trackRepo.findById(id))
+      );
+      const validTracks = fullTracksData.filter((t): t is NonNullable<typeof t> => t !== null);
+
+      const [artworksMap] = await Promise.all([
         artworksUseCase.execute(newQueue.tracks)
       ]);
 
-      setCurrentTrack(trackData);
       setQueueArtworks(artworksMap);
+      if (validTracks[newQueue.currentIndex]) {
+        setCurrentTrack(validTracks[newQueue.currentIndex]);
+      }
       await queueRepo.save(newQueue);
+
+      await playerService.setQueue(validTracks, newQueue.currentIndex);
     } catch (error) {
+      console.error(error);
     } finally {
       isProcessing.current = false;
     }
@@ -99,5 +129,5 @@ export const usePlayerActions = () => {
   const skipToNext = () => handleSkip('next');
   const skipToPrevious = () => handleSkip('prev');
 
-  return { skipToNext, skipToPrevious, jumpToIndex, playList };
+  return { skipToNext, skipToPrevious, jumpToIndex, playList, togglePlayPause };
 };

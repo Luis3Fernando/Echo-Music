@@ -16,7 +16,7 @@ const PlayerSection = () => {
   const queue = usePlayerStore((s) => s.queue);
   const currentIndex = usePlayerStore((s) => s.queue?.currentIndex ?? 0);
   const queueArtworks = usePlayerStore((s) => s.queueArtworks);
-  const { skipToNext, skipToPrevious } = usePlayerActions();
+  const { skipToNext, skipToPrevious, togglePlayPause } = usePlayerActions();
 
   const activeIds = queue?.isShuffle ? queue.shuffledTracks : queue?.tracks || [];
 
@@ -66,6 +66,7 @@ const PlayerSection = () => {
       <PlayerControls 
         onNext={skipToNext} 
         onPrev={skipToPrevious} 
+        onPlayPause={togglePlayPause} 
       />
     </View>
   );

@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from '@/core/theme/colors';
+import { Colors } from '@theme/colors';
+import { usePlaybackState, State } from 'react-native-track-player';
 
 interface Props {
   onNext: () => void;
   onPrev: () => void;
+  onPlayPause: () => void;
 }
 
-const PlayerControls = ({ onNext, onPrev }: Props) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+const PlayerControls = ({ onNext, onPrev, onPlayPause }: Props) => {
+  const playbackState = usePlaybackState();
   const [isShuffleActive, setIsShuffleActive] = useState(false);
   const [isRepeatActive, setIsRepeatActive] = useState(false);
+
+  const isPlaying = playbackState.state === State.Playing;
+  const isBuffering = playbackState.state === State.Buffering || playbackState.state === State.Loading;
 
   return (
     <View style={styles.playbackControls}>
@@ -33,15 +38,20 @@ const PlayerControls = ({ onNext, onPrev }: Props) => {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.playButton} 
-        onPress={() => setIsPlaying(!isPlaying)}
+        onPress={onPlayPause}
         activeOpacity={0.9}
+        disabled={isBuffering}
       >
-        <Ionicons 
-          name={isPlaying ? "pause" : "play"} 
-          size={38} 
-          color="#000" 
-          style={{ marginLeft: isPlaying ? 0 : 4 }} 
-        />
+        {isBuffering ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <Ionicons 
+            name={isPlaying ? "pause" : "play"} 
+            size={38} 
+            color="#000" 
+            style={{ marginLeft: isPlaying ? 0 : 4 }} 
+          />
+        )}
       </TouchableOpacity>
       <TouchableOpacity onPress={onNext}>
         <Ionicons name="play-skip-forward-outline" size={32} color="#dfdfdf" />
