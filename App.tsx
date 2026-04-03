@@ -3,7 +3,6 @@ import { View, StyleSheet, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { RootNavigator } from "@navigation/RootNavigator";
 import { navigationRef } from "@navigation/navigation-ref";
-import TrackPlayer from "react-native-track-player";
 import { ToastProvider } from "react-native-toast-notifications";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { appInitializerService } from "@services/app-initializer.service";
@@ -18,7 +17,6 @@ import { SqlitePlaybackQueueRepository } from "@repositories/sqlite-playback-que
 import { SqliteTrackRepository } from "@repositories/sqlite-track.repository";
 import { InitializeAppSettingsUseCase } from "@use-cases/settings/initialize-app-settings.use-case";
 import { GetQueueArtworksUseCase } from "@use-cases/player/get-queue-artworks.use-case";
-import { PlaybackService } from "@services/playback.service";
 import { TrackPlayerService } from "@services/track-player.service";
 
 const AppContent = () => {
@@ -88,8 +86,6 @@ const AppContent = () => {
     </View>
   );
 };
-
-TrackPlayer.registerPlaybackService(() => PlaybackService);
 
 export default function App() {
   return (

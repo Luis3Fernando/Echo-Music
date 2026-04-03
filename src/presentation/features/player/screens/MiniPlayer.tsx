@@ -1,9 +1,16 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import Animated from "react-native-reanimated";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "@theme/colors";
 import { usePlayerStore } from "@store/use-player.store";
-import { usePlayerActions } from "@/presentation/shared/hooks/use-player-actions.hook";
+import { usePlayerActions } from "@hooks/use-player-actions.hook";
 import { usePlaybackState, State } from "react-native-track-player";
 
 interface MiniPlayerProps {
@@ -14,10 +21,10 @@ interface MiniPlayerProps {
 const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
   const currentTrack = usePlayerStore((s) => s.currentTrack);
   const { skipToNext, skipToPrevious, togglePlayPause } = usePlayerActions();
-  const playbackState = usePlaybackState();
-
-  const isPlaying = playbackState.state === State.Playing;
-  const isBuffering = playbackState.state === State.Buffering || playbackState.state === State.Loading;
+  const { state: playerState } = usePlaybackState();
+  const isPlaying = playerState === State.Playing;
+  const isBuffering =
+    playerState === State.Buffering || playerState === State.Loading;
 
   if (!currentTrack) return null;
 
@@ -26,8 +33,8 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
       <Animated.View style={[styles.cardContainer, animatedStyle]}>
         <Image
           source={
-            currentTrack.artworkUri 
-              ? { uri: currentTrack.artworkUri } 
+            currentTrack.artworkUri
+              ? { uri: currentTrack.artworkUri }
               : require("@assets/img/song_default.png")
           }
           style={styles.artwork}
@@ -53,10 +60,10 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
             {isBuffering ? (
               <ActivityIndicator size="small" color={Colors.white} />
             ) : (
-              <Ionicons 
-                name={isPlaying ? "pause-outline" : "play-outline"} 
-                size={22} 
-                color={Colors.white} 
+              <Ionicons
+                name={isPlaying ? "pause-outline" : "play-outline"}
+                size={22}
+                color={Colors.white}
                 style={{ marginLeft: isPlaying ? 0 : 2 }}
               />
             )}

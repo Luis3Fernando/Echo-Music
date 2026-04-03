@@ -1,24 +1,58 @@
-import TrackPlayer, { Capability, AppKilledPlaybackBehavior, RepeatMode } from 'react-native-track-player';
+import TrackPlayer, {
+  Capability,
+  AppKilledPlaybackBehavior,
+  RepeatMode,
+} from "react-native-track-player";
 import { IPlayerService } from "@interfaces-services/player.service";
 import { Track } from "@entities/track.entity";
 
 export class TrackPlayerService implements IPlayerService {
   async setup(): Promise<void> {
-    await TrackPlayer.setupPlayer();
-    await TrackPlayer.updateOptions({
-      android: {
-        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-      },
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.Stop,
-        Capability.SeekTo,
-      ],
-      compactCapabilities: [Capability.Play, Capability.Pause, Capability.SkipToNext],
-    });
+    let isSetup = false;
+
+    try {
+      await TrackPlayer.setupPlayer({
+        autoHandleInterruptions: true,
+      });
+      isSetup = true;
+      console.log("✅ [TrackPlayer] Motor inicializado desde cero.");
+    } catch (error) {
+      isSetup = true;
+      console.log("⚙️ [TrackPlayer] El motor ya estaba corriendo.");
+    }
+
+    if (isSetup) {
+      await TrackPlayer.updateOptions({
+        android: {
+          appKilledPlaybackBehavior:
+            AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+        },
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.Stop,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+        ],
+        notificationCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        color: 0xff5722,
+        forwardJumpInterval: 30,
+        backwardJumpInterval: 15,
+      });
+      console.log("✅ [TrackPlayer] Opciones y botones configurados.");
+    }
   }
 
   async play(track: Track): Promise<void> {
@@ -51,7 +85,7 @@ export class TrackPlayerService implements IPlayerService {
   }
 
   async setQueue(tracks: Track[], startIndex: number): Promise<void> {
-    const playlist = tracks.map(t => ({
+    const playlist = tracks.map((t) => ({
       id: t.id,
       url: t.url,
       title: t.title,
