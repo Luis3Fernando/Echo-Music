@@ -5,7 +5,6 @@ import Animated, { useSharedValue, useAnimatedStyle, interpolate, Extrapolation 
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
-import { usePlayerSync } from "@hooks/use-player-sync.hook";
 
 const MINI_PLAYER_HEIGHT = 70;
 
@@ -14,7 +13,7 @@ export const PlayerController = () => {
   const [currentRoute, setCurrentRoute] = useState<string>("");
   const animatedIndex = useSharedValue(0);
   const [gesturesEnabled, setGesturesEnabled] = useState(false);
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setGesturesEnabled(true);

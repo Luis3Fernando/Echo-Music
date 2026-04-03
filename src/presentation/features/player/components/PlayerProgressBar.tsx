@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Animated, {
   useSharedValue,
@@ -7,35 +7,54 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import TrackPlayer, { useProgress } from "react-native-track-player";
 import { Colors } from "@/core/theme/colors";
 
-interface Props {
-  currentTime: string;
-  duration: string;
-}
+const formatTime = (seconds: number) => {
+  if (isNaN(seconds) || seconds < 0) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+};
 
-const PlayerProgressBar = ({ currentTime, duration }: Props) => {
-  const [width, setWidth] = useState(0);
-  const progress = useSharedValue(0.45);
+const PlayerProgressBar = () => {
+  const { position, duration } = useProgress(250);
+
+  const trackWidth = useSharedValue(0);
+  const progress = useSharedValue(0);
   const isDragging = useSharedValue(false);
 
-  const handleSeekEnd = (value: number) => {
-    console.log(`Usuario soltó en: ${Math.round(value * 100)}%`);
+  useEffect(() => {
+    if (!isDragging.value && duration > 0) {
+      progress.value = position / duration;
+    }
+  }, [position, duration]);
+
+  const handleSeekEnd = async (sliderValue: number) => {
+    if (duration > 0) {
+      const seekPosition = sliderValue * duration;
+      await TrackPlayer.seekTo(seekPosition);
+    }
   };
 
   const gesture = Gesture.Pan()
+    .minDistance(0)
     .onBegin((event) => {
       isDragging.value = true;
-      const newValue = Math.max(0, Math.min(event.x / width, 1));
-      progress.value = newValue;
+      if (trackWidth.value > 0) {
+        progress.value = Math.max(0, Math.min(event.x / trackWidth.value, 1));
+      }
     })
     .onUpdate((event) => {
-      const newValue = Math.max(0, Math.min(event.x / width, 1));
-      progress.value = newValue;
+      if (trackWidth.value > 0) {
+        progress.value = Math.max(0, Math.min(event.x / trackWidth.value, 1));
+      }
     })
     .onEnd(() => {
-      isDragging.value = false;
       runOnJS(handleSeekEnd)(progress.value);
+    })
+    .onFinalize(() => {
+      isDragging.value = false;
     });
 
   const animatedFilledStyle = useAnimatedStyle(() => ({
@@ -52,7 +71,9 @@ const PlayerProgressBar = ({ currentTime, duration }: Props) => {
       <GestureDetector gesture={gesture}>
         <View
           style={styles.barArea}
-          onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+          onLayout={(e) => {
+            trackWidth.value = e.nativeEvent.layout.width;
+          }}
         >
           <View style={styles.backgroundBar}>
             <Animated.View style={[styles.filledBar, animatedFilledStyle]} />
@@ -60,9 +81,12 @@ const PlayerProgressBar = ({ currentTime, duration }: Props) => {
           </View>
         </View>
       </GestureDetector>
+      
       <View style={styles.timeRow}>
-        <Text style={styles.timeText}>{currentTime}</Text>
-        <Text style={styles.timeText}>{duration}</Text>
+        <Text style={styles.timeText}>
+          {formatTime(isDragging.value ? progress.value * duration : position)}
+        </Text>
+        <Text style={styles.timeText}>{formatTime(duration)}</Text>
       </View>
     </View>
   );

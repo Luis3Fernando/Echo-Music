@@ -18,7 +18,9 @@ const PlayerSection = () => {
   const queueArtworks = usePlayerStore((s) => s.queueArtworks);
   const { skipToNext, skipToPrevious, togglePlayPause } = usePlayerActions();
 
-  const activeIds = queue?.isShuffle ? queue.shuffledTracks : queue?.tracks || [];
+  const activeIds = queue?.isShuffle
+    ? queue.shuffledTracks
+    : queue?.tracks || [];
 
   useEffect(() => {
     if (activeIds.length > 0) {
@@ -62,26 +64,26 @@ const PlayerSection = () => {
         />
       </View>
       <PlayerInfo onArtistPress={() => console.log("Ir al artista")} />
-      <PlayerProgressBar currentTime="0:00" duration="0:00" />
-      <PlayerControls 
-        onNext={skipToNext} 
-        onPrev={skipToPrevious} 
-        onPlayPause={togglePlayPause} 
+      <PlayerProgressBar />
+      <PlayerControls
+        onNext={skipToNext}
+        onPrev={skipToPrevious}
+        onPlayPause={togglePlayPause}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  section: { 
-    flex: 1, 
-    alignItems: "center", 
-    width: "100%", 
-    marginTop: -10 
+  section: {
+    flex: 1,
+    alignItems: "center",
+    width: "100%",
+    marginTop: -10,
   },
-  carouselContainer: { 
-    height: 380, 
-    width: SCREEN_WIDTH 
+  carouselContainer: {
+    height: 380,
+    width: SCREEN_WIDTH,
   },
 });
 
