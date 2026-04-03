@@ -16,7 +16,8 @@ export const usePlayerActions = () => {
     updateIndex,
     setCurrentTrack,
     setQueue,
-    setQueueArtworks
+    setQueueArtworks,
+    setIsPlaying,
   } = usePlayerStore();
   const isProcessing = useRef(false);
   const playerService = new TrackPlayerService();
@@ -26,8 +27,10 @@ export const usePlayerActions = () => {
       const state = await TrackPlayer.getPlaybackState();
       if (state.state === State.Playing) {
         await playerService.pause();
+        setIsPlaying(false);
       } else {
         await playerService.resume();
+        setIsPlaying(true);
       }
     } catch (error) {
       console.error(error);
@@ -58,6 +61,7 @@ export const usePlayerActions = () => {
 
       await TrackPlayer.skip(index);
       await playerService.resume();
+      setIsPlaying(true); // Sincronizamos estado al saltar
     } catch (error) {
       console.error(error);
     } finally {
@@ -67,7 +71,7 @@ export const usePlayerActions = () => {
     }
   };
 
-  const handleSkip = async (direction: 'next' | 'prev') => {
+  const handleSkip = async (direction: "next" | "prev") => {
     if (!queue || queue.tracks.length === 0 || isProcessing.current) return;
 
     const skipUseCase = new SkipTrackUseCase();
@@ -75,15 +79,19 @@ export const usePlayerActions = () => {
       queue.currentIndex,
       queue.tracks.length,
       direction,
-      queue.repeatMode
+      queue.repeatMode,
     );
 
-    if (newIndex === queue.currentIndex && queue.repeatMode !== 'all') return;
+    if (newIndex === queue.currentIndex && queue.repeatMode !== "all") return;
 
     await jumpToIndex(newIndex);
   };
 
-  const playList = async (trackIds: string[], startIndex: number = 0, shuffle: boolean = false) => {
+  const playList = async (
+    trackIds: string[],
+    startIndex: number = 0,
+    shuffle: boolean = false,
+  ) => {
     if (isProcessing.current || trackIds.length === 0) return;
 
     isProcessing.current = true;
@@ -97,19 +105,23 @@ export const usePlayerActions = () => {
       const newQueue = setQueueUseCase.execute({
         tracks: trackIds,
         startIndex,
-        startWithShuffle: shuffle
+        startWithShuffle: shuffle,
       });
 
       setQueue(newQueue);
 
-      const actualTrackIds = newQueue.isShuffle ? newQueue.shuffledTracks : newQueue.tracks;
+      const actualTrackIds = newQueue.isShuffle
+        ? newQueue.shuffledTracks
+        : newQueue.tracks;
       const fullTracksData = await Promise.all(
-        actualTrackIds.map(id => trackRepo.findById(id))
+        actualTrackIds.map((id) => trackRepo.findById(id)),
       );
-      const validTracks = fullTracksData.filter((t): t is NonNullable<typeof t> => t !== null);
+      const validTracks = fullTracksData.filter(
+        (t): t is NonNullable<typeof t> => t !== null,
+      );
 
       const [artworksMap] = await Promise.all([
-        artworksUseCase.execute(newQueue.tracks)
+        artworksUseCase.execute(newQueue.tracks),
       ]);
 
       setQueueArtworks(artworksMap);
@@ -119,6 +131,7 @@ export const usePlayerActions = () => {
       await queueRepo.save(newQueue);
 
       await playerService.setQueue(validTracks, newQueue.currentIndex);
+      setIsPlaying(true);
     } catch (error) {
       console.error(error);
     } finally {
@@ -126,8 +139,8 @@ export const usePlayerActions = () => {
     }
   };
 
-  const skipToNext = () => handleSkip('next');
-  const skipToPrevious = () => handleSkip('prev');
+  const skipToNext = () => handleSkip("next");
+  const skipToPrevious = () => handleSkip("prev");
 
   return { skipToNext, skipToPrevious, jumpToIndex, playList, togglePlayPause };
 };

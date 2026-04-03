@@ -1,10 +1,21 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { View } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import Animated, { useSharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolation,
+} from "react-native-reanimated";
+import TrackPlayer, {
+  useTrackPlayerEvents,
+  Event,
+  State,
+} from "react-native-track-player";
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
+import { usePlayerStore } from "@/presentation/store/use-player.store";
 
 const MINI_PLAYER_HEIGHT = 70;
 
@@ -13,6 +24,13 @@ export const PlayerController = () => {
   const [currentRoute, setCurrentRoute] = useState<string>("");
   const animatedIndex = useSharedValue(0);
   const [gesturesEnabled, setGesturesEnabled] = useState(false);
+
+  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
+    if (event.type === Event.PlaybackState) {
+      const isPlaying = event.state === State.Playing;
+      usePlayerStore.getState().setIsPlaying(isPlaying);
+    }
+  });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -28,7 +46,7 @@ export const PlayerController = () => {
       bottomSheetRef.current?.expand();
     }, 10);
   }, []);
-  
+
   useEffect(() => {
     const initial = navigationRef.getCurrentRoute()?.name;
     if (initial) setCurrentRoute(initial);
@@ -44,8 +62,18 @@ export const PlayerController = () => {
   const miniPlayerStyle = useAnimatedStyle(() => {
     const isHidden = animatedIndex.value > 0.05;
     return {
-      opacity: interpolate(animatedIndex.value, [0, 0.05], [1, 0], Extrapolation.CLAMP),
-      height: interpolate(animatedIndex.value, [0, 0.1], [MINI_PLAYER_HEIGHT, 0], Extrapolation.CLAMP),
+      opacity: interpolate(
+        animatedIndex.value,
+        [0, 0.05],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
+      height: interpolate(
+        animatedIndex.value,
+        [0, 0.1],
+        [MINI_PLAYER_HEIGHT, 0],
+        Extrapolation.CLAMP,
+      ),
       display: isHidden ? "none" : "flex",
     };
   });
@@ -61,9 +89,9 @@ export const PlayerController = () => {
       animatedIndex={animatedIndex}
       handleComponent={null}
       backgroundStyle={{ backgroundColor: "#FFF" }}
-      enableContentPanningGesture={gesturesEnabled} 
+      enableContentPanningGesture={gesturesEnabled}
       enableHandlePanningGesture={true}
-      enablePanDownToClose={false} 
+      enablePanDownToClose={false}
     >
       <View style={{ flex: 1 }}>
         <Animated.View style={miniPlayerStyle}>

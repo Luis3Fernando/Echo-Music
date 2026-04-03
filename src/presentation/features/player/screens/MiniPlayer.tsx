@@ -20,11 +20,11 @@ interface MiniPlayerProps {
 
 const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
   const currentTrack = usePlayerStore((s) => s.currentTrack);
+  const isPlayingStore = usePlayerStore((s) => s.isPlaying);
   const { skipToNext, skipToPrevious, togglePlayPause } = usePlayerActions();
+  
   const { state: playerState } = usePlaybackState();
-  const isPlaying = playerState === State.Playing;
-  const isBuffering =
-    playerState === State.Buffering || playerState === State.Loading;
+  const isBuffering = playerState === State.Buffering || playerState === State.Loading;
 
   if (!currentTrack) return null;
 
@@ -61,10 +61,10 @@ const MiniPlayer = ({ animatedStyle, onExpand }: MiniPlayerProps) => {
               <ActivityIndicator size="small" color={Colors.white} />
             ) : (
               <Ionicons
-                name={isPlaying ? "pause-outline" : "play-outline"}
+                name={isPlayingStore ? "pause-outline" : "play-outline"}
                 size={22}
                 color={Colors.white}
-                style={{ marginLeft: isPlaying ? 0 : 2 }}
+                style={{ marginLeft: isPlayingStore ? 0 : 2 }}
               />
             )}
           </TouchableOpacity>

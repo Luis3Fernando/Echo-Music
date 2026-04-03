@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from '@theme/colors';
-import { usePlaybackState, State } from 'react-native-track-player';
+import { usePlaybackState, State } from "react-native-track-player";
+import { usePlayerStore } from "@/presentation/store/use-player.store";
 
 interface Props {
   onNext: () => void;
@@ -11,64 +15,47 @@ interface Props {
 }
 
 const PlayerControls = ({ onNext, onPrev, onPlayPause }: Props) => {
+  const isPlaying = usePlayerStore((s) => s.isPlaying);
   const playbackState = usePlaybackState();
-  const [isShuffleActive, setIsShuffleActive] = useState(false);
-  const [isRepeatActive, setIsRepeatActive] = useState(false);
-
-  const isPlaying = playbackState.state === State.Playing;
-  const isBuffering = playbackState.state === State.Buffering || playbackState.state === State.Loading;
+  const isBuffering =
+    playbackState.state === State.Buffering ||
+    playbackState.state === State.Loading;
 
   return (
     <View style={styles.playbackControls}>
-      <TouchableOpacity 
-        onPress={() => {
-          setIsShuffleActive(!isShuffleActive);
-          console.log("Shuffle:", !isShuffleActive);
-        }}
-        activeOpacity={0.7}
-      >
-        <Ionicons 
-          name="shuffle-outline" 
-          size={24} 
-          color={isShuffleActive ? Colors.secondary : "#A0A0A0"} 
-        />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onPrev}>
+      {/* <TouchableOpacity activeOpacity={0.7}>
+        <Ionicons name="shuffle-outline" size={24} color="#A0A0A0" />
+      </TouchableOpacity> 
+      */}
+      <View style={{ width: 24 }} />
+      <TouchableOpacity onPress={onPrev} activeOpacity={0.7}>
         <Ionicons name="play-skip-back-outline" size={32} color="#dfdfdf" />
       </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.playButton} 
+      <TouchableOpacity
+        style={styles.playButton}
         onPress={onPlayPause}
-        activeOpacity={0.9}
+        activeOpacity={0.8}
         disabled={isBuffering}
       >
         {isBuffering ? (
           <ActivityIndicator size="large" color="#000" />
         ) : (
-          <Ionicons 
-            name={isPlaying ? "pause" : "play"} 
-            size={38} 
-            color="#000" 
-            style={{ marginLeft: isPlaying ? 0 : 4 }} 
+          <Ionicons
+            name={isPlaying ? "pause" : "play"}
+            size={38}
+            color="#000"
+            style={{ marginLeft: isPlaying ? 0 : 4 }}
           />
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={onNext}>
+      <TouchableOpacity onPress={onNext} activeOpacity={0.7}>
         <Ionicons name="play-skip-forward-outline" size={32} color="#dfdfdf" />
       </TouchableOpacity>
-      <TouchableOpacity 
-        onPress={() => {
-          setIsRepeatActive(!isRepeatActive);
-          console.log("Repeat:", !isRepeatActive);
-        }}
-        activeOpacity={0.7}
-      >
-        <Ionicons 
-          name="repeat-outline" 
-          size={24} 
-          color={isRepeatActive ? Colors.secondary : "#A0A0A0"} 
-        />
-      </TouchableOpacity>
+      {/* <TouchableOpacity activeOpacity={0.7}>
+        <Ionicons name="repeat-outline" size={24} color="#A0A0A0" />
+      </TouchableOpacity> 
+      */}
+      <View style={{ width: 24 }} />
     </View>
   );
 };
