@@ -57,11 +57,16 @@ const SettingsMenuScreen = () => {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.profileSection}>
-          <View style={styles.logoContainer}></View>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("@assets/icon/app-logo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
           <Text style={styles.appName}>{APP_INFO.NAME}</Text>
           <Text style={styles.appVersion}>{APP_INFO.VERSION}</Text>
         </View>
-
         <Text style={styles.sectionLabel}>Reproductor</Text>
         <View style={styles.card}>
           <SettingOption
@@ -84,7 +89,6 @@ const SettingsMenuScreen = () => {
             }
           />
         </View>
-
         <Text style={styles.sectionLabel}>Sobre la app</Text>
         <View style={styles.card}>
           <View style={styles.sysariSection}>
@@ -174,6 +178,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
+    overflow: "hidden",
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   appName: {
     fontSize: 26,

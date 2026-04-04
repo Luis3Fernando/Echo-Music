@@ -22,14 +22,14 @@ const ExploreScreen = () => {
   const db = useSQLiteContext();
   const navigation = useNavigation<any>();
   const [mostPlayed, setMostPlayed] = useState<Track[]>([]);
-
+ 
   const { recommendedTracks } = useRecommendations();
   const { recentAlbums, topCountAlbums, mostLikedAlbums } = useHomeAlbums();
   const { topTrackArtists, likedArtists, topPlayedArtists } = useHomeArtists();
 
   const { getMostPlayedTracks, findAll } = useTrack();
   const { playList } = usePlayerActions();
-
+ 
   useEffect(() => {
     const loadTopTracks = async () => {
       const tracks = await getMostPlayedTracks(8);

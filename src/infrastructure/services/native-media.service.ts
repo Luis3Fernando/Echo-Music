@@ -9,14 +9,13 @@ export const nativeMediaService = {
 
     const media = await MediaLibrary.getAssetsAsync({
       mediaType: "audio",
-      first: 10,
+      first: 500,
     });
 
     const filteredAssets = media.assets.filter((asset) => {
       const durationSeconds = asset.duration || 0;
       return durationSeconds >= 30;
     });
-
     return filteredAssets;
   },
 };
