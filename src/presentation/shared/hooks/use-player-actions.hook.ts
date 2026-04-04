@@ -37,15 +37,20 @@ export const usePlayerActions = () => {
     }
   };
 
-  const loadTrackMetadata = async (index: number, currentQueue = queue) => {
-    if (!currentQueue) return;
+  const loadTrackMetadata = async (index: number) => {
+    const freshQueue = usePlayerStore.getState().queue;
+
+    if (!freshQueue) return;
+
     const trackRepo = new SqliteTrackRepository(db);
-    const targetId = currentQueue.isShuffle
-      ? currentQueue.shuffledTracks[index]
-      : currentQueue.tracks[index];
+    const targetId = freshQueue.isShuffle
+      ? freshQueue.shuffledTracks[index]
+      : freshQueue.tracks[index];
 
     const trackData = await trackRepo.findById(targetId);
-    if (trackData) setCurrentTrack(trackData);
+    if (trackData) {
+      usePlayerStore.getState().setCurrentTrack(trackData);
+    }
   };
 
   const jumpToIndex = async (index: number) => {
@@ -142,5 +147,12 @@ export const usePlayerActions = () => {
   const skipToNext = () => handleSkip("next");
   const skipToPrevious = () => handleSkip("prev");
 
-  return { skipToNext, skipToPrevious, jumpToIndex, playList, togglePlayPause };
+  return {
+    skipToNext,
+    skipToPrevious,
+    jumpToIndex,
+    playList,
+    togglePlayPause,
+    loadTrackMetadata,
+  };
 };

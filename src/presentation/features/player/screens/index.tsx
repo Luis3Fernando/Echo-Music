@@ -15,21 +15,40 @@ import TrackPlayer, {
 import { navigationRef } from "@navigation/navigation-ref";
 import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
-import { usePlayerStore } from "@/presentation/store/use-player.store";
+import { usePlayerStore } from "@store/use-player.store";
 import { TrackProgressTracker } from "../components/TrackProgressTracker";
+import { useTrackPlayerSync } from "@hooks/use-track-player-sync.hook";
+import { SqliteTrackRepository } from "@/infrastructure/repositories/sqlite-track.repository";
+import { useSQLiteContext } from "expo-sqlite";
 
 const MINI_PLAYER_HEIGHT = 70;
 
 export const PlayerController = () => {
+  useTrackPlayerSync();
+  const db = useSQLiteContext();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentRoute, setCurrentRoute] = useState<string>("");
   const animatedIndex = useSharedValue(0);
   const [gesturesEnabled, setGesturesEnabled] = useState(false);
+  
+  useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async (event) => {
+    if (event.type === Event.PlaybackActiveTrackChanged && event.index != null) {
 
-  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
-    if (event.type === Event.PlaybackState) {
-      const isPlaying = event.state === State.Playing;
-      usePlayerStore.getState().setIsPlaying(isPlaying);
+      const store = usePlayerStore.getState();
+      const freshQueue = store.queue;
+
+      if (!freshQueue) return;
+      store.updateIndex(event.index);
+
+      const targetId = freshQueue.isShuffle
+        ? freshQueue.shuffledTracks[event.index]
+        : freshQueue.tracks[event.index];
+      const trackRepo = new SqliteTrackRepository(db);
+      const newTrackData = await trackRepo.findById(targetId);
+
+      if (newTrackData) {
+        store.setCurrentTrack(newTrackData);
+      }
     }
   });
 

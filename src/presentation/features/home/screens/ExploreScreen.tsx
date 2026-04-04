@@ -97,7 +97,7 @@ const ExploreScreen = () => {
       <LibraryStatsSection />
       <View style={{ height: 40 }} />
     </ScrollView>
-  );
+  ); 
 };
 
 export default ExploreScreen;

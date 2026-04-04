@@ -15,10 +15,8 @@ export class TrackPlayerService implements IPlayerService {
         autoHandleInterruptions: true,
       });
       isSetup = true;
-      console.log("✅ [TrackPlayer] Motor inicializado desde cero.");
     } catch (error) {
       isSetup = true;
-      console.log("⚙️ [TrackPlayer] El motor ya estaba corriendo.");
     }
 
     if (isSetup) {
@@ -51,7 +49,6 @@ export class TrackPlayerService implements IPlayerService {
         forwardJumpInterval: 30,
         backwardJumpInterval: 15,
       });
-      console.log("✅ [TrackPlayer] Opciones y botones configurados.");
     }
   }
 
