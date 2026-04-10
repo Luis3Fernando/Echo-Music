@@ -1,7 +1,7 @@
 # Echo Music
 
 <div align="center">
-  <img src="assets/screenshots/echomusic_logo.png" alt="Echo Music Logo" width="150"/>
+  <img src="assets/screenshots/echomusic-logo.png" alt="Echo Music Logo" width="150"/>
   <br />
   
   ![Status](https://img.shields.io/badge/status-development-372add) 
