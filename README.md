@@ -32,13 +32,11 @@
 ### **English**
 - **Clean Architecture:** Domain-driven design with strict separation of concerns (Application, Domain, Infrastructure, Presentation).
 - **Native Synchronization:** Advanced integration with `react-native-track-player` for precise playback control and dynamic queues.
-- **High-Performance UI:** Modern interface with 60fps animations using `React Native Reanimated` and complex gestures.
 - **Smart Persistence:** Indexed local media recovery using `expo-sqlite` for instant access to thousands of tracks.
 
 ### **Español**
 - **Arquitectura Limpia:** Diseño orientado al dominio con separación estricta de capas (Aplicación, Dominio, Infraestructura, Presentación).
 - **Sincronización Nativa:** Integración avanzada con `react-native-track-player` para control preciso y colas dinámicas.
-- **UI de Alto Rendimiento:** Interfaz moderna con animaciones a 60fps usando `React Native Reanimated` y gestos complejos.
 - **Persistencia Inteligente:** Recuperación indexada de medios locales mediante `expo-sqlite` para acceso instantáneo.
 
 ---
