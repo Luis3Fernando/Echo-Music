@@ -1,7 +1,11 @@
 # Echo Music
 
 <div align="center">
-  <img src="./screenshots/echomusic-logo.png" alt="Echo Music Logo" width="100" style="border-radius: 20px; border: 2px solid #372add;"/>
+  <div align="center">
+  <kbd>
+    <img src="assets/screenshots/echomusic_logo.png" alt="Echo Music Logo" width="100"/>
+  </kbd>
+</div>
   <br />
   
   ![Status](https://img.shields.io/badge/status-development-372add) 
