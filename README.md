@@ -1,7 +1,7 @@
 # Echo Music
 
 <div align="center">
-  <img src="./screenshots/echomusic-logo.png" alt="Echo Music Logo" width="150"/>
+  <img src="./screenshots/echomusic-logo.png" alt="Echo Music Logo" width="100"/>
   <br />
   
   ![Status](https://img.shields.io/badge/status-development-372add) 
@@ -52,3 +52,12 @@ src/
 ├── domain/          # Entities, repository interfaces, and value objects
 ├── infrastructure/  # API, persistence (SQLite), and native service implementations
 └── presentation/    # UI components (features, navigation, shared, store/Zustand)
+
+## 🛠️ Technologies / Tecnologías
+
+- **React Native / Expo** (SDK 50+)
+- **TypeScript** (Strong typing)
+- **Zustand** (State management)
+- **React Native Reanimated** (Fluid UI)
+- **SQLite** (Local indexing)
+- **React Native Track Player** (Native audio engine)
