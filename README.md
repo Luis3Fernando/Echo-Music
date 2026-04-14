@@ -81,3 +81,21 @@ const media = await MediaLibrary.getAssetsAsync({
 });
 ```
 
+## 📸 Screenshots / Capturas
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><b>Library</b><br><img src="assets/screenshots/s1.jpg" width="220"/></td>
+      <td align="center"><b>Player</b><br><img src="assets/screenshots/s2.jpg" width="220"/></td>
+      <td align="center"><b>Playlists</b><br><img src="assets/screenshots/s3.jpg" width="220"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Artists</b><br><img src="assets/screenshots/s4.jpg" width="220"/></td>
+      <td align="center"><b>Albums</b><br><img src="assets/screenshots/s5.jpg" width="220"/></td>
+      <td align="center"><b>Settings</b><br><img src="assets/screenshots/s6.jpg" width="220"/></td>
+    </tr>
+  </table>
+  <br />
+  <sub>Full gallery (s1 to s12) available in the <code>assets/screenshots/</code> folder.</sub>
+</div>
