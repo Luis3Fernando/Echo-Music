@@ -3,7 +3,7 @@
 <div align="center">
   <div align="center">
   <kbd>
-    <img src="assets/screenshots/echomusic_logo.png" alt="Echo Music Logo" width="100"/>
+    <img src="./screenshots/echomusic-logo.png" alt="Echo Music Logo" width="100"/>
   </kbd>
 </div>
   <br />
