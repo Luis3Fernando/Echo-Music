@@ -99,3 +99,31 @@ const media = await MediaLibrary.getAssetsAsync({
   <br />
   <sub>Full gallery (s1 to s12) available in the <code>./screenshots/</code> folder.</sub>
 </div>
+
+---
+
+## 🛠️ Installation / Instalación
+
+Follow these steps to set up the project locally:  
+*Sigue estos pasos para configurar el proyecto localmente:*
+
+### 1️⃣ Clone the repository / Clonar el repositorio
+```bash
+git clone [https://github.com/Luis3Fernando/EchoMusic](https://github.com/Luis3Fernando/EchoMusic)
+cd EchoMusic
+```
+### 2️⃣ Install dependencies / Instalar dependencias
+```bash
+npm install
+# or / o
+yarn install
+```
+### 3️⃣ Configure Permissions (Optional) / Configurar Permisos
+Make sure your device/emulator has media reading permissions enabled for Expo Media Library.
+
+Asegúrate de que tu dispositivo o emulador tenga habilitados los permisos de lectura para Expo Media Library.
+
+### 4️⃣ Start the project / Iniciar el proyecto
+```bash
+npx expo start
+```
