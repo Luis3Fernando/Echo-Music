@@ -52,6 +52,7 @@ src/
 ├── domain/          # Entities, repository interfaces, and value objects
 ├── infrastructure/  # API, persistence (SQLite), and native service implementations
 └── presentation/    # UI components (features, navigation, shared, store/Zustand)
+```
 
 ## 🛠️ Technologies / Tecnologías
 
