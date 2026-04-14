@@ -92,7 +92,7 @@ const media = await MediaLibrary.getAssetsAsync({
     <tr>
       <td align="center"><b>Library</b><br><img src="./screenshots/s1.jpg" width="220"/></td>
       <td align="center"><b>Artists</b><br><img src="./screenshots/s2.jpg" width="220"/></td>
-      <td align="center"><b>Playlists</b><br><img src="./screenshots/s3.jpg" width="220"/></td>
+      <td align="center"><b>Playlists</b><br><img src="./screenshots/s10.jpg" width="220"/></td>
     </tr>
     <tr>
       <td align="center"><b>Artists</b><br><img src="./screenshots/s4.jpg" width="220"/></td>
