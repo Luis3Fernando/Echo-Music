@@ -26,7 +26,6 @@
 <div align="center">
   <img src="./screenshots/banner.jpg" alt="Echo Music Banner" width="100%"/>
   <br />
-  <i>(Gif preview coming soon / Vista previa en GIF próximamente)</i>
 </div>
 
 ---
