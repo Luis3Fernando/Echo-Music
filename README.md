@@ -127,3 +127,24 @@ Asegúrate de que tu dispositivo o emulador tenga habilitados los permisos de le
 ```bash
 npx expo start
 ```
+---
+
+## 🚧 Project Status / Estado del Proyecto
+
+<div align="center">
+  <img src="https://img.shields.io/badge/status-in--development-FFD700?style=for-the-badge&logo=github" alt="Development Status" />
+</div>
+
+### **English**
+This project is currently in **active development**. While the core architecture and audio engine are stable, we are continuously working on:
+- UI/UX refinements and micro-interactions.
+- Performance optimizations for massive local libraries.
+- Advanced synchronization for lyrics and metadata.
+
+### **Español**
+Este proyecto se encuentra actualmente en **desarrollo activo**. Aunque la arquitectura base y el motor de audio son estables, seguimos trabajando en:
+- Refinamiento de la UI/UX y micro-interacciones.
+- Optimizaciones de rendimiento para librerías locales masivas.
+- Sincronización avanzada de letras y metadatos.
+
+---
