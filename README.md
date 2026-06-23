@@ -17,7 +17,7 @@
 
   ---
 
-  **Echo Music** es un reproductor de audio móvil de alto rendimiento y grado profesional construido con React Native. Diseñado bajo los principios de Clean Architecture para garantizar escalabilidad y un rendimiento ultra fluido.
+  **Echo Music** es un reproductor de audio móvil profesional construido con React Native. Diseñado bajo los principios de Clean Architecture para garantizar escalabilidad y un rendimiento ultra fluido.
 </div>
 
 ---
