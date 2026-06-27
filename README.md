@@ -71,9 +71,9 @@ src/
 ## ⚠️ Technical Note: Performance / Nota Técnica: Rendimiento
 
 > [!IMPORTANT]
-> **Performance Optimization:** To ensure a smooth experience on devices with large libraries, the service is configured to fetch media in limited batches.
+> **Performance optimization:** To ensure a smooth experience on devices with large libraries, the service is configured to fetch media in limited batches.
 >
-> **Optimización de Rendimiento:** Para asegurar una experiencia fluida en dispositivos con librerías extensas, el servicio está configurado para obtener los archivos en lotes limitados:
+> **Optimización de rendimiento:** Para asegurar una experiencia fluida en dispositivos con librerías extensas, el servicio está configurado para obtener los archivos en lotes limitados:
 
 ```typescript
 // src/infrastructure/services/native-media.service.ts
